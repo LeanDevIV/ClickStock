@@ -1,0 +1,30 @@
+.integrante-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 20px;
+}
+
+.integrante-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.integrante-img {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  padding: 2px;
+  transition: transform 0.4s ease;
+}
+
+.integrante-card:hover .integrante-img {
+  transform: scale(1.05) rotate(-2deg);
+}
+
+.social-icons a {
+  transition: transform 0.4s ease, color 0.3s ease;
+}
+
+.social-icons a:hover {
+  transform: scale(1.2);
+  color: #0d6efd !important;
+}
