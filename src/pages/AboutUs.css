@@ -1,18 +1,38 @@
+.about-section {
+  width: 100%;
+  background-color: #F5F5F5; /* o el color que combine con tu diseño */
+  padding: 60px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Centrar el texto y limitar ancho del párrafo */
+.about-section p {
+  max-width: 800px;
+  margin: 0 auto;
+  color: #212529;
+}
+
+/* Mantener las cards centradas y adaptables */
 .integrante-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: white;
   border-radius: 20px;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  text-align: center;
 }
 
 .integrante-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* Ajustar las imágenes */
 .integrante-img {
-  width: 130px;
-  height: 130px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
-  padding: 2px;
+  border: 3px solid #D4AF37;
   transition: transform 0.4s ease;
 }
 
@@ -20,11 +40,13 @@
   transform: scale(1.05) rotate(-2deg);
 }
 
+/* Íconos sociales */
 .social-icons a {
   transition: transform 0.4s ease, color 0.3s ease;
+  color: #212529;
 }
 
 .social-icons a:hover {
   transform: scale(1.2);
-  color: #0d6efd !important;
+  color: #B91C1C !important;
 }

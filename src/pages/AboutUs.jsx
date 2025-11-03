@@ -36,7 +36,7 @@ const integrantes = [
 
 export default function AboutUs() {
   return (
-    <div className="container py-5 text-center">
+    <div className="container-fluid py-5 text-center about-section">
       <h1 className="mb-4 fw-bold">Quiénes Somos</h1>
       <p className="mb-5 text-muted mx-auto" style={{ maxWidth: "700px" }}>
         Somos un equipo de desarrolladores apasionados por la tecnología y el
