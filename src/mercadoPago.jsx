@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Container, Card, Spinner } from "react-bootstrap";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+import axios from "axios";
 
 const MercadoPago = () => {
   const [preferenceId, setPreferenceId] = useState(null);
@@ -14,27 +15,19 @@ const MercadoPago = () => {
     try {
       setLoadingPayment(true);
 
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:5000/api/payment/create_preference",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            items: [
-              { title: "Auriculares Bluetooth", cantidad: 1, precio: 25000 },
-              { title: "Teclado Mecánico RGB", cantidad: 1, precio: 45000 },
-              { title: "Mouse Gamer Inalámbrico", cantidad: 2, precio: 18000 },
-            ],
-            user: { email: "test_user@example.com" },
-            returnUrl: `${import.meta.env.VITE_FRONTEND_URL}/payments`,
-          }),
+          items: [
+            { title: "Auriculares Bluetooth", cantidad: 1, precio: 25000 },
+            { title: "Teclado Mecánico RGB", cantidad: 1, precio: 45000 },
+            { title: "Mouse Gamer Inalámbrico", cantidad: 2, precio: 18000 },
+          ],
+          user: { email: "test_user@example.com" },
+          returnUrl: `${import.meta.env.VITE_FRONTEND_URL}/payments`,
         }
       );
-
-      const data = await response.json();
-      setPreferenceId(data.id);
+      setPreferenceId(response.data.id);
     } catch (error) {
       console.error("Error creando preferencia:", error);
       alert("Ocurrió un error al generar el pago. Intenta nuevamente.");
