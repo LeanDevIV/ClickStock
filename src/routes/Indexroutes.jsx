@@ -7,6 +7,7 @@ import Admin from "../pages/Admin";
 import Error404 from "../pages/Error404";
 import Aboutus from "../pages/Aboutus";
 import Contact from "../pages/Contact";
+import MercadoPago from "../mercadoPago";
 
 function IndexRoutes() {
   return (
@@ -18,6 +19,9 @@ function IndexRoutes() {
         <Route path="/Admin" element={<Admin />} />
         <Route path="/Acerca" element={<Aboutus />} />
         <Route path="/Contacto" element={<Contact />} />
+        <Route path="/mp" element={<MercadoPago />} />
+        
+        
         </Route>
         <Route path="*" element={<Error404 />} />
     </Routes>
