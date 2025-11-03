@@ -12,7 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useScrollDirection } from "../hooks/useScrollDirection";
 import "./Header.css";
 
-const Header = () => {
+export const Header = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const showNavbar = useScrollDirection(10);
@@ -97,4 +97,3 @@ const Header = () => {
   );
 };
 
-export default Header;
