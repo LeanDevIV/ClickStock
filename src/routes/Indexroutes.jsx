@@ -7,21 +7,23 @@ import Admin from "../pages/Admin";
 import Error404 from "../pages/Error404";
 import Aboutus from "../pages/Aboutus";
 import Contact from "../pages/Contact";
+import RegistroLogin from "../pages/RegistroLogin";
 
 function IndexRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/Login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<RegistroLogin />} />
         <Route path="/Productos" element={<Products />} />
         <Route path="/Admin" element={<Admin />} />
         <Route path="/Acerca" element={<Aboutus />} />
         <Route path="/Contacto" element={<Contact />} />
-        </Route>
-        <Route path="*" element={<Error404 />} />
+      </Route>
+      <Route path="*" element={<Error404 />} />
     </Routes>
   );
-  }
+}
 
 export default IndexRoutes;
