@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useStore } from "../hooks/useStore.js";
+import { useStore } from "../hooks/useStore";
 
 const clientAxios = axios.create({
 
