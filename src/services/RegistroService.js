@@ -16,7 +16,12 @@ export async function registroService({
       emailUsuario,
       contrasenia,
     });
-    return data;
+
+    const usuario = data.usuario || null;
+    const token = data.token || (usuario && usuario.token) || null;
+    const msg = data.message || data.msg || null;
+
+    return { token, usuario, msg };
   } catch (error) {
     // Normalizar el error para que el componente lo muestre
     const mensaje =

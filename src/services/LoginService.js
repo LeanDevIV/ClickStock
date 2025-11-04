@@ -11,7 +11,12 @@ export async function loginService({ emailUsuario, contrasenia }) {
       emailUsuario,
       contrasenia,
     });
-    return data;
+    
+    const token = data.token;
+    const usuario = data.usuario || null;
+    const msg = data.message || data.msg || null;
+
+    return { token, usuario, msg };
   } catch (error) {
     const mensaje =
       error.response?.data?.msg || error.message || "Error en el login";

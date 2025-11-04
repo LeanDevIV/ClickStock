@@ -8,14 +8,19 @@ import {
   FormControl,
   NavDropdown,
 } from "react-bootstrap";
+import RegistroLogin from "../pages/RegistroLogin";
 import { Link, useNavigate } from "react-router-dom";
 import { useScrollDirection } from "../hooks/useScrollDirection";
 import "./Header.css";
 
 export const Header = () => {
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const showNavbar = useScrollDirection(10);
+
+  const handleOpenAuth = () => setShowAuthModal(true);
+  const handleCloseAuth = () => setShowAuthModal(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,6 +31,7 @@ export const Header = () => {
   };
 
   return (
+    <>
     <Navbar
       bg="light"
       expand="lg"
@@ -81,12 +87,11 @@ export const Header = () => {
               </NavDropdown.Item>
             </NavDropdown>
 
-            {/* Botón login */}
+            {/* Botón login -> abre modal */}
             <Button
-              as={Link}
-              to="/login"
               variant="primary"
               className="ms-2 px-4 fw-semibold rounded-pill"
+              onClick={handleOpenAuth}
             >
               Iniciar sesión
             </Button>
@@ -94,6 +99,9 @@ export const Header = () => {
         </Navbar.Collapse>
       </Container>
     </Navbar>
+
+    <RegistroLogin show={showAuthModal} onHide={handleCloseAuth} />
+    </>
   );
 };
 

@@ -3,8 +3,10 @@ import "./RegistroLogin.css";
 import { useStore } from "../hooks/useStore";
 import { registroService } from "../services/RegistroService";
 import { loginService } from "../services/LoginService";
+import { Modal, Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { PersonFill, KeyFill, EnvelopeFill, ArrowLeftCircleFill } from 'react-bootstrap-icons';
 
-function RegistroLogin() {
+function RegistroLogin({ show, onHide }) {
   const [modo, setModo] = useState("registro");
   const [formData, setFormData] = useState({
     nombreUsuario: "",
@@ -72,103 +74,121 @@ function RegistroLogin() {
   };
 
   return (
-    <div className="registro-login-container">
-      {modo === "registro" ? (
-        <>
-          <h2 className="registro-login-titulo">Registro de Usuario</h2>
-          <form className="registro-login-form" onSubmit={handleRegistro}>
-            <input
-              type="text"
-              name="nombreUsuario"
-              placeholder="Nombre completo"
-              value={formData.nombreUsuario}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="email"
-              name="emailUsuario"
-              placeholder="Correo electrónico"
-              value={formData.emailUsuario}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="password"
-              name="contrasenia"
-              placeholder="Contraseña"
-              value={formData.contrasenia}
-              onChange={handleChange}
-              required
-            />
-            <button
-              type="submit"
-              disabled={cargando}
-              className="registro-login-boton"
-            >
-              {cargando ? "Procesando..." : "Registrarse"}
-            </button>
-          </form>
+    <>
+      <Modal show={!!show} onHide={onHide} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{modo === "registro" ? "Registro de Usuario" : "Iniciar Sesión"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Container>
+            {mensaje && (
+              <Row className="mb-3">
+                <Col>
+                  <div className={`alert ${mensaje.includes("Error") ? "alert-danger" : "alert-success"}`}>
+                    {mensaje}
+                  </div>
+                </Col>
+              </Row>
+            )}
 
-          <p className="registro-login-mensaje">{mensaje}</p>
+            <Form onSubmit={modo === "registro" ? handleRegistro : handleLogin}>
+              {modo === "registro" && (
+                <Form.Group className="mb-3">
+                  <Form.Label>Nombre completo</Form.Label>
+                  <div className="input-group">
+                    <span className="input-group-text">
+                      <PersonFill />
+                    </span>
+                    <Form.Control
+                      type="text"
+                      name="nombreUsuario"
+                      value={formData.nombreUsuario}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </Form.Group>
+              )}
 
-          <div className="registro-login-cambio">
-            ¿Ya tienes una cuenta?{" "}
-            <a
-              onClick={() => {
-                setModo("login");
-                setMensaje("");
-              }}
-            >
-              Inicia sesión aquí
-            </a>
-          </div>
-        </>
-      ) : (
-        <>
-          <h2 className="registro-login-titulo">Iniciar Sesión</h2>
-          <form className="registro-login-form" onSubmit={handleLogin}>
-            <input
-              type="email"
-              name="emailUsuario"
-              placeholder="Correo electrónico"
-              value={formData.emailUsuario}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="password"
-              name="contrasenia"
-              placeholder="Contraseña"
-              value={formData.contrasenia}
-              onChange={handleChange}
-              required
-            />
-            <button
-              type="submit"
-              disabled={cargando}
-              className="registro-login-boton"
-            >
-              {cargando ? "Verificando..." : "Ingresar"}
-            </button>
-          </form>
+              <Form.Group className="mb-3">
+                <Form.Label>Correo electrónico</Form.Label>
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <EnvelopeFill />
+                  </span>
+                  <Form.Control
+                    type="email"
+                    name="emailUsuario"
+                    value={formData.emailUsuario}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </Form.Group>
 
-          <p className="registro-login-mensaje">{mensaje}</p>
+              <Form.Group className="mb-3">
+                <Form.Label>Contraseña</Form.Label>
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <KeyFill />
+                  </span>
+                  <Form.Control
+                    type="password"
+                    name="contrasenia"
+                    value={formData.contrasenia}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </Form.Group>
 
-          <div className="registro-login-cambio">
-            ¿No tienes cuenta?{" "}
-            <a
-              onClick={() => {
-                setModo("registro");
-                setMensaje("");
-              }}
-            >
-              Regístrate aquí
-            </a>
-          </div>
-        </>
-      )}
-    </div>
+              <div className="d-grid gap-2">
+                <Button 
+                  variant="primary" 
+                  type="submit" 
+                  disabled={cargando}
+                >
+                  {cargando 
+                    ? (modo === "registro" ? "Procesando..." : "Verificando...") 
+                    : (modo === "registro" ? "Registrarse" : "Ingresar")}
+                </Button>
+
+                {modo === "login" && (
+                  <Button 
+                    variant="link" 
+                    className="text-decoration-none"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      // Aquí iría la funcionalidad de recuperar contraseña
+                    }}
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </Button>
+                )}
+              </div>
+            </Form>
+
+            <Row className="mt-3">
+              <Col className="text-center">
+                <Button
+                  variant="link"
+                  className="text-decoration-none"
+                  onClick={() => {
+                    setModo(modo === "registro" ? "login" : "registro");
+                    setMensaje("");
+                  }}
+                >
+                  <ArrowLeftCircleFill className="me-2" />
+                  {modo === "registro" 
+                    ? "¿Ya tienes una cuenta? Inicia sesión aquí"
+                    : "¿No tienes cuenta? Regístrate aquí"}
+                </Button>
+              </Col>
+            </Row>
+          </Container>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 }
 
