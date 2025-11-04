@@ -9,7 +9,7 @@
 }
 
 /* Curva SVG superior */
-.footer::before {
+/* .footer::before {
   content: "";
   position: absolute;
   top: 0;
@@ -20,7 +20,7 @@
   background-size: cover;
   transform: translateY(-99%);
 
-}
+} */
 
 .footer h5 {
   color: #D4AF37;
@@ -74,7 +74,7 @@
   }
 
   .footer .row {
-    flex-direction: column;
+    align-self: center;
   }
 
   .footer h5 {
