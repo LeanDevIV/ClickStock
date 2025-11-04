@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
@@ -8,6 +8,7 @@ import Error404 from "../pages/Error404";
 import Aboutus from "../pages/Aboutus";
 import Contact from "../pages/Contact";
 import RegistroLogin from "../pages/RegistroLogin";
+import ProductDetail from "../pages/ProductDetail"; // 👈 Importa la nueva página
 
 function IndexRoutes() {
   return (
@@ -20,7 +21,10 @@ function IndexRoutes() {
         <Route path="/Admin" element={<Admin />} />
         <Route path="/Acerca" element={<Aboutus />} />
         <Route path="/Contacto" element={<Contact />} />
+        <Route path="/Producto/detalle" element={<ProductDetail />} />
       </Route>
+      <Route path="*" element={<Error404 />} />
+
       <Route path="*" element={<Error404 />} />
     </Routes>
   );

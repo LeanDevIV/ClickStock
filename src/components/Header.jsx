@@ -29,7 +29,7 @@ export const Header = () => {
     <Navbar
       bg="light"
       expand="lg"
-      className={`shadow-sm py-3 fixed-top navbar-transition ${
+      className={`shadow-sm py-3 sticky-top navbar-transition ${
         showNavbar ? "navbar-visible" : "navbar-hidden"
       }`}
     >
