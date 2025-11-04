@@ -28,23 +28,26 @@ El proyecto está desarrollado con tecnologías modernas de frontend y busca ofr
 - 💬 **Asistente virtual:** Chat con IA integrado para asistencia al usuario.  
 
 ---
-
 ## 🧩 Estructura del proyecto
 
+```bash
 click-stock-frontend/
+│
 ├── src/
-│ ├── assets/ # Recursos estáticos (imágenes, íconos, etc.)
-│ ├── components/ # Componentes reutilizables de UI
-│ ├── layouts/ # Estructuras base para distintas rutas
-│ ├── pages/ # Páginas principales de la app
-│ ├── services/ # Comunicación con la API (clientAxios)
-│ ├── store/ # Manejo de estado global (Zustand)
-│ ├── hooks/ # Hooks personalizados
-│ ├── utils/ # Funciones auxiliares
-│ └── main.jsx # Punto de entrada del proyecto
-├── .env # Variables de entorno
+│   ├── assets/           # Recursos estáticos (imágenes, íconos, etc.)
+│   ├── components/       # Componentes reutilizables de UI
+│   ├── layouts/          # Estructuras base para distintas rutas
+│   ├── pages/            # Páginas principales de la app
+│   ├── services/         # Comunicación con la API (clientAxios)
+│   ├── store/            # Manejo de estado global (Zustand)
+│   ├── hooks/            # Hooks personalizados
+│   ├── utils/            # Funciones auxiliares
+│   └── main.jsx          # Punto de entrada del proyecto
+│
+├── .env                  # Variables de entorno
 ├── package.json
 └── README.md
+
 
 ---
 
