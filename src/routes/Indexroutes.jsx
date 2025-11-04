@@ -9,6 +9,7 @@ import Aboutus from "../pages/Aboutus";
 import Contact from "../pages/Contact";
 import RegistroLogin from "../pages/RegistroLogin";
 import ProductDetail from "../pages/ProductDetail"; // 👈 Importa la nueva página
+import AdminProductos from "../pages/AdminProductos";
 
 function IndexRoutes() {
   return (
@@ -17,6 +18,8 @@ function IndexRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<RegistroLogin />} />
+        <Route path="/admin" element={<AdminProductos />} />
+        <Route path="/Login" element={<Login />} />
         <Route path="/Productos" element={<Products />} />
         <Route path="/Admin" element={<Admin />} />
         <Route path="/Acerca" element={<Aboutus />} />
