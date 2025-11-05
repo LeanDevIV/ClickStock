@@ -1,0 +1,154 @@
+.carousel-container {
+  width: 100%;
+  max-width: 1400px; /* AUMENTADO de 1200px a 1400px */
+  margin: 0 auto;
+  padding: 0; /* Eliminado padding para usar todo el ancho */
+}
+
+.carousel-wrapper {
+  position: relative;
+  border-radius: 0; /* Eliminado border-radius para bordes rectos */
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.slide-content {
+  position: relative;
+  height: 500px; /* AUMENTADO de 400px a 500px */
+  overflow: hidden;
+}
+
+.slide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease; /* REDUCIDO para transición más rápida */
+}
+
+.slide-content:hover .slide-image {
+  transform: scale(1.03); /* REDUCIDO el efecto hover */
+}
+
+.slide-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 25px 20px 20px;
+  transform: translateY(5px); /* REDUCIDO para animación más sutil */
+  opacity: 0;
+  transition: all 0.2s ease; /* REDUCIDO para transición más rápida */
+}
+
+.slide-content:hover .slide-overlay {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.slide-overlay h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.8rem; /* AUMENTADO ligeramente */
+  font-weight: bold;
+}
+
+.slide-overlay p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 1rem;
+}
+
+/* Barra de progreso personalizada */
+.custom-progress {
+  width: 100%;
+  height: 4px;
+  background: #ffffff;
+  position: absolute;
+  bottom: 60px;
+  left: 0;
+  z-index: 10;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ff0000, #eeff01);
+  transition: width 0.2s ease; /* REDUCIDO para transición más rápida */
+  border-radius: 2px;
+}
+
+/* Indicadores de progreso */
+.progress-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* AUMENTADO ligeramente */
+  padding: 20px;
+  background: white;
+}
+
+.progress-dot {
+  width: 10px; /* AUMENTADO ligeramente */
+  height: 10px; /* AUMENTADO ligeramente */
+  border-radius: 50%;
+  background: #d1d5db;
+  transition: all 0.2s ease; /* REDUCIDO para transición más rápida */
+}
+
+.progress-dot.active {
+  background: #ff0000;
+  transform: scale(1.3); /* AUMENTADO ligeramente */
+}
+
+.progress-dot.completed {
+  background: #e5ff00;
+}
+
+/* Estilos para los controles de Splide */
+.splide__arrow {
+  background: rgba(255, 255, 255, 0.9);
+  opacity: 0.7;
+  transition: all 0.2s ease; /* REDUCIDO para transición más rápida */
+  width: 40px; /* AUMENTADO ligeramente */
+  height: 40px; /* AUMENTADO ligeramente */
+}
+
+.splide__arrow:hover {
+  background: white;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.splide__arrow svg {
+  fill: #374151;
+  width: 20px; /* AUMENTADO ligeramente */
+  height: 20px; /* AUMENTADO ligeramente */
+}
+
+.splide__arrow--prev {
+  left: 20px; /* AUMENTADO para más margen */
+}
+
+.splide__arrow--next {
+  right: 20px; /* AUMENTADO para más margen */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .carousel-container {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+  
+  .slide-content {
+    height: 350px; /* Ajustado para mobile */
+  }
+  
+  .slide-overlay h3 {
+    font-size: 1.4rem;
+  }
+  
+  .slide-overlay p {
+    font-size: 0.9rem;
+  }
+}
