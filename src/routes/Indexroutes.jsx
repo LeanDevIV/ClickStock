@@ -7,6 +7,7 @@ import Admin from "../pages/Admin";
 import Error404 from "../pages/Error404";
 import Aboutus from "../pages/Aboutus";
 import Contact from "../pages/Contact";
+import PedidosList from "../components/PedidosList";
 
 function IndexRoutes() {
   return (
@@ -18,10 +19,11 @@ function IndexRoutes() {
         <Route path="/Admin" element={<Admin />} />
         <Route path="/Acerca" element={<Aboutus />} />
         <Route path="/Contacto" element={<Contact />} />
-        </Route>
-        <Route path="*" element={<Error404 />} />
+        <Route path="/pedidos" element={<PedidosList />} />
+      </Route>
+      <Route path="*" element={<Error404 />} />
     </Routes>
   );
-  }
+}
 
 export default IndexRoutes;
