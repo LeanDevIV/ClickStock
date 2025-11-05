@@ -6,6 +6,7 @@ function App() {
     <div>
       <AppRoutes />
       <FloatingChat />
+      <Footer />
     </div>
   );
 }

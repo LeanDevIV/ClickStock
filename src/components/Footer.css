@@ -1,0 +1,83 @@
+.footer {
+  background-color: #000000;
+  color: #F5F5F5;
+  position: relative;
+  overflow: hidden;
+  padding-top: 80px;
+  padding-bottom: 40px;
+  text-align: center;
+}
+
+/* Curva SVG superior */
+/* .footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url("../assets/footer-wave-top.svg") no-repeat top center;
+  background-size: cover;
+  transform: translateY(-99%);
+
+} */
+
+.footer h5 {
+  color: #D4AF37;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.footer ul {
+  padding: 0;
+  list-style: none;
+}
+
+.footer a {
+  color: #F5F5F5;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: #D4AF37;
+}
+
+/* Redes sociales */
+.social-icon {
+  font-size: 1.8rem;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.social-icon:hover {
+  color: #B91C1C;
+  transform: scale(1.2);
+}
+
+/* Línea divisoria */
+.footer-line {
+  border-color: #D4AF37;
+  opacity: 0.6;
+}
+
+/* Texto final */
+.footer p {
+  color: #F5F5F5;
+  font-size: 0.9rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .footer {
+    text-align: center;
+    padding-top: 60px;
+  }
+
+  .footer .row {
+    align-self: center;
+  }
+
+  .footer h5 {
+    margin-top: 1.5rem;
+  }
+}
