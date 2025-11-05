@@ -9,6 +9,7 @@ import {
   NavDropdown,
 } from "react-bootstrap";
 import RegistroLogin from "../pages/RegistroLogin";
+import { useStore } from "../hooks/useStore";
 import { Link, useNavigate } from "react-router-dom";
 import { useScrollDirection } from "../hooks/useScrollDirection";
 import "./Header.css";
@@ -28,6 +29,14 @@ export const Header = () => {
       navigate(`/buscar?query=${search}`);
       setSearch("");
     }
+  };
+
+  const user = useStore((state) => state.user);
+  const logout = useStore((state) => state.logout);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -58,6 +67,18 @@ export const Header = () => {
               Contacto
             </Nav.Link>
 
+            {/* Mostrar enlaces de admin sólo si hay user y es admin */}
+            {user?.rolUsuario === "admin" && (
+              <>
+                <Nav.Link as={Link} to="/admin/productos" className="mx-2 fw-medium text-danger">
+                  Admin Productos
+                </Nav.Link>
+                <Nav.Link as={Link} to="/admin/usuarios" className="mx-2 fw-medium text-danger">
+                  Admin Usuarios
+                </Nav.Link>
+              </>
+            )}
+
             {/* Buscador */}
             <Form className="d-flex mx-3" onSubmit={handleSubmit}>
               <FormControl
@@ -73,28 +94,32 @@ export const Header = () => {
               </Button>
             </Form>
 
-            {/* Dropdown cuenta */}
-            <NavDropdown title="Cuenta" id="basic-nav-dropdown" className="mx-2">
-              <NavDropdown.Item as={Link} to="/perfil">
-                Mi Perfil
-              </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/admin">
-                Panel Admin
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item as={Link} to="/logout">
-                Cerrar sesión
-              </NavDropdown.Item>
-            </NavDropdown>
-
-            {/* Botón login -> abre modal */}
-            <Button
-              variant="primary"
-              className="ms-2 px-4 fw-semibold rounded-pill"
-              onClick={handleOpenAuth}
-            >
-              Iniciar sesión
-            </Button>
+            {/* Si hay usuario: mostrar dropdown con perfil y logout. Si no hay: mostrar botón de login */}
+            {user ? (
+              <NavDropdown title={user.nombreUsuario || "Cuenta"} id="basic-nav-dropdown" className="mx-2">
+                <NavDropdown.Item as={Link} to="/perfil">
+                  Mi Perfil
+                </NavDropdown.Item>
+                {/* Mostrar Panel Admin solo para usuarios que NO sean admin (evita duplicado) */}
+                {user.rolUsuario !== "admin" && (
+                  <NavDropdown.Item as={Link} to="/admin">
+                    Panel Admin
+                  </NavDropdown.Item>
+                )}
+                <NavDropdown.Divider />
+                  <NavDropdown.Item onClick={handleLogout}>
+                    Cerrar sesión
+                  </NavDropdown.Item>
+              </NavDropdown>
+            ) : (
+              <Button
+                variant="primary"
+                className="ms-2 px-4 fw-semibold rounded-pill"
+                onClick={handleOpenAuth}
+              >
+                Iniciar sesión
+              </Button>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

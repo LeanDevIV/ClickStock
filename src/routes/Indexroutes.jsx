@@ -7,17 +7,25 @@ import AboutUs from "../pages/AboutUs";
 import Contact from "../pages/Contact";
 import AdminProductos from "../pages/AdminProductos";
 import ProductDetail from "../pages/ProductDetail";
+import AdminUsuarios from "../pages/AdminUsuarios";
+import AdminLayout from "../layouts/AdminLayout";
 
 function IndexRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/admin" element={<AdminProductos />} />
+        {/* Rutas públicas */}
         <Route path="/Productos" element={<Products />} />
         <Route path="/Acerca" element={<AboutUs />} />
         <Route path="/Contacto" element={<Contact />} />
         <Route path="/Producto/detalle" element={<ProductDetail />} />
+
+        {/* Rutas admin protegidas */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="productos" element={<AdminProductos />} />
+          <Route path="usuarios" element={<AdminUsuarios />} />
+        </Route>
       </Route>
       <Route path="*" element={<Error404 />} />
 
