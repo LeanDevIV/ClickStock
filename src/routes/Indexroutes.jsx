@@ -1,28 +1,21 @@
 import { Routes, Route } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
 import Home from "../pages/Home";
-import Login from "../pages/Login";
 import Products from "../pages/Products";
-import Admin from "../pages/Admin";
 import Error404 from "../pages/Error404";
-import Aboutus from "../pages/Aboutus";
+import AboutUs from "../pages/AboutUs";
 import Contact from "../pages/Contact";
-import RegistroLogin from "../pages/RegistroLogin";
-import ProductDetail from "../pages/ProductDetail"; // 👈 Importa la nueva página
 import AdminProductos from "../pages/AdminProductos";
+import ProductDetail from "../pages/ProductDetail";
 
 function IndexRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/registro" element={<RegistroLogin />} />
         <Route path="/admin" element={<AdminProductos />} />
-        <Route path="/Login" element={<Login />} />
         <Route path="/Productos" element={<Products />} />
-        <Route path="/Admin" element={<Admin />} />
-        <Route path="/Acerca" element={<Aboutus />} />
+        <Route path="/Acerca" element={<AboutUs />} />
         <Route path="/Contacto" element={<Contact />} />
         <Route path="/Producto/detalle" element={<ProductDetail />} />
       </Route>
