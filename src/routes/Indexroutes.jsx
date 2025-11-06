@@ -9,10 +9,10 @@ import ProductDetail from "../pages/ProductDetail";
 import AdminUsuarios from "../pages/AdminUsuarios";
 import AdminLayout from "../layouts/AdminLayout";
 
-function IndexRoutes() {
+function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
     <Routes>
-      <Route element={<MainLayout />}>
+      <Route element={<MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />}>
         <Route path="/" element={<Home />} />
         {/* Rutas públicas */}
         <Route path="/Acerca" element={<AboutUs />} />
