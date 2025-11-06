@@ -61,7 +61,9 @@ function RegistroLogin({ show, onHide }) {
     try {
       setCargando(true);
       const data = await loginService({ emailUsuario, contrasenia });
-      setMensaje(data.msg || `Bienvenido, ${data.nombre || "usuario"}`);
+      setMensaje(
+        data.msg || `Bienvenido, ${data.usuario?.nombreUsuario || "usuario"}`
+      );
       setFormData({ nombreUsuario: "", emailUsuario: "", contrasenia: "" });
       if (data.usuario || data.token) {
         useStore.getState().setUser(data.usuario, data.token);

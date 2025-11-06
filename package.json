@@ -10,7 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@mercadopago/sdk-react": "^1.0.6",
+    "@mui/icons-material": "^7.3.5",
+    "@mui/material": "^7.3.5",
     "aos": "^2.3.4",
     "axios": "^1.12.2",
     "bootstrap": "^5.3.8",

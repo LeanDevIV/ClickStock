@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import clientAxios from "../utils/clientAxios";
-
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
 function Products() {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,7 +41,13 @@ function Products() {
           <li>No hay productos disponibles.</li>
         )}
       </ul>
-      <section>Lista de productos se mostrará aquí.</section>
+      <section>
+        <Button variant="contained" color="primary">Agregar Producto</Button>
+        <TextField label="Nombre del producto" variant="outlined" />
+        <TextField label="Precio del producto" variant="outlined" />
+        <TextField label="Stock del producto" variant="outlined" />
+        <Button variant="contained" color="primary">Guardar Producto</Button>
+        </section>
       <section>Componente de pie de página</section>
     </>
   );
