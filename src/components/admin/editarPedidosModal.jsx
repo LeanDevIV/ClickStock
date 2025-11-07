@@ -121,7 +121,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
         total: calcularTotal()
       };
 
-      console.log('Actualizando pedido:', updateData);
+ 
 
       const response = await fetch(`http://localhost:5000/api/pedidos/${pedido._id}`, {
         method: 'PUT',

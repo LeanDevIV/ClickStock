@@ -34,72 +34,9 @@ import "../../css/tablaPedidos.css";
 const TablaPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState("");
   const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
   const [pedidoEditando, setPedidoEditando] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState("todos");
-
-  const pedidosMock = [
-    {
-      _id: "1",
-      usuario: {
-        nombreUsuario: "sofia_admin",
-        email: "sofia@clickstock.com",
-      },
-      productos: [
-        {
-          producto: { nombre: "Mouse Gamer 8600 DPI" },
-          cantidad: 3,
-          precioUnitario: 100,
-        },
-      ],
-      total: 300,
-      estado: "procesando",
-      direccionEnvio: "Dirección de ejemplo 123",
-      fechaCreacion: new Date().toISOString(),
-    },
-    {
-      _id: "2",
-      usuario: {
-        nombreUsuario: "carlos_cliente",
-        email: "carlos@example.com",
-      },
-      productos: [
-        {
-          producto: { nombre: "Teclado Mecánico RGB" },
-          cantidad: 1,
-          precioUnitario: 150,
-        },
-        {
-          producto: { nombre: 'Monitor 24"' },
-          cantidad: 1,
-          precioUnitario: 300,
-        },
-      ],
-      total: 450,
-      estado: "pendiente",
-      direccionEnvio: "Calle Principal 456",
-      fechaCreacion: new Date(Date.now() - 86400000).toISOString(),
-    },
-    {
-      _id: "3",
-      usuario: {
-        nombreUsuario: "ana_usuario",
-        email: "ana@example.com",
-      },
-      productos: [
-        {
-          producto: { nombre: "Auriculares Inalámbricos" },
-          cantidad: 2,
-          precioUnitario: 80,
-        },
-      ],
-      total: 160,
-      estado: "entregado",
-      direccionEnvio: "Av. Central 789",
-      fechaCreacion: new Date(Date.now() - 172800000).toISOString(),
-    },
-  ];
 
   const obtenerPedidos = async () => {
     try {
@@ -111,9 +48,8 @@ const TablaPedidos = () => {
       } else {
         throw new Error("Error del servidor");
       }
-    } catch (err) {
-      console.warn("Usando datos mock por error de conexión");
-      setPedidos(pedidosMock);
+    } catch (error) {
+      console.error("los pedidos no se cargaron");
     } finally {
       setCargando(false);
     }
@@ -124,31 +60,9 @@ const TablaPedidos = () => {
   }, []);
 
   const manejarPedidoCreado = (nuevoPedido) => {
-    const pedidoConId = {
-      ...nuevoPedido,
-      _id: Date.now().toString(),
-      fechaCreacion: new Date().toISOString(),
-    };
-    setPedidos([pedidoConId, ...pedidos]);
+    setPedidos([nuevoPedido, ...pedidos]);
     setModalCrearAbierto(false);
     alert("✅ Pedido creado exitosamente");
-  };
-
-  const manejarCambiarEstado = async (pedidoId, nuevoEstado) => {
-    try {
-      setPedidos(
-        pedidos.map((p) =>
-          p._id === pedidoId ? { ...p, estado: nuevoEstado } : p
-        )
-      );
-      await fetch(`http://localhost:5000/api/pedidos/${pedidoId}/estado`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estado: nuevoEstado }),
-      });
-    } catch (err) {
-      console.warn("Error al cambiar estado:", err);
-    }
   };
 
   const manejarEditarPedido = async (pedidoActualizado) => {
@@ -307,7 +221,7 @@ const TablaPedidos = () => {
                     Productos
                   </TableCell>
                   <TableCell className="tabla-celda-cabecera tabla-celda-productos">
-                   Direccion de Envio
+                    Direccion de Envio
                   </TableCell>
 
                   <TableCell className="tabla-celda-cabecera tabla-celda-total">
@@ -470,18 +384,18 @@ const TablaPedidos = () => {
       </Card>
 
       {/* Modales */}
-    <CrearPedidosModal
-  show={modalCrearAbierto}
-  onHide={() => setModalCrearAbierto(false)}
-  onPedidoCreado={manejarPedidoCreado}
-/>
+      <CrearPedidosModal
+        show={modalCrearAbierto}
+        onHide={() => setModalCrearAbierto(false)}
+        onPedidoCreado={manejarPedidoCreado}
+      />
 
-<EditarPedidosModal
-  show={!!pedidoEditando}
-  onHide={() => setPedidoEditando(null)}
-  pedido={pedidoEditando}
-  onPedidoEditado={manejarEditarPedido}
-/>
+      <EditarPedidosModal
+        show={!!pedidoEditando}
+        onHide={() => setPedidoEditando(null)}
+        pedido={pedidoEditando}
+        onPedidoEditado={manejarEditarPedido}
+      />
     </Box>
   );
 };

@@ -50,7 +50,6 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
       cargarUsuarios();
       cargarProductos();
       resetForm();
-      probarConexionBackend();
     }
   }, [show]);
 
@@ -61,126 +60,146 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
     setErrorProductos('');
   };
 
-  const probarConexionBackend = async () => {
-    try {
-      console.log('Probando conexión con el backend...');
-      
-      const response = await fetch('http://localhost:5000/api/pedidos', {
-        method: 'GET'
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Conexión exitosa. Pedidos existentes:', data);
-      } else {
-        console.error('❌ Error en la conexión:', response.status);
-      }
-    } catch (error) {
-      console.error('❌ No se pudo conectar al backend:', error);
-    }
-  };
-
- const cargarUsuarios = async () => {
+const cargarUsuarios = async () => {
   try {
     setCargandoUsuarios(true);
     setErrorUsuarios('');
+  
+    const authStorage = localStorage.getItem('auth-storage');
     
-    const response = await fetch('http://localhost:5000/api/usuarios');
+    if (!authStorage) {
+      throw new Error('No hay sesión activa. Inicia sesión primero.');
+    }
+    
+    let userData, token;
+    try {
+      const parsedStorage = JSON.parse(authStorage);
+      userData = parsedStorage.state?.user;
+      token = parsedStorage.state?.token;
+    
+    } catch (error) {
+      console.error('Error parseando auth-storage:', error);
+      throw new Error('Error al leer la sesión del usuario.');
+    }
+    
+    if (!userData || !token) {
+      throw new Error('No se encontraron datos de autenticación completos.');
+    }
+    
+    // HEADERS CON AUTORIZACIÓN
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+    
+    
+    // INTENTAR CARGAR USUARIOS REALES
+    const response = await fetch('http://localhost:5000/api/usuarios', {
+      method: 'GET',
+      headers: headers
+    });
+    
     
     if (response.status === 401) {
-      throw new Error('No autorizado. Usando datos de demostración.');
+      throw new Error('No autorizado. Tu sesión puede haber expirado.');
+    }
+    
+    if (response.status === 403) {
+      throw new Error('No tienes permisos para ver usuarios.');
     }
     
     if (!response.ok) {
-      throw new Error(`Error ${response.status}: No se pudieron cargar los usuarios`);
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
     
     const data = await response.json();
+
     
+    // Procesar datos
     let usuariosData = [];
     if (Array.isArray(data)) {
       usuariosData = data;
     } else if (data.usuarios && Array.isArray(data.usuarios)) {
       usuariosData = data.usuarios;
-    } else if (data.data && Array.isArray(data.data)) {
-      usuariosData = data.data;
     } else {
-      throw new Error('Formato de respuesta no válido');
+      console.warn('Formato de respuesta inesperado:', data);
+      usuariosData = [];
     }
     
-    console.log('✅ Usuarios REALES cargados:', usuariosData);
     setUsuarios(usuariosData);
     
+    if (usuariosData.length === 0) {
+      setErrorUsuarios('No se encontraron usuarios en el sistema');
+    }
+    
   } catch (error) {
-    console.error('Error cargando usuarios reales:', error);
+    console.error('❌ Error cargando usuarios:', error);
     setErrorUsuarios(error.message);
     
-    // Mock data con IDs que probablemente existan en tu BD
-    const usuariosMock = [
-      { _id: '6993e0beba8b631c1cedc99', nombreUsuario: 'admin', email: 'admin@clickstock.com' },
-      { _id: '6993e0beba8b631c1cedc9a', nombreUsuario: 'cliente1', email: 'cliente1@example.com' },
-      { _id: '6993e0beba8b631c1cedc9b', nombreUsuario: 'cliente2', email: 'cliente2@example.com' }
+    // Datos de ejemplo como fallback
+    const usuariosEjemplo = [
+      { _id: '690ba421dfa3a0a4c8bc8633', nombreUsuario: 'admin-test', email: 'test@example.com' },
+      { _id: 'usuario-2', nombreUsuario: 'Cliente Demo', email: 'cliente@ejemplo.com' }
     ];
-    setUsuarios(usuariosMock);
+    setUsuarios(usuariosEjemplo);
   } finally {
     setCargandoUsuarios(false);
   }
 };
 
-const cargarProductos = async () => {
-  try {
-    setCargandoProductos(true);
-    setErrorProductos('');
-    
-    const response = await fetch('http://localhost:5000/api/productos');
-    
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}: No se pudieron cargar los productos`);
-    }
-    
-    const data = await response.json();
-    
-    let productosData = [];
-    if (Array.isArray(data)) {
-      productosData = data;
-    } else if (data.productos && Array.isArray(data.productos)) {
-      productosData = data.productos;
-    } else if (data.data && Array.isArray(data.data)) {
-      productosData = data.data;
-    } else {
-      throw new Error('Formato de respuesta no válido');
-    }
-    
-    console.log('✅ Productos REALES cargados:', productosData);
-    setProductos(productosData);
-    
-  } catch (error) {
-    console.error('Error cargando productos reales:', error);
-    setErrorProductos('No se pudieron cargar los productos reales: ' + error.message);
-    
-    // Si falla, usa productos mock con IDs que coincidan con tu BD
-    const productosMock = [
-      { 
-        _id: '6993e0beba8b631c1cedc97', 
-        nombre: 'Mouse Gamer 8600 DPI', 
-        precio: 25999, 
-        stock: 36, 
-        descripcion: 'Mouse ergonómico con 7 botones programables.' 
-      },
-      { 
-        _id: '6993e0beba8b631c1cedc98', 
-        nombre: "Monitor 24' 144Hz", 
-        precio: 189999, 
-        stock: 3, 
-        descripcion: "Monitor Full HD con tasa de refresco de 144Hz." 
+  const cargarProductos = async () => {
+    try {
+      setCargandoProductos(true);
+      setErrorProductos('');
+      
+      const response = await fetch('http://localhost:5000/api/productos');
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: No se pudieron cargar los productos`);
       }
-    ];
-    setProductos(productosMock);
-    setErrorProductos('Usando datos de demostración con IDs reales');
-  } finally {
-    setCargandoProductos(false);
-  }
-};
+      
+      const data = await response.json();
+      
+      let productosData = [];
+      if (Array.isArray(data)) {
+        productosData = data;
+      } else if (data.productos && Array.isArray(data.productos)) {
+        productosData = data.productos;
+      } else if (data.data && Array.isArray(data.data)) {
+        productosData = data.data;
+      } else {
+        throw new Error('Formato de respuesta no válido');
+      }
+     
+      setProductos(productosData);
+      
+    } catch (error) {
+      console.error('Error cargando productos reales:', error);
+      setErrorProductos('No se pudieron cargar los productos reales: ' + error.message);
+      
+      // Si falla, usa productos mock con IDs que coincidan con tu BD
+      const productosMock = [
+        { 
+          _id: '6993e0beba8b631c1cedc97', 
+          nombre: 'Mouse Gamer 8600 DPI', 
+          precio: 25999, 
+          stock: 36, 
+          descripcion: 'Mouse ergonómico con 7 botones programables.' 
+        },
+        { 
+          _id: '6993e0beba8b631c1cedc98', 
+          nombre: "Monitor 24' 144Hz", 
+          precio: 189999, 
+          stock: 3, 
+          descripcion: "Monitor Full HD con tasa de refresco de 144Hz." 
+        }
+      ];
+      setProductos(productosMock);
+      setErrorProductos('Usando datos de demostración con IDs reales');
+    } finally {
+      setCargandoProductos(false);
+    }
+  };
 
   const agregarAlCarrito = (producto) => {
     if (producto.stock <= 0) {
@@ -235,66 +254,102 @@ const cargarProductos = async () => {
   const calcularTotal = () => {
     return carrito.reduce((total, item) => total + (item.precioUnitario * item.cantidad), 0);
   };
+const crearPedido = async () => {
+  if (!formData.usuarioId) {
+    alert('❌ Selecciona un cliente');
+    return;
+  }
 
-  const crearPedido = async () => {
-    if (!formData.usuarioId) {
-      alert('❌ Selecciona un cliente');
-      return;
+  if (carrito.length === 0) {
+    alert('❌ Agrega al menos un producto al carrito');
+    return;
+  }
+
+  if (!formData.direccionEnvio?.trim()) {
+    alert('❌ La dirección de envío es requerida');
+    return;
+  }
+
+  setCargando(true);
+  try {
+    const pedidoData = {
+      usuario: formData.usuarioId,
+      productos: carrito.map(item => ({
+        producto: item.producto._id,
+        cantidad: item.cantidad,
+        precioUnitario: item.precioUnitario // Asegurarnos de incluir el precio
+      })),
+      total: calcularTotal(),
+      direccion: formData.direccionEnvio.trim(),
+      estado: 'pendiente'
+    };
+
+
+    // OBTENER TOKEN DESDE auth-storage
+    const authStorage = localStorage.getItem('auth-storage');
+    if (!authStorage) {
+      throw new Error('No hay sesión activa. Inicia sesión primero.');
     }
 
-    if (carrito.length === 0) {
-      alert('❌ Agrega al menos un producto al carrito');
-      return;
+    const parsedStorage = JSON.parse(authStorage);
+    const token = parsedStorage.state?.token;
+
+    if (!token) {
+      throw new Error('No se encontró token de autenticación.');
     }
 
-    if (!formData.direccionEnvio?.trim()) {
-      alert('❌ La dirección de envío es requerida');
-      return;
-    }
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
 
-    setCargando(true);
+    const response = await fetch('http://localhost:5000/api/pedidos', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(pedidoData)
+    });
+
+    const responseText = await response.text();
+    let responseData;
+    
     try {
-      const pedidoData = {
-        usuario: formData.usuarioId,
-        productos: carrito.map(item => ({
-          producto: item.producto._id,
-          cantidad: item.cantidad
-        })),
-        total: calcularTotal(),
-        direccion: formData.direccionEnvio.trim(),
-        estado: 'pendiente'
-      };
-
-      console.log('Enviando pedido al backend:', pedidoData);
-
-      const response = await fetch('http://localhost:5000/api/pedidos', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(pedidoData)
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.error || `Error ${response.status}: ${response.statusText}`);
-      }
-
-      console.log('Pedido creado exitosamente:', responseData);
-      
-      onPedidoCreado(responseData.pedido || responseData);
-      alert('✅ Pedido creado exitosamente');
-      onHide();
-      
-    } catch (error) {
-      console.error('Error creando pedido:', error);
-      alert(`❌ Error al crear pedido: ${error.message}`);
-    } finally {
-      setCargando(false);
+      responseData = JSON.parse(responseText);
+    } catch (e) {
+      console.error('❌ La respuesta no es JSON válido:', responseText);
+      throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
     }
-  };
 
+
+    if (!response.ok) {
+      // Intentar obtener mensaje de error más específico
+      const errorMessage = responseData.error || 
+                          responseData.message || 
+                          responseData.details || 
+                          `Error ${response.status}: ${response.statusText}`;
+      throw new Error(errorMessage);
+    }
+
+   
+    onPedidoCreado(responseData.pedido || responseData);
+    alert('✅ Pedido creado exitosamente');
+    onHide();
+    
+  } catch (error) {
+    console.error('❌ Error creando pedido:', error);
+    
+    // Mostrar mensaje de error más detallado
+    let mensajeError = `Error al crear pedido: ${error.message}`;
+    
+    // Si es error 500, sugerir revisar la consola del backend
+    if (error.message.includes('500') || error.message.includes('Internal Server')) {
+      mensajeError += '\n\nRevisa la consola del backend para más detalles.';
+    }
+    
+    alert(mensajeError);
+  } finally {
+    setCargando(false);
+  }
+};
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
