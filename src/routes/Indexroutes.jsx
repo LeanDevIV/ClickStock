@@ -8,7 +8,7 @@ import AdminProductos from "../pages/AdminProductos";
 import ProductDetail from "../pages/ProductDetail";
 import AdminUsuarios from "../pages/AdminUsuarios";
 import AdminLayout from "../layouts/AdminLayout";
-import TablaPedidos from "../components/admin/tablaPedidos";
+import TablaPedidos from "../pages/admin/tablaPedidos";
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (

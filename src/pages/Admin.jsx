@@ -1,4 +1,4 @@
-import TablaPedidos from "../components/admin/tablaPedidos"
+import TablaPedidos from "./admin/tablaPedidos"
 function Admin() {
   return (
     <div><TablaPedidos></TablaPedidos></div>

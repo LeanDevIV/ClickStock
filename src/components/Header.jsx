@@ -16,6 +16,7 @@ import {
   Brightness4,
   Inventory2,
   People,
+  LocalShipping,
   Search as SearchIcon,
 } from "@mui/icons-material";
 import { useStore } from "../hooks/useStore";
@@ -23,7 +24,6 @@ import { useScrollDirection } from "../hooks/useScrollDirection";
 import { UserMenu } from "./MenuUsuario";
 import RegistroLogin from "../pages/RegistroLogin";
 import "./Header.css";
-
 
 // === 🔍 Estilos del buscador ===
 const SearchContainer = styled("div")(({ theme }) => ({
@@ -66,7 +66,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
   },
 }));
-
 
 // === 🧠 Componente principal ===
 export const Header = ({ modoOscuro, toggleModo }) => {
@@ -123,22 +122,42 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                 Contacto
               </Nav.Link>
 
-              {/* Enlaces de admin */}
+              {/* Enlaces de admin - CORREGIDO: SIN ANIDAMIENTO PERO MANTENIENDO ESTILO */}
               {user?.rolUsuario === "admin" && (
-                <Nav.Link as={Link} to="/admin" className="text-danger">
-                  <ButtonGroup variant="text">
+                <div className="mx-2"> {/* Contenedor div en lugar de Nav.Link */}
+                  <ButtonGroup variant="text" className="text-danger">
                     <Tooltip title="Productos">
-                      <Button as={Link} to="/admin/productos" color="error">
+                      <Button 
+                        component={Link} 
+                        to="/admin/productos" 
+                        color="error"
+                        className="text-danger"
+                      >
                         <Inventory2 />
                       </Button>
                     </Tooltip>
+                    <Tooltip title="Pedidos">
+                      <Button 
+                        component={Link} 
+                        to="/admin/pedidos" 
+                        color="error"
+                        className="text-danger"
+                      >
+                        <LocalShipping />
+                      </Button>
+                    </Tooltip>
                     <Tooltip title="Usuarios">
-                      <Button as={Link} to="/admin/usuarios" color="error">
+                      <Button 
+                        component={Link} 
+                        to="/admin/usuarios" 
+                        color="error"
+                        className="text-danger"
+                      >
                         <People />
                       </Button>
                     </Tooltip>
                   </ButtonGroup>
-                </Nav.Link>
+                </div>
               )}
 
               {/* 🔍 Buscador */}

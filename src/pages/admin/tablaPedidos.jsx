@@ -128,7 +128,7 @@ const TablaPedidos = () => {
         alignItems="center"
         sx={{ mb: 3 }}
       >
-        <Grid item>
+        <Grid >
           <Typography variant="h4" color="primary" fontWeight="bold">
             <LocalShippingIcon sx={{ mr: 1, verticalAlign: "middle" }} />
             Gestión de Pedidos
@@ -138,7 +138,7 @@ const TablaPedidos = () => {
           </Typography>
         </Grid>
 
-        <Grid item>
+        <Grid >
           <Button
             variant="contained"
             color="success"
