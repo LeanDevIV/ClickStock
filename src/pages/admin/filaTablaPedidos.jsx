@@ -21,7 +21,7 @@ const FilaTablaPedidos = ({
   onEditar,
   onEliminar,
 }) => {
-  // Función para formatear moneda
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -29,7 +29,7 @@ const FilaTablaPedidos = ({
     }).format(amount);
   };
 
-  // Función para formatear fecha
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-AR', {
       day: '2-digit',
@@ -38,12 +38,10 @@ const FilaTablaPedidos = ({
     });
   };
 
-  // Función para obtener la clase del estado
   const getEstadoClass = (estado) => {
     return `estado-chip estado-${estado}`;
   };
 
-  // Función para obtener el texto del estado
   const getEstadoText = (estado) => {
     const estados = {
       pendiente: '⏳ Pendiente',
@@ -57,12 +55,9 @@ const FilaTablaPedidos = ({
 
   return (
     <TableRow className="fila-pedido">
-      {/* Número */}
       <TableCell className="celda-numero">
         {index + 1}
       </TableCell>
-
-      {/* Cliente */}
       <TableCell className="celda-cliente">
         <Box>
           <Typography className="texto-cliente" variant="body2">
@@ -99,7 +94,6 @@ const FilaTablaPedidos = ({
         </Box>
       </TableCell>
 
-      {/* Dirección - NUEVA COLUMNA */}
       <TableCell className="celda-direccion">
         <Box display="flex" alignItems="flex-start" gap={1}>
           <LocationIcon 
@@ -117,14 +111,12 @@ const FilaTablaPedidos = ({
         </Box>
       </TableCell>
 
-      {/* Total */}
       <TableCell className="celda-total">
         <Typography variant="body2" color="success.main" fontWeight="bold">
           {formatCurrency(pedido.total)}
         </Typography>
       </TableCell>
 
-      {/* Estado - SOLO LECTURA */}
       <TableCell className="celda-estado">
         <Chip
           label={getEstadoText(pedido.estado)}
@@ -134,14 +126,12 @@ const FilaTablaPedidos = ({
         />
       </TableCell>
 
-      {/* Fecha */}
       <TableCell className="celda-fecha">
         <Typography variant="body2" color="text.secondary">
           {formatDate(pedido.fechaCreacion)}
         </Typography>
       </TableCell>
 
-      {/* Acciones */}
       <TableCell className="celda-acciones">
         <Box className="contenedor-botones">
           <Tooltip title="Editar pedido">

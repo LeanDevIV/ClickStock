@@ -45,11 +45,9 @@ const TablaPedidos = () => {
       if (response.ok) {
         const data = await response.json();
         setPedidos(data.pedidos || data);
-      } else {
-        throw new Error("Error del servidor");
       }
     } catch (error) {
-      console.error("los pedidos no se cargaron");
+      // Error silencioso
     } finally {
       setCargando(false);
     }
@@ -62,26 +60,17 @@ const TablaPedidos = () => {
   const manejarPedidoCreado = (nuevoPedido) => {
     setPedidos([nuevoPedido, ...pedidos]);
     setModalCrearAbierto(false);
-    alert("✅ Pedido creado exitosamente");
   };
 
   const manejarEditarPedido = async (pedidoActualizado) => {
     try {
-      setPedidos(
-        pedidos.map((p) =>
-          p._id === pedidoActualizado._id ? pedidoActualizado : p
-        )
-      );
-      await fetch(
-        `http://localhost:5000/api/pedidos/${pedidoActualizado._id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(pedidoActualizado),
-        }
-      );
+      setPedidos(pedidos.map(p => p._id === pedidoActualizado._id ? pedidoActualizado : p));
+      await fetch(`http://localhost:5000/api/pedidos/${pedidoActualizado._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pedidoActualizado),
+      });
       setPedidoEditando(null);
-      alert("✅ Pedido actualizado correctamente");
     } catch (err) {
       alert("Error al editar pedido: " + err.message);
     }
@@ -90,24 +79,23 @@ const TablaPedidos = () => {
   const manejarEliminarPedido = async (pedidoId) => {
     if (!window.confirm("¿Seguro que deseas eliminar este pedido?")) return;
     try {
-      setPedidos(pedidos.filter((p) => p._id !== pedidoId));
+      setPedidos(pedidos.filter(p => p._id !== pedidoId));
       await fetch(`http://localhost:5000/api/pedidos/${pedidoId}`, {
         method: "DELETE",
       });
-      alert("✅ Pedido eliminado correctamente");
     } catch (err) {
       alert("Error al eliminar pedido: " + err.message);
     }
   };
 
-  const getEstadoClass = (estado) => {
-    return `estado-${estado}`;
-  };
+  const getEstadoClass = (estado) => `estado-${estado}`;
 
-  const pedidosFiltrados =
-    filtroEstado === "todos"
-      ? pedidos
-      : pedidos.filter((p) => p.estado === filtroEstado);
+  const pedidosFiltrados = filtroEstado === "todos" 
+    ? pedidos 
+    : pedidos.filter(p => p.estado === filtroEstado);
+
+  const pedidosPendientes = pedidos.filter(p => p.estado === "pendiente").length;
+  const pedidosEntregados = pedidos.filter(p => p.estado === "entregado").length;
 
   if (cargando) {
     return (
@@ -122,13 +110,8 @@ const TablaPedidos = () => {
 
   return (
     <Box className="contenedor-principal">
-      <Grid
-        container
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ mb: 3 }}
-      >
-        <Grid >
+      <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Grid>
           <Typography variant="h4" color="primary" fontWeight="bold">
             <LocalShippingIcon sx={{ mr: 1, verticalAlign: "middle" }} />
             Gestión de Pedidos
@@ -138,7 +121,7 @@ const TablaPedidos = () => {
           </Typography>
         </Grid>
 
-        <Grid >
+        <Grid>
           <Button
             variant="contained"
             color="success"
@@ -154,13 +137,7 @@ const TablaPedidos = () => {
       <Card sx={{ borderRadius: 2, boxShadow: 3, overflow: "hidden" }}>
         <CardHeader
           title={
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              flexWrap="wrap"
-              gap={2}
-            >
+            <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
               <Box display="flex" alignItems="center" gap={2}>
                 <Typography fontWeight="bold" color="text.primary">
                   Filtrar por estado:
@@ -181,25 +158,9 @@ const TablaPedidos = () => {
               </Box>
 
               <Box display="flex" gap={1} flexWrap="wrap">
-                <Chip
-                  label={`Total: ${pedidos.length}`}
-                  color="primary"
-                  variant="outlined"
-                />
-                <Chip
-                  label={`Pendiente: ${
-                    pedidos.filter((p) => p.estado === "pendiente").length
-                  }`}
-                  color="warning"
-                  variant="outlined"
-                />
-                <Chip
-                  label={`Entregado: ${
-                    pedidos.filter((p) => p.estado === "entregado").length
-                  }`}
-                  color="success"
-                  variant="outlined"
-                />
+                <Chip label={`Total: ${pedidos.length}`} color="primary" variant="outlined" />
+                <Chip label={`Pendiente: ${pedidosPendientes}`} color="warning" variant="outlined" />
+                <Chip label={`Entregado: ${pedidosEntregados}`} color="success" variant="outlined" />
               </Box>
             </Box>
           }
@@ -211,46 +172,26 @@ const TablaPedidos = () => {
             <Table stickyHeader sx={{ minWidth: 800 }}>
               <TableHead>
                 <TableRow className="tabla-cabecera">
-                  <TableCell className="tabla-celda-cabecera" width="60">
-                    #
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-cliente">
-                    Cliente
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-productos">
-                    Productos
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-productos">
-                    Direccion de Envio
-                  </TableCell>
-
-                  <TableCell className="tabla-celda-cabecera tabla-celda-total">
-                    Total
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-estado">
-                    Estado
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-fecha">
-                    Fecha
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-acciones">
-                    Acciones
-                  </TableCell>
+                  <TableCell className="tabla-celda-cabecera" width="60">#</TableCell>
+                  <TableCell className="tabla-celda-cabecera tabla-celda-cliente">Cliente</TableCell>
+                  <TableCell className="tabla-celda-cabecera tabla-celda-productos">Productos</TableCell>
+                  <TableCell className="tabla-celda-cabecera tabla-celda-productos">Dirección de Envío</TableCell>
+                  <TableCell className="tabla-celda-cabecera tabla-celda-total">Total</TableCell>
+                  <TableCell className="tabla-celda-cabecera tabla-celda-estado">Estado</TableCell>
+                  <TableCell className="tabla-celda-cabecera tabla-celda-fecha">Fecha</TableCell>
+                  <TableCell className="tabla-celda-cabecera tabla-celda-acciones">Acciones</TableCell>
                 </TableRow>
               </TableHead>
+              
               <TableBody>
                 {pedidosFiltrados.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="estado-vacio">
-                      <Typography
-                        variant="h6"
-                        color="text.secondary"
-                        gutterBottom
-                      >
+                    <TableCell colSpan={8} className="estado-vacio">
+                      <Typography variant="h6" color="text.secondary" gutterBottom>
                         No hay pedidos
                       </Typography>
                       <Typography color="text.secondary" sx={{ mb: 2 }}>
-                        {filtroEstado !== "todos"
+                        {filtroEstado !== "todos" 
                           ? `No se encontraron pedidos con estado "${filtroEstado}"`
                           : "No hay pedidos registrados en el sistema"}
                       </Typography>
@@ -273,10 +214,7 @@ const TablaPedidos = () => {
                         <Typography className="texto-cliente">
                           {pedido.usuario.nombreUsuario}
                         </Typography>
-                        <Typography
-                          className="texto-email"
-                          title={pedido.usuario.email}
-                        >
+                        <Typography className="texto-email" title={pedido.usuario.email}>
                           {pedido.usuario.email}
                         </Typography>
                       </TableCell>
@@ -295,18 +233,15 @@ const TablaPedidos = () => {
                           ))}
                         </Box>
                       </TableCell>
+
                       <TableCell>
-                        {" "}
                         <Typography className="texto-cliente">
                           {pedido.direccion}
                         </Typography>
                       </TableCell>
+
                       <TableCell className="tabla-celda tabla-celda-total">
-                        <Typography
-                          variant="subtitle1"
-                          fontWeight="bold"
-                          color="primary"
-                        >
+                        <Typography variant="subtitle1" fontWeight="bold" color="primary">
                           ${pedido.total}
                         </Typography>
                       </TableCell>
@@ -362,17 +297,7 @@ const TablaPedidos = () => {
         </CardContent>
 
         {pedidosFiltrados.length > 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              px: 3,
-              py: 1.5,
-              backgroundColor: "#fafafa",
-              borderTop: "1px solid #e0e0e0",
-            }}
-          >
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", px: 3, py: 1.5, backgroundColor: "#fafafa", borderTop: "1px solid #e0e0e0" }}>
             <Typography variant="body2" color="text.secondary">
               Mostrando {pedidosFiltrados.length} de {pedidos.length} pedidos
             </Typography>
@@ -383,7 +308,6 @@ const TablaPedidos = () => {
         )}
       </Card>
 
-      {/* Modales */}
       <CrearPedidosModal
         show={modalCrearAbierto}
         onHide={() => setModalCrearAbierto(false)}

@@ -24,7 +24,7 @@ import {
   Add as AddIcon,
   Remove as RemoveIcon,
   Delete as DeleteIcon,
-  ShoppingCart as CartIcon,
+  List as ListIcon,
   Store as StoreIcon,
   AttachMoney as MoneyIcon,
   AddCircle as AddCircleIcon,
@@ -34,7 +34,7 @@ import "../../css/crearPedidosModal.css";
 const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
   const [usuarios, setUsuarios] = useState([]);
   const [productos, setProductos] = useState([]);
-  const [carrito, setCarrito] = useState([]);
+  const [inventario, setInventario] = useState([]);
   const [formData, setFormData] = useState({
     usuarioId: '',
     direccionEnvio: ''
@@ -54,98 +54,87 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
   }, [show]);
 
   const resetForm = () => {
-    setCarrito([]);
+    setInventario([]);
     setFormData({ usuarioId: '', direccionEnvio: '' });
     setErrorUsuarios('');
     setErrorProductos('');
   };
 
-const cargarUsuarios = async () => {
-  try {
-    setCargandoUsuarios(true);
-    setErrorUsuarios('');
-  
-    const authStorage = localStorage.getItem('auth-storage');
-    
-    if (!authStorage) {
-      throw new Error('No hay sesión activa. Inicia sesión primero.');
-    }
-    
-    let userData, token;
+  const cargarUsuarios = async () => {
     try {
-      const parsedStorage = JSON.parse(authStorage);
-      userData = parsedStorage.state?.user;
-      token = parsedStorage.state?.token;
-    
+      setCargandoUsuarios(true);
+      setErrorUsuarios('');
+  
+      const authStorage = localStorage.getItem('auth-storage');
+      
+      if (!authStorage) {
+        throw new Error('No hay sesión activa. Inicia sesión primero.');
+      }
+      
+      let userData, token;
+      try {
+        const parsedStorage = JSON.parse(authStorage);
+        userData = parsedStorage.state?.user;
+        token = parsedStorage.state?.token;
+      } catch (error) {
+        throw new Error('Error al leer la sesión del usuario.');
+      }
+      
+      if (!userData || !token) {
+        throw new Error('No se encontraron datos de autenticación completos.');
+      }
+      
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+      
+      const response = await fetch('http://localhost:5000/api/usuarios', {
+        method: 'GET',
+        headers: headers
+      });
+      
+      if (response.status === 401) {
+        throw new Error('No autorizado. Tu sesión puede haber expirado.');
+      }
+      
+      if (response.status === 403) {
+        throw new Error('No tienes permisos para ver usuarios.');
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      let usuariosData = [];
+      if (Array.isArray(data)) {
+        usuariosData = data;
+      } else if (data.usuarios && Array.isArray(data.usuarios)) {
+        usuariosData = data.usuarios;
+      } else {
+        usuariosData = [];
+      }
+      
+      setUsuarios(usuariosData);
+      
+      if (usuariosData.length === 0) {
+        setErrorUsuarios('No se encontraron usuarios en el sistema');
+      }
+      
     } catch (error) {
-      console.error('Error parseando auth-storage:', error);
-      throw new Error('Error al leer la sesión del usuario.');
+      setErrorUsuarios(error.message);
+      
+      const usuariosEjemplo = [
+        { _id: '690ba421dfa3a0a4c8bc8633', nombreUsuario: 'admin-test', email: 'test@example.com' },
+        { _id: 'usuario-2', nombreUsuario: 'Cliente Demo', email: 'cliente@ejemplo.com' }
+      ];
+      setUsuarios(usuariosEjemplo);
+    } finally {
+      setCargandoUsuarios(false);
     }
-    
-    if (!userData || !token) {
-      throw new Error('No se encontraron datos de autenticación completos.');
-    }
-    
-    // HEADERS CON AUTORIZACIÓN
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
-    
-    
-    // INTENTAR CARGAR USUARIOS REALES
-    const response = await fetch('http://localhost:5000/api/usuarios', {
-      method: 'GET',
-      headers: headers
-    });
-    
-    
-    if (response.status === 401) {
-      throw new Error('No autorizado. Tu sesión puede haber expirado.');
-    }
-    
-    if (response.status === 403) {
-      throw new Error('No tienes permisos para ver usuarios.');
-    }
-    
-    if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-
-    
-    // Procesar datos
-    let usuariosData = [];
-    if (Array.isArray(data)) {
-      usuariosData = data;
-    } else if (data.usuarios && Array.isArray(data.usuarios)) {
-      usuariosData = data.usuarios;
-    } else {
-      console.warn('Formato de respuesta inesperado:', data);
-      usuariosData = [];
-    }
-    
-    setUsuarios(usuariosData);
-    
-    if (usuariosData.length === 0) {
-      setErrorUsuarios('No se encontraron usuarios en el sistema');
-    }
-    
-  } catch (error) {
-    console.error('❌ Error cargando usuarios:', error);
-    setErrorUsuarios(error.message);
-    
-    // Datos de ejemplo como fallback
-    const usuariosEjemplo = [
-      { _id: '690ba421dfa3a0a4c8bc8633', nombreUsuario: 'admin-test', email: 'test@example.com' },
-      { _id: 'usuario-2', nombreUsuario: 'Cliente Demo', email: 'cliente@ejemplo.com' }
-    ];
-    setUsuarios(usuariosEjemplo);
-  } finally {
-    setCargandoUsuarios(false);
-  }
-};
+  };
 
   const cargarProductos = async () => {
     try {
@@ -174,10 +163,8 @@ const cargarUsuarios = async () => {
       setProductos(productosData);
       
     } catch (error) {
-      console.error('Error cargando productos reales:', error);
       setErrorProductos('No se pudieron cargar los productos reales: ' + error.message);
       
-      // Si falla, usa productos mock con IDs que coincidan con tu BD
       const productosMock = [
         { 
           _id: '6993e0beba8b631c1cedc97', 
@@ -201,26 +188,26 @@ const cargarUsuarios = async () => {
     }
   };
 
-  const agregarAlCarrito = (producto) => {
+  const agregarAlInventario = (producto) => {
     if (producto.stock <= 0) {
       alert('❌ Producto sin stock disponible');
       return;
     }
 
-    const existe = carrito.find(item => item.producto._id === producto._id);
+    const existe = inventario.find(item => item.producto._id === producto._id);
     
     if (existe) {
       if (existe.cantidad >= producto.stock) {
         alert(`❌ No hay suficiente stock. Máximo: ${producto.stock}`);
         return;
       }
-      setCarrito(carrito.map(item =>
+      setInventario(inventario.map(item =>
         item.producto._id === producto._id
           ? { ...item, cantidad: item.cantidad + 1 }
           : item
       ));
     } else {
-      setCarrito([...carrito, {
+      setInventario([...inventario, {
         producto,
         cantidad: 1,
         precioUnitario: producto.precio
@@ -228,23 +215,23 @@ const cargarUsuarios = async () => {
     }
   };
 
-  const removerDelCarrito = (productoId) => {
-    setCarrito(carrito.filter(item => item.producto._id !== productoId));
+  const removerDelInventario = (productoId) => {
+    setInventario(inventario.filter(item => item.producto._id !== productoId));
   };
 
   const actualizarCantidad = (productoId, nuevaCantidad) => {
     if (nuevaCantidad < 1) {
-      removerDelCarrito(productoId);
+      removerDelInventario(productoId);
       return;
     }
 
-    const item = carrito.find(item => item.producto._id === productoId);
+    const item = inventario.find(item => item.producto._id === productoId);
     if (item && nuevaCantidad > item.producto.stock) {
       alert(`❌ No hay suficiente stock. Máximo: ${item.producto.stock}`);
       return;
     }
 
-    setCarrito(carrito.map(item =>
+    setInventario(inventario.map(item =>
       item.producto._id === productoId
         ? { ...item, cantidad: nuevaCantidad }
         : item
@@ -252,104 +239,96 @@ const cargarUsuarios = async () => {
   };
 
   const calcularTotal = () => {
-    return carrito.reduce((total, item) => total + (item.precioUnitario * item.cantidad), 0);
+    return inventario.reduce((total, item) => total + (item.precioUnitario * item.cantidad), 0);
   };
-const crearPedido = async () => {
-  if (!formData.usuarioId) {
-    alert('❌ Selecciona un cliente');
-    return;
-  }
 
-  if (carrito.length === 0) {
-    alert('❌ Agrega al menos un producto al carrito');
-    return;
-  }
-
-  if (!formData.direccionEnvio?.trim()) {
-    alert('❌ La dirección de envío es requerida');
-    return;
-  }
-
-  setCargando(true);
-  try {
-    const pedidoData = {
-      usuario: formData.usuarioId,
-      productos: carrito.map(item => ({
-        producto: item.producto._id,
-        cantidad: item.cantidad,
-        precioUnitario: item.precioUnitario // Asegurarnos de incluir el precio
-      })),
-      total: calcularTotal(),
-      direccion: formData.direccionEnvio.trim(),
-      estado: 'pendiente'
-    };
-
-
-    // OBTENER TOKEN DESDE auth-storage
-    const authStorage = localStorage.getItem('auth-storage');
-    if (!authStorage) {
-      throw new Error('No hay sesión activa. Inicia sesión primero.');
+  const crearPedido = async () => {
+    if (!formData.usuarioId) {
+      alert('❌ Selecciona un cliente');
+      return;
     }
 
-    const parsedStorage = JSON.parse(authStorage);
-    const token = parsedStorage.state?.token;
-
-    if (!token) {
-      throw new Error('No se encontró token de autenticación.');
+    if (inventario.length === 0) {
+      alert('❌ Agrega al menos un producto al inventario');
+      return;
     }
 
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    };
+    if (!formData.direccionEnvio?.trim()) {
+      alert('❌ La dirección de envío es requerida');
+      return;
+    }
 
-    const response = await fetch('http://localhost:5000/api/pedidos', {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(pedidoData)
-    });
-
-    const responseText = await response.text();
-    let responseData;
-    
+    setCargando(true);
     try {
-      responseData = JSON.parse(responseText);
-    } catch (e) {
-      console.error('❌ La respuesta no es JSON válido:', responseText);
-      throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
-    }
+      const pedidoData = {
+        usuario: formData.usuarioId,
+        productos: inventario.map(item => ({
+          producto: item.producto._id,
+          cantidad: item.cantidad,
+          precioUnitario: item.precioUnitario
+        })),
+        total: calcularTotal(),
+        direccion: formData.direccionEnvio.trim(),
+        estado: 'pendiente'
+      };
 
+      const authStorage = localStorage.getItem('auth-storage');
+      if (!authStorage) {
+        throw new Error('No hay sesión activa. Inicia sesión primero.');
+      }
 
-    if (!response.ok) {
-      // Intentar obtener mensaje de error más específico
-      const errorMessage = responseData.error || 
-                          responseData.message || 
-                          responseData.details || 
-                          `Error ${response.status}: ${response.statusText}`;
-      throw new Error(errorMessage);
-    }
+      const parsedStorage = JSON.parse(authStorage);
+      const token = parsedStorage.state?.token;
 
-   
-    onPedidoCreado(responseData.pedido || responseData);
-    alert('✅ Pedido creado exitosamente');
-    onHide();
-    
-  } catch (error) {
-    console.error('❌ Error creando pedido:', error);
-    
-    // Mostrar mensaje de error más detallado
-    let mensajeError = `Error al crear pedido: ${error.message}`;
-    
-    // Si es error 500, sugerir revisar la consola del backend
-    if (error.message.includes('500') || error.message.includes('Internal Server')) {
-      mensajeError += '\n\nRevisa la consola del backend para más detalles.';
+      if (!token) {
+        throw new Error('No se encontró token de autenticación.');
+      }
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      const response = await fetch('http://localhost:5000/api/pedidos', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(pedidoData)
+      });
+
+      const responseText = await response.text();
+      let responseData;
+      
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+      }
+
+      if (!response.ok) {
+        const errorMessage = responseData.error || 
+                            responseData.message || 
+                            responseData.details || 
+                            `Error ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      onPedidoCreado(responseData.pedido || responseData);
+      alert('✅ Pedido creado exitosamente');
+      onHide();
+      
+    } catch (error) {
+      let mensajeError = `Error al crear pedido: ${error.message}`;
+      
+      if (error.message.includes('500') || error.message.includes('Internal Server')) {
+        mensajeError += '\n\nRevisa la consola del backend para más detalles.';
+      }
+      
+      alert(mensajeError);
+    } finally {
+      setCargando(false);
     }
-    
-    alert(mensajeError);
-  } finally {
-    setCargando(false);
-  }
-};
+  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -381,9 +360,8 @@ const crearPedido = async () => {
           </Alert>
         )}
 
-        {/* Cliente y Dirección */}
         <Grid container spacing={3} className="seccion-cliente-direccion">
-          <Grid item size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <FormControl fullWidth>
               <InputLabel>Cliente</InputLabel>
               {cargandoUsuarios ? (
@@ -412,7 +390,7 @@ const crearPedido = async () => {
             </FormControl>
           </Grid>
           
-          <Grid item size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               label="Dirección de Envío"
@@ -423,10 +401,8 @@ const crearPedido = async () => {
           </Grid>
         </Grid>
 
-        {/* Productos y Carrito */}
         <Box className="seccion-productos">
-          <Box className="contenedor-productos-carrito">
-            {/* Productos Disponibles */}
+          <Box className="contenedor-productos-inventario">
             <Card className="tarjeta-seccion" variant="outlined">
               <Typography variant="h6" className="titulo-seccion">
                 <StoreIcon />
@@ -450,7 +426,7 @@ const crearPedido = async () => {
                       <Card 
                         key={producto._id}
                         className="tarjeta-producto"
-                        onClick={() => agregarAlCarrito(producto)}
+                        onClick={() => agregarAlInventario(producto)}
                         sx={{
                           cursor: producto.stock > 0 ? 'pointer' : 'not-allowed',
                           opacity: producto.stock > 0 ? 1 : 0.6
@@ -489,29 +465,28 @@ const crearPedido = async () => {
               )}
             </Card>
 
-            {/* Carrito de Compra */}
             <Card className="tarjeta-seccion" variant="outlined">
               <Typography variant="h6" className="titulo-seccion">
-                <CartIcon />
-                Carrito de Compra
+                <ListIcon />
+                Inventario del Pedido
               </Typography>
               
-              <Box className="lista-carrito">
-                {carrito.length === 0 ? (
+              <Box className="lista-inventario">
+                {inventario.length === 0 ? (
                   <Box className="estado-vacio">
-                    <CartIcon sx={{ fontSize: 48, mb: 2, color: 'text.secondary' }} />
+                    <ListIcon sx={{ fontSize: 48, mb: 2, color: 'text.secondary' }} />
                     <Typography variant="h6" color="text.secondary">
-                      No hay productos en el carrito
+                      No hay productos en el inventario
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Haz clic en los productos para agregarlos
                     </Typography>
                   </Box>
                 ) : (
-                  carrito.map(item => (
-                    <Card key={item.producto._id} className="tarjeta-carrito">
-                      <CardContent className="contenido-carrito">
-                        <Box className="info-producto-carrito">
+                  inventario.map(item => (
+                    <Card key={item.producto._id} className="tarjeta-inventario">
+                      <CardContent className="contenido-inventario">
+                        <Box className="info-producto-inventario">
                           <Typography variant="body1" fontWeight="600">
                             {item.producto.nombre}
                           </Typography>
@@ -553,7 +528,7 @@ const crearPedido = async () => {
                           
                           <IconButton
                             size="small"
-                            onClick={() => removerDelCarrito(item.producto._id)}
+                            onClick={() => removerDelInventario(item.producto._id)}
                             className="boton-eliminar"
                           >
                             <DeleteIcon />
@@ -573,7 +548,7 @@ const crearPedido = async () => {
                 )}
               </Box>
               
-              {carrito.length > 0 && (
+              {inventario.length > 0 && (
                 <Card className="resumen-total">
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -606,7 +581,7 @@ const crearPedido = async () => {
           onClick={crearPedido}
           className="boton-crear"
           variant="contained"
-          disabled={cargando || carrito.length === 0 || !formData.usuarioId}
+          disabled={cargando || inventario.length === 0 || !formData.usuarioId}
           startIcon={cargando ? <CircularProgress size={16} /> : <AddCircleIcon />}
         >
           {cargando ? 'Creando Pedido...' : 'Crear Pedido'}

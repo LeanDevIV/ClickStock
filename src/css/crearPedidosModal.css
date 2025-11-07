@@ -26,7 +26,6 @@
 }
 
 /* SELECTOR DE USUARIO MEJORADO */
-/* Selector de usuario simplificado */
 .selector-usuario-simple .MuiFormControl-root {
   width: 100%;
 }
@@ -106,8 +105,8 @@
   margin-bottom: 24px;
 }
 
-/* Tarjetas de productos y carrito */
-.contenedor-productos-carrito {
+/* Tarjetas de productos e inventario */
+.contenedor-productos-inventario {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
@@ -201,15 +200,14 @@
   font-weight: 600 !important;
 }
 
-/* Carrito de compras */
-.lista-carrito {
+.lista-inventario {
   flex: 1;
   overflow-y: auto;
   max-height: 300px;
   padding-right: 8px;
 }
 
-.tarjeta-carrito {
+.tarjeta-inventario {
   background: white !important;
   border: 1px solid #e9ecef !important;
   border-radius: 10px !important;
@@ -217,16 +215,16 @@
   transition: all 0.2s ease !important;
 }
 
-.tarjeta-carrito:hover {
+.tarjeta-inventario:hover {
   border-color: #667eea !important;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1) !important;
 }
 
-.contenido-carrito {
+.contenido-inventario {
   padding: 16px !important;
 }
 
-.info-producto-carrito {
+.info-producto-inventario {
   margin-bottom: 12px;
 }
 
@@ -275,7 +273,6 @@
   color: #374151 !important;
 }
 
-/* Total del carrito */
 .resumen-total {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
   color: white !important;
@@ -335,37 +332,34 @@
   box-shadow: none !important;
 }
 
-/* Scrollbar personalizado */
 .lista-productos::-webkit-scrollbar,
-.lista-carrito::-webkit-scrollbar {
+.lista-inventario::-webkit-scrollbar {
   width: 6px;
 }
 
 .lista-productos::-webkit-scrollbar-track,
-.lista-carrito::-webkit-scrollbar-track {
+.lista-inventario::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 3px;
 }
 
 .lista-productos::-webkit-scrollbar-thumb,
-.lista-carrito::-webkit-scrollbar-thumb {
+.lista-inventario::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 3px;
 }
 
 .lista-productos::-webkit-scrollbar-thumb:hover,
-.lista-carrito::-webkit-scrollbar-thumb:hover {
+.lista-inventario::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
-
-/* Responsive */
 @media (max-width: 768px) {
   .modal-crear-pedido .MuiDialog-paper {
     min-width: auto !important;
     margin: 16px !important;
   }
   
-  .contenedor-productos-carrito {
+  .contenedor-productos-inventario {
     grid-template-columns: 1fr;
     gap: 16px;
   }
