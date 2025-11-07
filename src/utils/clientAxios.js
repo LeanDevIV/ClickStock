@@ -1,7 +1,8 @@
 import axios from "axios";
-import { useStore } from "../store/useStore.js";
+import { useStore } from "../hooks/useStore";
 
 const clientAxios = axios.create({
+
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   headers: { "Content-Type": "application/json" },
 });

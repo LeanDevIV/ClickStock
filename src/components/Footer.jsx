@@ -7,11 +7,11 @@ const Footer = () => {
   return (
     <footer className="footer text-white pt-5 pb-3 d-flex flex-column justify-content-center">
       <div className="container">
-        <div className="row align-items-start text-center text-md-start">
+        <div className="row align-items-start text-center text-md-center">
 
-          <div className="col-md-4 mb-4 mb-md-0">
+          <div className="col-md-4 mb-4">
             <h5 className="fw-bold mb-3 text-gold">Nuestras redes</h5>
-            <div className="d-flex justify-content-center justify-content-md-start gap-3 fs-4">
+            <div className="d-flex justify-content-center justify-content-md-center gap-3 fs-4">
               <a href="#" className="text-white social-icon"><i className="bi bi-instagram"></i></a>
               <a href="#" className="text-white social-icon"><i className="bi bi-facebook"></i></a>
               <a href="#" className="text-white social-icon"><i className="bi bi-twitter-x"></i></a>

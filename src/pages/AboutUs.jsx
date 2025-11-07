@@ -7,28 +7,35 @@ const integrantes = [
   {
     nombre: "Luciano Mayorga",
     rol: "Desarrollador Frontend",
-    imagen: "/img/luciano.jpg",
-    github: "#",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRq2Td0CIbPGuZvYgLyx0up0jcQ1VH3Vm5yMg&s",
+    github: "https://github.com/lucianomayorga",
     linkedin: "#",
   },
   {
     nombre: "Leandro Cordoba",
     rol: "Desarrollador Fullstack",
-    imagen: "/img/leandro.jpg",
-    github: "#",
+    imagen: "https://avatars.githubusercontent.com/u/123712000?v=4",
+    github: "https://github.com/LeanDevIV",
     linkedin: "#",
   },
   {
     nombre: "Sara Robles",
     rol: "Diseñador fullstack",
-    imagen: "/img/sara.jpg",
-    github: "#",
+    imagen: "https://avatars.githubusercontent.com/u/209563219?v=4",
+    github: "https://github.com/sara-18Git",
     linkedin: "#",
   },
   {
     nombre: "Isaias Romano",
     rol: "Tester",
-    imagen: "/img/isaias.jpg",
+    imagen: "https://ca.slack-edge.com/THQU1MGPN-U088Z15QP6Z-1362ac5a8ce0-512",
+    github: "#",
+    linkedin: "#",
+  },
+  {
+    nombre: "Alvaro Roldan",
+    rol: "Tester",
+    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SNQ9XsPt9cv4aHIR6z2XXTBHZ9Wn091bkQ&s",
     github: "#",
     linkedin: "#",
   },
@@ -43,6 +50,7 @@ export default function AboutUs() {
         trabajo en equipo. Este proyecto forma parte de nuestro trabajo final
         del curso de desarrollo Fullstack, donde buscamos crear una aplicación
         web moderna y funcional.
+        Y por sobre todo, APROBAR😁
       </p>
 
       <div className="row justify-content-center g-4">

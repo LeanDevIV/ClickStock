@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "../components/Header";
 
-export const MainLayout = () => {
+export const MainLayout = ({ modoOscuro, toggleModo }) => {
   return (
     <>
-      <Header />
+      <Header modoOscuro={modoOscuro} toggleModo={toggleModo} />
       <main className="p-4">
         <Outlet />
       </main>
