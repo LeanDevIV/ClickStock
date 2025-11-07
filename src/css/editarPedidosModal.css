@@ -5,7 +5,7 @@
 }
 
 .header-modal {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #000000 0%, #F5F5F5 90%) !important;
   color: white !important;
   padding: 24px 24px 20px 24px !important;
 }
@@ -44,7 +44,7 @@
 
 .etiqueta-dato {
   font-weight: 600 !important;
-  color: #495057 !important;
+  color: #000000 !important; /* Cambiado a negro */
   margin-bottom: 12px !important;
   display: flex !important;
   align-items: center !important;
@@ -53,7 +53,7 @@
 }
 
 .valor-dato {
-  color: #2c3e50 !important;
+  color: #000000 !important; /* Cambiado a negro */
   font-weight: 600 !important;
   font-size: 1.1rem !important;
   margin-bottom: 4px !important;
@@ -62,18 +62,18 @@
 .valor-dato-cliente {
   font-size: 1.2rem !important;
   font-weight: 700 !important;
-  color: #1a365d !important;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .valor-dato-total {
   font-size: 1.4rem !important;
   font-weight: 700 !important;
-  color: #059669 !important;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .texto-email {
   font-size: 0.85rem !important;
-  color: #6c757d !important;
+  color: #000000 !important; /* Cambiado a negro */
   font-style: italic;
 }
 
@@ -85,12 +85,22 @@
   border-radius: 12px !important;
 }
 
+.campo-direccion .MuiInputLabel-root,
+.campo-direccion .MuiOutlinedInput-input {
+  color: #000000 !important; /* Cambiado a negro */
+}
+
 .campo-estado {
   margin-bottom: 24px !important;
 }
 
 .campo-estado .MuiOutlinedInput-root {
   border-radius: 12px !important;
+}
+
+.campo-estado .MuiInputLabel-root,
+.campo-estado .MuiSelect-select {
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .seccion-productos {
@@ -102,6 +112,11 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px !important;
+}
+
+.titulo-productos h6,
+.titulo-productos .MuiTypography-body2 {
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .boton-agregar-producto {
@@ -144,13 +159,13 @@
 
 .nombre-producto {
   font-weight: 600 !important;
-  color: #2c3e50 !important;
+  color: #000000 !important; /* Cambiado a negro */
   margin-bottom: 4px !important;
   font-size: 1rem !important;
 }
 
 .precio-producto {
-  color: #6c757d !important;
+  color: #000000 !important; /* Cambiado a negro */
   font-size: 0.875rem !important;
 }
 
@@ -169,6 +184,7 @@
   text-align: center;
   padding: 8px 12px;
   font-weight: 600;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .boton-eliminar-producto {
@@ -197,10 +213,14 @@
   margin-bottom: 8px;
 }
 
+.fila-total .MuiTypography-root {
+  color: #000000 !important; /* Cambiado a negro */
+}
+
 .total-final {
   font-size: 1.3rem !important;
   font-weight: 700 !important;
-  color: #059669 !important;
+  color: #000000 !important; /* Cambiado a negro */
   border-top: 2px solid #d1fae5;
   padding-top: 12px;
   margin-top: 8px;
@@ -217,6 +237,8 @@
   padding: 10px 24px !important;
   font-weight: 600 !important;
   text-transform: none !important;
+  color: #000000 !important; /* Cambiado a negro */
+  border-color: #000000 !important; /* Cambiado a negro */
 }
 
 .boton-guardar {
@@ -226,6 +248,7 @@
   text-transform: none !important;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3) !important;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .boton-guardar:hover {
@@ -241,26 +264,27 @@
 .estado-option {
   font-weight: 500 !important;
   padding: 8px 16px !important;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .estado-pendiente {
-  color: #d97706 !important;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .estado-procesando {
-  color: #1d4ed8 !important;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .estado-enviado {
-  color: #3730a3 !important;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .estado-entregado {
-  color: #166534 !important;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .estado-cancelado {
-  color: #dc2626 !important;
+  color: #000000 !important; /* Cambiado a negro */
 }
 
 .contenedor-productos::-webkit-scrollbar {
@@ -310,4 +334,14 @@
     width: 100%;
     justify-content: space-between;
   }
+}
+
+/* Validaciones no tan exigentes para dirección */
+.campo-direccion .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #000000 !important;
+  border-width: 2px !important;
+}
+
+.campo-direccion .MuiInputLabel-root.Mui-focused {
+  color: #000000 !important;
 }

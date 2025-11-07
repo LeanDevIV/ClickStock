@@ -29,6 +29,7 @@ import {
   Add as AddIcon,
   Remove as RemoveIcon,
 } from "@mui/icons-material";
+import { toast } from "react-hot-toast";
 import "../../css/editarPedidosModal.css";
 
 const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
@@ -39,6 +40,9 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
   });
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
+  const [errores, setErrores] = useState({
+    direccionEnvio: ""
+  });
 
   useEffect(() => {
     if (pedido) {
@@ -48,8 +52,44 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
         productos: pedido.productos ? [...pedido.productos] : [],
       });
       setError("");
+      setErrores({ direccionEnvio: "" });
     }
   }, [pedido]);
+
+  const validarDireccion = (direccion) => {
+    if (!direccion || direccion.trim() === "") {
+      return "La dirección es obligatoria";
+    }
+    
+    if (direccion.trim().length < 10) {
+      return "La dirección debe tener al menos 10 caracteres";
+    }
+    
+    if (direccion.trim().length > 200) {
+      return "La dirección no puede exceder los 200 caracteres";
+    }
+    
+    const tieneNumero = /\d/.test(direccion);
+    const tieneTexto = /[a-zA-Z]/.test(direccion);
+    
+    if (!tieneNumero || !tieneTexto) {
+      return "La dirección debe incluir número y nombre de calle";
+    }
+    
+    return "";
+  };
+
+  const manejarCambioDireccion = (e) => {
+    const nuevaDireccion = e.target.value;
+    setFormData({ ...formData, direccionEnvio: nuevaDireccion });
+    
+    if (nuevaDireccion.length > 0) {
+      const error = validarDireccion(nuevaDireccion);
+      setErrores({ ...errores, direccionEnvio: error });
+    } else {
+      setErrores({ ...errores, direccionEnvio: "" });
+    }
+  };
 
   const actualizarCantidad = (index, nuevaCantidad) => {
     if (nuevaCantidad < 1) return;
@@ -91,9 +131,10 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!pedido) return;
-
-    if (!formData.direccionEnvio.trim()) {
-      setError("La dirección de envío es requerida");
+    const errorDireccion = validarDireccion(formData.direccionEnvio);
+    if (errorDireccion) {
+      setErrores({ ...errores, direccionEnvio: errorDireccion });
+      setError("Por favor, corrige los errores en el formulario");
       return;
     }
 
@@ -112,6 +153,8 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
 
     setCargando(true);
     setError("");
+
+    const toastId = toast.loading("Actualizando pedido...");
 
     try {
       const updateData = {
@@ -140,9 +183,10 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
       }
 
       onPedidoEditado(responseData.pedido || responseData);
+      toast.success("Pedido actualizado exitosamente", { id: toastId });
       onHide();
     } catch (error) {
-      console.error("Error actualizando pedido:", error);
+      toast.error(`Error al actualizar pedido: ${error.message}`, { id: toastId });
       setError("Error al actualizar pedido: " + error.message);
     } finally {
       setCargando(false);
@@ -228,12 +272,12 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
               fullWidth
               label="Dirección de Envío"
               value={formData.direccionEnvio}
-              onChange={(e) =>
-                setFormData({ ...formData, direccionEnvio: e.target.value })
-              }
-              placeholder="Ingresa la dirección completa de envío"
+              onChange={manejarCambioDireccion}
+              placeholder="Ingresa la dirección completa de envío (ej: Av. Corrientes 1234, CABA)"
               multiline
               rows={3}
+              error={!!errores.direccionEnvio}
+              helperText={errores.direccionEnvio}
             />
           </Box>
 
@@ -322,7 +366,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                           actualizarCantidad(index, item.cantidad - 1)
                         }
                         disabled={item.cantidad <= 1}
-                        color="primary"
+                        sx={{ color: "#000000" }}
                       >
                         <RemoveIcon />
                       </IconButton>
@@ -343,7 +387,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                         onClick={() =>
                           actualizarCantidad(index, item.cantidad + 1)
                         }
-                        color="primary"
+                        sx={{ color: "#000000" }}
                       >
                         <AddIcon />
                       </IconButton>
@@ -383,7 +427,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                     )}
                   </Typography>
                 </Box>
-                <Box className="fila-total total-final">
+                <Box className="fila-total total-final" sx={{padding:'5px 15px',borderRadius:'5px', borderTopColor:'black'}}>
                   <Typography variant="h6" fontWeight="700">
                     Total Final:
                   </Typography>
@@ -405,6 +449,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
             onClick={onHide}
             className="boton-cancelar"
             variant="outlined"
+            sx={{color:'black!important',backgroundColor:'red !important'}}
             disabled={cargando}
           >
             Cancelar
@@ -413,7 +458,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
             type="submit"
             className="boton-guardar"
             variant="contained"
-            disabled={cargando}
+            disabled={cargando || !!errores.direccionEnvio}
             startIcon={cargando ? <CircularProgress size={16} /> : <EditIcon />}
           >
             {cargando ? "Guardando..." : "Guardar Cambios"}

@@ -30,6 +30,7 @@ import {
   AttachMoney as MoneyIcon,
   AddCircle as AddCircleIcon,
 } from "@mui/icons-material";
+import { Toaster, toast } from "react-hot-toast";
 import "../../css/crearPedidosModal.css";
 
 const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
@@ -170,7 +171,7 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
 
   const agregarAlInventario = (producto) => {
     if (producto.stock <= 0) {
-      alert("❌ Producto sin stock disponible");
+      toast.error("Producto sin stock disponible");
       return;
     }
 
@@ -178,7 +179,7 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
 
     if (existe) {
       if (existe.cantidad >= producto.stock) {
-        alert(`❌ Stock máximo: ${producto.stock}`);
+        toast.error(`Stock máximo: ${producto.stock}`);
         return;
       }
       setInventario(
@@ -212,7 +213,7 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
 
     const item = inventario.find((item) => item.producto._id === productoId);
     if (item && nuevaCantidad > item.producto.stock) {
-      alert(`❌ Stock máximo: ${item.producto.stock}`);
+      toast.error(`Stock máximo: ${item.producto.stock}`);
       return;
     }
 
@@ -233,15 +234,23 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
   };
 
   const crearPedido = async () => {
-    if (!formData.usuarioId) return alert("❌ Selecciona un cliente");
-    if (inventario.length === 0) return alert("❌ Agrega al menos un producto");
+    if (!formData.usuarioId) {
+      toast.error("Selecciona un cliente");
+      return;
+    }
+    if (inventario.length === 0) {
+      toast.error("Agrega al menos un producto");
+      return;
+    }
     
     if (!validarFormulario()) {
-      alert("❌ Por favor corrige los errores en el formulario");
+      toast.error("Por favor corrige los errores en el formulario");
       return;
     }
 
     setCargando(true);
+    const toastId = toast.loading("Creando pedido...");
+
     try {
       const authStorage = localStorage.getItem("auth-storage");
       if (!authStorage) throw new Error("No hay sesión activa");
@@ -274,10 +283,10 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
       if (!response.ok) throw new Error(responseData.error || responseData.message || "Error del servidor");
 
       onPedidoCreado(responseData.pedido || responseData);
-      alert("✅ Pedido creado exitosamente");
+      toast.success("Pedido creado exitosamente", { id: toastId });
       onHide();
     } catch (error) {
-      alert(`Error al crear pedido: ${error.message}`);
+      toast.error(`Error al crear pedido: ${error.message}`, { id: toastId });
     } finally {
       setCargando(false);
     }
@@ -291,268 +300,298 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
   };
 
   return (
-    <Dialog
-      open={show}
-      onClose={onHide}
-      maxWidth="lg"
-      fullWidth
-      className="modal-crear-pedido"
-    >
-      <DialogTitle className="header-modal-crear">
-        <Box className="titulo-modal-crear">
-          <AddCircleIcon />
-          <Typography variant="h5">Cargar un pedido manualmente</Typography>
-        </Box>
-      </DialogTitle>
-
-      <DialogContent
-        className="contenido-modal-crear"
-        sx={{ backgroundColor: theme.palette.background.default }}
+    <>
+      <Dialog
+        open={show}
+        onClose={onHide}
+        maxWidth="lg"
+        fullWidth
+        className="modal-crear-pedido"
       >
-        {errorUsuarios && (
-          <Alert severity="warning" sx={{ mb: 3, borderRadius: 2 }}>
-            <strong>Aviso:</strong> {errorUsuarios}
-          </Alert>
-        )}
+        <DialogTitle className="header-modal-crear">
+          <Box className="titulo-modal-crear">
+            <AddCircleIcon />
+            <Typography variant="h5">Cargar un pedido manualmente</Typography>
+          </Box>
+        </DialogTitle>
 
-        <Grid container spacing={3} className="seccion-cliente-direccion">
-          <Grid size={{ xs: 12, md: 6 }}>
-            <FormControl fullWidth>
-              <InputLabel sx={{ color: theme.palette.text.primary }}>
-                Cliente
-              </InputLabel>
-              {cargandoUsuarios ? (
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, p: 2 }}>
-                  <CircularProgress size={20} />
-                  <Typography sx={{ color: theme.palette.text.primary }}>
-                    Cargando clientes...
-                  </Typography>
-                </Box>
-              ) : (
-                <Select
-                  value={formData.usuarioId}
-                  onChange={(e) => setFormData({ ...formData, usuarioId: e.target.value })}
-                  label="Cliente"
-                  sx={{ color: theme.palette.text.primary }}
-                >
-                  <MenuItem value="">Selecciona un cliente</MenuItem>
-                  {usuarios.map((usuario) => (
-                    <MenuItem key={usuario._id} value={usuario._id} sx={{ color: theme.palette.text.primary }}>
-                      {usuario.nombreUsuario} - {usuario.emailUsuario}
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
-            </FormControl>
-          </Grid>
+        <DialogContent
+          className="contenido-modal-crear"
+          sx={{ backgroundColor: theme.palette.background.default }}
+        >
+          {errorUsuarios && (
+            <Alert severity="warning" sx={{ mb: 3, borderRadius: 2 }}>
+              <strong>Aviso:</strong> {errorUsuarios}
+            </Alert>
+          )}
 
-          <Grid size={{ xs: 12, md: 6 }}>
-            <TextField
-              fullWidth
-              label="Dirección de Envío"
-              value={formData.direccionEnvio}
-              onChange={manejarCambioDireccion}
-              onBlur={() => {
-                const error = validarDireccion(formData.direccionEnvio);
-                setErrores({ ...errores, direccionEnvio: error });
-              }}
-              error={!!errores.direccionEnvio}
-              helperText={errores.direccionEnvio || "Ej: Av. Corrientes 1234, Buenos Aires"}
-              placeholder="Ingresa la dirección completa"
-              multiline
-              rows={2}
-              inputProps={{ maxLength: 200 }}
-            />
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-              {formData.direccionEnvio.length}/200 caracteres
-            </Typography>
-          </Grid>
-        </Grid>
-
-        <Box className="seccion-productos">
-          <Box className="contenedor-productos-inventario">
-            <Card className="tarjeta-seccion">
-              <Typography variant="h6" className="titulo-seccion" sx={{ color: theme.palette.text.primary }}>
-                <StoreIcon />
-                Productos Disponibles
-              </Typography>
-
-              {errorProductos && (
-                <Alert severity="info" sx={{ mb: 2 }}>
-                  {errorProductos}
-                </Alert>
-              )}
-
-              {cargandoProductos ? (
-                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", flex: 1 }}>
-                  <CircularProgress />
-                </Box>
-              ) : (
-                <Box className="lista-productos">
-                  {productos.map((producto) => (
-                    <Card
-                      key={producto._id}
-                      className="tarjeta-producto"
-                      onClick={() => agregarAlInventario(producto)}
-                      sx={{
-                        cursor: producto.stock > 0 ? "pointer" : "not-allowed",
-                        opacity: producto.stock > 0 ? 1 : 0.6,
-                      }}
-                    >
-                      <CardContent className="contenido-producto">
-                        <Typography className="nombre-producto" sx={{ color: "black" }}>
-                          {producto.nombre}
-                        </Typography>
-                        <Typography className="descripcion-producto" sx={{ color: "black" }}>
-                          {producto.descripcion}
-                        </Typography>
-                        <Box className="precio-stock">
-                          <Typography className="precio-producto" sx={{ color: "black !important" }}>
-                            {formatCurrency(producto.precio)}
-                          </Typography>
-                          <Chip
-                            label={`Stock: ${producto.stock}`}
-                            color={producto.stock > 0 ? "success" : "error"}
-                            size="small"
-                          />
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </Box>
-              )}
-            </Card>
-
-            <Card className="tarjeta-seccion">
-              <Typography variant="h6" className="titulo-seccion" sx={{ color: theme.palette.text.primary }}>
-                <ListIcon />
-                Inventario del Pedido
-              </Typography>
-
-              <Box className="lista-inventario">
-                {inventario.length === 0 ? (
-                  <Box className="estado-vacio">
-                    <ListIcon sx={{ fontSize: 48, mb: 2, color: theme.palette.text.secondary }} />
-                    <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
-                      No hay productos en el inventario
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                      Haz clic en los productos para agregarlos
+          <Grid container spacing={3} className="seccion-cliente-direccion">
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: theme.palette.text.primary }}>
+                  Cliente
+                </InputLabel>
+                {cargandoUsuarios ? (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, p: 2 }}>
+                    <CircularProgress size={20} />
+                    <Typography sx={{ color: theme.palette.text.primary }}>
+                      Cargando clientes...
                     </Typography>
                   </Box>
                 ) : (
-                  inventario.map((item) => (
-                    <Card key={item.producto._id} className="tarjeta-inventario">
-                      <CardContent className="contenido-inventario">
-                        <Box className="info-producto-inventario">
-                          <Typography variant="body1" fontWeight="600" sx={{ color: theme.palette.text.primary }}>
-                            {item.producto.nombre}
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: "black !important" }}>
-                            {formatCurrency(item.precioUnitario)} c/u
-                          </Typography>
-                        </Box>
+                  <Select
+                    value={formData.usuarioId}
+                    onChange={(e) => setFormData({ ...formData, usuarioId: e.target.value })}
+                    label="Cliente"
+                    sx={{ color: theme.palette.text.primary }}
+                  >
+                    <MenuItem value="">Selecciona un cliente</MenuItem>
+                    {usuarios.map((usuario) => (
+                      <MenuItem key={usuario._id} value={usuario._id} sx={{ color: theme.palette.text.primary }}>
+                        {usuario.nombreUsuario} - {usuario.emailUsuario}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </FormControl>
+            </Grid>
 
-                        <Box className="controles-cantidad">
-                          <Box className="botones-cantidad">
-                            <IconButton
-                              size="small"
-                              onClick={() => actualizarCantidad(item.producto._id, item.cantidad - 1)}
-                              className="boton-cantidad"
-                              sx={{ color: theme.palette.text.primary }}
-                            >
-                              <RemoveIcon />
-                            </IconButton>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Dirección de Envío"
+                value={formData.direccionEnvio}
+                onChange={manejarCambioDireccion}
+                onBlur={() => {
+                  const error = validarDireccion(formData.direccionEnvio);
+                  setErrores({ ...errores, direccionEnvio: error });
+                }}
+                error={!!errores.direccionEnvio}
+                helperText={errores.direccionEnvio || "Ej: Av. Corrientes 1234, Buenos Aires"}
+                placeholder="Ingresa la dirección completa"
+                multiline
+                rows={2}
+                inputProps={{ maxLength: 200 }}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                {formData.direccionEnvio.length}/200 caracteres
+              </Typography>
+            </Grid>
+          </Grid>
 
-                            <TextField
-                              value={item.cantidad}
-                              onChange={(e) => actualizarCantidad(item.producto._id, parseInt(e.target.value) || 1)}
-                              type="number"
+          <Box className="seccion-productos">
+            <Box className="contenedor-productos-inventario">
+              <Card className="tarjeta-seccion">
+                <Typography variant="h6" className="titulo-seccion" sx={{ color: theme.palette.text.primary }}>
+                  <StoreIcon />
+                  Productos Disponibles
+                </Typography>
+
+                {errorProductos && (
+                  <Alert severity="info" sx={{ mb: 2 }}>
+                    {errorProductos}
+                  </Alert>
+                )}
+
+                {cargandoProductos ? (
+                  <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", flex: 1 }}>
+                    <CircularProgress />
+                  </Box>
+                ) : (
+                  <Box className="lista-productos">
+                    {productos.map((producto) => (
+                      <Card
+                        key={producto._id}
+                        className="tarjeta-producto"
+                        onClick={() => agregarAlInventario(producto)}
+                        sx={{
+                          cursor: producto.stock > 0 ? "pointer" : "not-allowed",
+                          opacity: producto.stock > 0 ? 1 : 0.6,
+                        }}
+                      >
+                        <CardContent className="contenido-producto">
+                          <Typography className="nombre-producto" sx={{ color: "black" }}>
+                            {producto.nombre}
+                          </Typography>
+                          <Typography className="descripcion-producto" sx={{ color: "black" }}>
+                            {producto.descripcion}
+                          </Typography>
+                          <Box className="precio-stock">
+                            <Typography className="precio-producto" sx={{ color: "black !important" }}>
+                              {formatCurrency(producto.precio)}
+                            </Typography>
+                            <Chip
+                              label={`Stock: ${producto.stock}`}
+                              color={producto.stock > 0 ? "success" : "error"}
                               size="small"
-                              className="input-cantidad"
                             />
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </Box>
+                )}
+              </Card>
+
+              <Card className="tarjeta-seccion">
+                <Typography variant="h6" className="titulo-seccion" sx={{ color: theme.palette.text.primary }}>
+                  <ListIcon />
+                  Inventario del Pedido
+                </Typography>
+
+                <Box className="lista-inventario">
+                  {inventario.length === 0 ? (
+                    <Box className="estado-vacio">
+                      <ListIcon sx={{ fontSize: 48, mb: 2, color: theme.palette.text.secondary }} />
+                      <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
+                        No hay productos en el inventario
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                        Haz clic en los productos para agregarlos
+                      </Typography>
+                    </Box>
+                  ) : (
+                    inventario.map((item) => (
+                      <Card key={item.producto._id} className="tarjeta-inventario">
+                        <CardContent className="contenido-inventario">
+                          <Box className="info-producto-inventario">
+                            <Typography variant="body1" fontWeight="600" sx={{ color: theme.palette.text.primary }}>
+                              {item.producto.nombre}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: "black !important" }}>
+                              {formatCurrency(item.precioUnitario)} c/u
+                            </Typography>
+                          </Box>
+
+                          <Box className="controles-cantidad">
+                            <Box className="botones-cantidad">
+                              <IconButton
+                                size="small"
+                                onClick={() => actualizarCantidad(item.producto._id, item.cantidad - 1)}
+                                className="boton-cantidad"
+                                sx={{ color: theme.palette.text.primary }}
+                              >
+                                <RemoveIcon />
+                              </IconButton>
+
+                              <TextField
+                                value={item.cantidad}
+                                onChange={(e) => actualizarCantidad(item.producto._id, parseInt(e.target.value) || 1)}
+                                type="number"
+                                size="small"
+                                className="input-cantidad"
+                              />
+
+                              <IconButton
+                                size="small"
+                                onClick={() => actualizarCantidad(item.producto._id, item.cantidad + 1)}
+                                className="boton-cantidad"
+                                sx={{ color: theme.palette.text.primary }}
+                              >
+                                <AddIcon />
+                              </IconButton>
+                            </Box>
 
                             <IconButton
                               size="small"
-                              onClick={() => actualizarCantidad(item.producto._id, item.cantidad + 1)}
-                              className="boton-cantidad"
-                              sx={{ color: theme.palette.text.primary }}
+                              onClick={() => removerDelInventario(item.producto._id)}
+                              className="boton-eliminar"
+                              sx={{ color: theme.palette.error.main }}
                             >
-                              <AddIcon />
+                              <DeleteIcon />
                             </IconButton>
                           </Box>
 
-                          <IconButton
-                            size="small"
-                            onClick={() => removerDelInventario(item.producto._id)}
-                            className="boton-eliminar"
-                            sx={{ color: theme.palette.error.main }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-
-                        <Box sx={{ textAlign: "right", mt: 1 }}>
-                          <Chip
-                            label={`Subtotal: ${formatCurrency(item.precioUnitario * item.cantidad)}`}
-                            color="primary"
-                            size="small"
-                          />
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </Box>
-
-              {inventario.length > 0 && (
-                <Box
-                  sx={{
-                    background: "linear-gradient(135deg, #083628ff 0%, #08684aff 100%)",
-                    color: "white",
-                    borderRadius: "12px",
-                    padding: "20px",
-                    marginTop: "16px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography sx={{ fontWeight: "700", fontSize: "1.1rem", display: "flex", alignItems: "center" }}>
-                    <MoneyIcon sx={{ mr: 1 }} />
-                    Total:
-                  </Typography>
-                  <Typography sx={{ fontSize: "1.5rem", fontWeight: "700" }}>
-                    {formatCurrency(calcularTotal())}
-                  </Typography>
+                          <Box sx={{ textAlign: "right", mt: 1 }}>
+                            <Chip
+                              label={`Subtotal: ${formatCurrency(item.precioUnitario * item.cantidad)}`}
+                              color="primary"
+                              size="small"
+                            />
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
                 </Box>
-              )}
-            </Card>
-          </Box>
-        </Box>
-      </DialogContent>
 
-      <DialogActions className="contenedor-botones-crear" sx={{ backgroundColor: theme.palette.background.default }}>
-        <Button
-          onClick={onHide}
-          className="boton-cancelar-crear"
-          variant="outlined"
-          disabled={cargando}
-          sx={{ color: theme.palette.text.primary, backgroundColor: 'red' }}
-        >
-          Cancelar
-        </Button>
-        <Button
-          onClick={crearPedido}
-          className="boton-crear"
-          variant="contained"
-          disabled={cargando || inventario.length === 0 || !formData.usuarioId}
-          startIcon={cargando ? <CircularProgress size={16} /> : <AddCircleIcon />}
-        >
-          {cargando ? "Creando Pedido..." : "Crear Pedido"}
-        </Button>
-      </DialogActions>
-    </Dialog>
+                {inventario.length > 0 && (
+                  <Box
+                    sx={{
+                      background: "linear-gradient(135deg, #083628ff 0%, #08684aff 100%)",
+                      color: "white",
+                      borderRadius: "12px",
+                      padding: "20px",
+                      marginTop: "16px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography sx={{ fontWeight: "700", fontSize: "1.1rem", display: "flex", alignItems: "center" }}>
+                      <MoneyIcon sx={{ mr: 1 }} />
+                      Total:
+                    </Typography>
+                    <Typography sx={{ fontSize: "1.5rem", fontWeight: "700" }}>
+                      {formatCurrency(calcularTotal())}
+                    </Typography>
+                  </Box>
+                )}
+              </Card>
+            </Box>
+          </Box>
+        </DialogContent>
+
+        <DialogActions className="contenedor-botones-crear" sx={{ backgroundColor: theme.palette.background.default }}>
+          <Button
+            onClick={onHide}
+            className="boton-cancelar-crear"
+            variant="outlined"
+            disabled={cargando}
+            sx={{ color: theme.palette.text.primary, backgroundColor: 'red' }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={crearPedido}
+            className="boton-crear"
+            variant="contained"
+            disabled={cargando || inventario.length === 0 || !formData.usuarioId}
+            startIcon={cargando ? <CircularProgress size={16} /> : <AddCircleIcon />}
+          >
+            {cargando ? "Creando Pedido..." : "Crear Pedido"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+          loading: {
+            duration: Infinity,
+          },
+        }}
+      />
+    </>
   );
 };
 
