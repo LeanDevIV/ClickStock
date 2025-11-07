@@ -22,7 +22,6 @@ import {
 } from "@mui/material";
 import {
   Edit as EditIcon,
-  LocationOn as LocationIcon,
   Person as PersonIcon,
   AttachMoney as MoneyIcon,
   Inventory as InventoryIcon,
@@ -34,56 +33,58 @@ import "../../css/editarPedidosModal.css";
 
 const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
   const [formData, setFormData] = useState({
-    direccionEnvio: '',
-    estado: 'pendiente',
-    productos: []
+    direccionEnvio: "",
+    estado: "pendiente",
+    productos: [],
   });
   const [cargando, setCargando] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (pedido) {
       setFormData({
-        direccionEnvio: pedido.direccionEnvio || pedido.direccion || '',
-        estado: pedido.estado || 'pendiente',
-        productos: pedido.productos ? [...pedido.productos] : []
+        direccionEnvio: pedido.direccionEnvio || pedido.direccion || "",
+        estado: pedido.estado || "pendiente",
+        productos: pedido.productos ? [...pedido.productos] : [],
       });
-      setError('');
+      setError("");
     }
   }, [pedido]);
 
   const actualizarCantidad = (index, nuevaCantidad) => {
     if (nuevaCantidad < 1) return;
-    
+
     const productosActualizados = [...formData.productos];
     productosActualizados[index] = {
       ...productosActualizados[index],
-      cantidad: nuevaCantidad
+      cantidad: nuevaCantidad,
     };
-    
+
     setFormData({
       ...formData,
-      productos: productosActualizados
+      productos: productosActualizados,
     });
   };
 
   const eliminarProducto = (index) => {
     if (formData.productos.length <= 1) {
-      setError('El pedido debe tener al menos un producto');
+      setError("El pedido debe tener al menos un producto");
       return;
     }
 
-    const productosActualizados = formData.productos.filter((_, i) => i !== index);
+    const productosActualizados = formData.productos.filter(
+      (_, i) => i !== index
+    );
     setFormData({
       ...formData,
-      productos: productosActualizados
+      productos: productosActualizados,
     });
   };
 
   const calcularTotal = () => {
     return formData.productos.reduce((total, item) => {
       const precio = item.precioUnitario || item.producto?.precio || 0;
-      return total + (precio * item.cantidad);
+      return total + precio * item.cantidad;
     }, 0);
   };
 
@@ -92,64 +93,66 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
     if (!pedido) return;
 
     if (!formData.direccionEnvio.trim()) {
-      setError('La dirección de envío es requerida');
+      setError("La dirección de envío es requerida");
       return;
     }
 
     if (formData.productos.length === 0) {
-      setError('El pedido debe tener al menos un producto');
+      setError("El pedido debe tener al menos un producto");
       return;
     }
 
-    const productoInvalido = formData.productos.find(item => item.cantidad < 1);
+    const productoInvalido = formData.productos.find(
+      (item) => item.cantidad < 1
+    );
     if (productoInvalido) {
-      setError('Todas las cantidades deben ser al menos 1');
+      setError("Todas las cantidades deben ser al menos 1");
       return;
     }
 
     setCargando(true);
-    setError('');
+    setError("");
 
     try {
       const updateData = {
         direccion: formData.direccionEnvio.trim(),
         estado: formData.estado,
-        productos: formData.productos.map(item => ({
+        productos: formData.productos.map((item) => ({
           producto: item.producto?._id || item.producto,
-          cantidad: item.cantidad
+          cantidad: item.cantidad,
         })),
-        total: calcularTotal()
+        total: calcularTotal(),
       };
 
- 
-
-      const response = await fetch(`http://localhost:5000/api/pedidos/${pedido._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/pedidos/${pedido._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updateData),
+        }
+      );
 
       const responseData = await response.json();
 
       if (!response.ok) {
-        throw new Error(responseData.error || 'Error al actualizar pedido');
+        throw new Error(responseData.error || "Error al actualizar pedido");
       }
 
       onPedidoEditado(responseData.pedido || responseData);
       onHide();
-      
     } catch (error) {
-      console.error('Error actualizando pedido:', error);
-      setError('Error al actualizar pedido: ' + error.message);
+      console.error("Error actualizando pedido:", error);
+      setError("Error al actualizar pedido: " + error.message);
     } finally {
       setCargando(false);
     }
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
     }).format(amount);
   };
 
@@ -189,11 +192,14 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                   <PersonIcon sx={{ fontSize: 18, mr: 1 }} />
                   Información del Cliente
                 </Typography>
-                <Typography variant="h6" className="valor-dato valor-dato-cliente">
-                  {pedido.usuario?.nombreUsuario || 'Cliente no especificado'}
+                <Typography
+                  variant="h6"
+                  className="valor-dato valor-dato-cliente"
+                >
+                  {pedido.usuario?.nombreUsuario || "Cliente no especificado"}
                 </Typography>
                 <Typography variant="body2" className="texto-email">
-                  {pedido.usuario?.email || 'Email no disponible'}
+                  {pedido.usuario?.emailUsuario || "Email no disponible"}
                 </Typography>
               </Box>
             </Grid>
@@ -204,7 +210,10 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                   <MoneyIcon sx={{ fontSize: 18, mr: 1 }} />
                   Total del Pedido
                 </Typography>
-                <Typography variant="h4" className="valor-dato valor-dato-total">
+                <Typography
+                  variant="h4"
+                  className="valor-dato valor-dato-total"
+                >
                   {formatCurrency(totalCalculado)}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -219,13 +228,12 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
               fullWidth
               label="Dirección de Envío"
               value={formData.direccionEnvio}
-              onChange={(e) => setFormData({...formData, direccionEnvio: e.target.value})}
+              onChange={(e) =>
+                setFormData({ ...formData, direccionEnvio: e.target.value })
+              }
               placeholder="Ingresa la dirección completa de envío"
               multiline
               rows={3}
-              InputProps={{
-                startAdornment: <LocationIcon color="action" sx={{ mr: 1 }} />
-              }}
             />
           </Box>
 
@@ -234,23 +242,40 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
               <InputLabel>Estado del Pedido</InputLabel>
               <Select
                 value={formData.estado}
-                onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                onChange={(e) =>
+                  setFormData({ ...formData, estado: e.target.value })
+                }
                 label="Estado del Pedido"
               >
-                <MenuItem value="pendiente" className="estado-option estado-pendiente">
-                  ⏳ Pendiente
+                <MenuItem
+                  value="pendiente"
+                  className="estado-option estado-pendiente"
+                >
+                  Pendiente
                 </MenuItem>
-                <MenuItem value="procesando" className="estado-option estado-procesando">
-                  🔄 Procesando
+                <MenuItem
+                  value="procesando"
+                  className="estado-option estado-procesando"
+                >
+                  Procesando
                 </MenuItem>
-                <MenuItem value="enviado" className="estado-option estado-enviado">
-                  🚚 Enviado
+                <MenuItem
+                  value="enviado"
+                  className="estado-option estado-enviado"
+                >
+                  Enviado
                 </MenuItem>
-                <MenuItem value="entregado" className="estado-option estado-entregado">
-                  📦 Entregado
+                <MenuItem
+                  value="entregado"
+                  className="estado-option estado-entregado"
+                >
+                  Entregado
                 </MenuItem>
-                <MenuItem value="cancelado" className="estado-option estado-cancelado">
-                  ❌ Cancelado
+                <MenuItem
+                  value="cancelado"
+                  className="estado-option estado-cancelado"
+                >
+                  Cancelado
                 </MenuItem>
               </Select>
             </FormControl>
@@ -258,7 +283,10 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
 
           <Box className="seccion-productos">
             <Box className="titulo-productos">
-              <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography
+                variant="h6"
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              >
                 <InventoryIcon />
                 Productos del Pedido
               </Typography>
@@ -266,24 +294,33 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                 Edita las cantidades según sea necesario
               </Typography>
             </Box>
-            
+
             <Box className="contenedor-productos">
               {formData.productos.map((item, index) => (
-                <Card key={index} className="tarjeta-producto" variant="outlined">
+                <Card
+                  key={index}
+                  className="tarjeta-producto"
+                  variant="outlined"
+                >
                   <CardContent className="contenido-producto">
                     <Box className="info-producto">
                       <Typography className="nombre-producto" variant="body1">
-                        {item.producto?.nombre || 'Producto no especificado'}
+                        {item.producto?.nombre || "Producto no especificado"}
                       </Typography>
                       <Typography className="precio-producto" variant="body2">
-                        {formatCurrency(item.precioUnitario || item.producto?.precio || 0)} c/u
+                        {formatCurrency(
+                          item.precioUnitario || item.producto?.precio || 0
+                        )}{" "}
+                        c/u
                       </Typography>
                     </Box>
 
                     <Box className="controles-cantidad">
                       <IconButton
                         size="small"
-                        onClick={() => actualizarCantidad(index, item.cantidad - 1)}
+                        onClick={() =>
+                          actualizarCantidad(index, item.cantidad - 1)
+                        }
                         disabled={item.cantidad <= 1}
                         color="primary"
                       >
@@ -297,17 +334,15 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                           actualizarCantidad(index, valor);
                         }}
                         type="number"
-                        inputProps={{ 
-                          min: 1, 
-                          style: { textAlign: 'center' } 
-                        }}
                         size="small"
                         className="input-cantidad"
                       />
 
                       <IconButton
                         size="small"
-                        onClick={() => actualizarCantidad(index, item.cantidad + 1)}
+                        onClick={() =>
+                          actualizarCantidad(index, item.cantidad + 1)
+                        }
                         color="primary"
                       >
                         <AddIcon />
@@ -341,14 +376,22 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                     Productos: {formData.productos.length}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Items totales: {formData.productos.reduce((sum, item) => sum + item.cantidad, 0)}
+                    Items totales:{" "}
+                    {formData.productos.reduce(
+                      (sum, item) => sum + item.cantidad,
+                      0
+                    )}
                   </Typography>
                 </Box>
                 <Box className="fila-total total-final">
                   <Typography variant="h6" fontWeight="700">
                     Total Final:
                   </Typography>
-                  <Typography variant="h6" fontWeight="700" color="success.main">
+                  <Typography
+                    variant="h6"
+                    fontWeight="700"
+                    color="success.main"
+                  >
                     {formatCurrency(totalCalculado)}
                   </Typography>
                 </Box>
@@ -373,7 +416,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
             disabled={cargando}
             startIcon={cargando ? <CircularProgress size={16} /> : <EditIcon />}
           >
-            {cargando ? 'Guardando...' : 'Guardar Cambios'}
+            {cargando ? "Guardando..." : "Guardar Cambios"}
           </Button>
         </DialogActions>
       </form>

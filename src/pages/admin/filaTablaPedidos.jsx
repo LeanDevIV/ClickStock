@@ -15,26 +15,19 @@ import {
 } from "@mui/icons-material";
 import "../../css/filaTablaPedidos.css";
 
-const FilaTablaPedidos = ({
-  pedido,
-  index,
-  onEditar,
-  onEliminar,
-}) => {
-
+const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
     }).format(amount);
   };
 
-
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return new Date(dateString).toLocaleDateString("es-AR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
@@ -44,42 +37,38 @@ const FilaTablaPedidos = ({
 
   const getEstadoText = (estado) => {
     const estados = {
-      pendiente: '⏳ Pendiente',
-      procesando: '🔄 Procesando',
-      enviado: '🚚 Enviado',
-      entregado: '📦 Entregado',
-      cancelado: '❌ Cancelado'
+      pendiente: "Pendiente",
+      procesando: "Procesando",
+      enviado: "Enviado",
+      entregado: "Entregado",
+      cancelado: "Cancelado",
     };
     return estados[estado] || estado;
   };
 
   return (
     <TableRow className="fila-pedido">
-      <TableCell className="celda-numero">
-        {index + 1}
-      </TableCell>
+      <TableCell className="celda-numero">{index + 1}</TableCell>
       <TableCell className="celda-cliente">
         <Box>
           <Typography className="texto-cliente" variant="body2">
-            {pedido.usuario?.nombreUsuario || 'Cliente'}
+            {pedido.usuario?.nombreUsuario || "Cliente"}
           </Typography>
           <Typography className="texto-email" variant="caption">
-            {pedido.usuario?.email || 'N/A'}
+            {pedido.usuario?.emailUsuario || "N/A"}
           </Typography>
         </Box>
       </TableCell>
-
-      {/* Productos */}
       <TableCell className="celda-productos">
         <Box className="contenedor-productos">
           {pedido.productos?.slice(0, 3).map((item, idx) => (
             <Box key={idx} className="producto-item">
-              <Typography 
-                className="nombre-producto" 
+              <Typography
+                className="nombre-producto"
                 variant="body2"
-                title={item.producto?.nombre || 'Producto'}
+                title={item.producto?.nombre || "Producto"}
               >
-                {item.producto?.nombre || 'Producto'}
+                {item.producto?.nombre || "Producto"}
               </Typography>
               <Typography className="cantidad-producto" variant="caption">
                 x{item.cantidad}
@@ -93,30 +82,29 @@ const FilaTablaPedidos = ({
           )}
         </Box>
       </TableCell>
-
       <TableCell className="celda-direccion">
         <Box display="flex" alignItems="flex-start" gap={1}>
-          <LocationIcon 
-            fontSize="small" 
-            color="action" 
+          <LocationIcon
+            fontSize="small"
+            color="action"
             sx={{ mt: 0.2, flexShrink: 0 }}
           />
-          <Typography 
-            className="texto-direccion" 
+          <Typography
+            className="texto-direccion"
             variant="body2"
-            title={pedido.direccionEnvio || pedido.direccion || 'Sin dirección'}
+            title={pedido.direccionEnvio || pedido.direccion || "Sin dirección"}
           >
-            {pedido.direccionEnvio || pedido.direccion || 'Sin dirección especificada'}
+            {pedido.direccionEnvio ||
+              pedido.direccion ||
+              "Sin dirección especificada"}
           </Typography>
         </Box>
       </TableCell>
-
       <TableCell className="celda-total">
-        <Typography variant="body2" color="success.main" fontWeight="bold">
+        <Typography  variant="body2" color="black !important " fontWeight="bold">
           {formatCurrency(pedido.total)}
         </Typography>
       </TableCell>
-
       <TableCell className="celda-estado">
         <Chip
           label={getEstadoText(pedido.estado)}
@@ -125,13 +113,11 @@ const FilaTablaPedidos = ({
           variant="filled"
         />
       </TableCell>
-
       <TableCell className="celda-fecha">
         <Typography variant="body2" color="text.secondary">
           {formatDate(pedido.fechaCreacion)}
         </Typography>
       </TableCell>
-
       <TableCell className="celda-acciones">
         <Box className="contenedor-botones">
           <Tooltip title="Editar pedido">
@@ -144,7 +130,6 @@ const FilaTablaPedidos = ({
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          
           <Tooltip title="Eliminar pedido">
             <IconButton
               size="small"

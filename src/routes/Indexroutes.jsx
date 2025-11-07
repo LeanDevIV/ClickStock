@@ -25,7 +25,7 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
         {/* Rutas admin protegidas */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="productos" element={<AdminProductos />} />
-          <Route path="/admin/pedidos" element={<TablaPedidos />} />
+          <Route path="pedidos" element={<TablaPedidos />} />
           <Route path="usuarios" element={<AdminUsuarios />} />
         </Route>
       </Route>

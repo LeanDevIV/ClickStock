@@ -1,4 +1,3 @@
-/* src/css/editarPedidosModal.css */
 .modal-editar-pedido .MuiDialog-paper {
   border-radius: 16px !important;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2) !important;
@@ -22,7 +21,6 @@
   padding: 24px !important;
 }
 
-/* SECCIÓN DATOS MÁS GRANDE */
 .seccion-datos {
   margin-bottom: 24px;
 }
@@ -95,7 +93,6 @@
   border-radius: 12px !important;
 }
 
-/* PRODUCTOS EDITABLES */
 .seccion-productos {
   margin-bottom: 16px;
 }
@@ -185,7 +182,6 @@
   background-color: #fef2f2 !important;
 }
 
-/* Resumen de total */
 .resumen-total {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
   border: 2px solid #e9ecef !important;
@@ -210,7 +206,6 @@
   margin-top: 8px;
 }
 
-/* Botones */
 .contenedor-botones {
   padding: 20px 24px 24px 24px !important;
   border-top: 1px solid #e9ecef !important;
@@ -243,7 +238,6 @@
   box-shadow: none !important;
 }
 
-/* Estados del select */
 .estado-option {
   font-weight: 500 !important;
   padding: 8px 16px !important;
@@ -269,7 +263,6 @@
   color: #dc2626 !important;
 }
 
-/* Scrollbar personalizado */
 .contenedor-productos::-webkit-scrollbar {
   width: 6px;
 }
@@ -288,7 +281,6 @@
   background: #a8a8a8;
 }
 
-/* Responsive para móviles */
 @media (max-width: 768px) {
   .modal-editar-pedido .MuiDialog-paper {
     min-width: auto !important;

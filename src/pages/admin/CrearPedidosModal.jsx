@@ -19,6 +19,7 @@ import {
   Grid,
   Alert,
   IconButton,
+  useTheme,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -32,16 +33,20 @@ import {
 import "../../css/crearPedidosModal.css";
 
 const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
+  const theme = useTheme();
   const [usuarios, setUsuarios] = useState([]);
   const [productos, setProductos] = useState([]);
   const [inventario, setInventario] = useState([]);
   const [formData, setFormData] = useState({
-    usuarioId: '',
-    direccionEnvio: ''
+    usuarioId: "",
+    direccionEnvio: "",
+  });
+  const [errores, setErrores] = useState({
+    direccionEnvio: "",
   });
   const [cargando, setCargando] = useState(false);
-  const [errorUsuarios, setErrorUsuarios] = useState('');
-  const [errorProductos, setErrorProductos] = useState('');
+  const [errorUsuarios, setErrorUsuarios] = useState("");
+  const [errorProductos, setErrorProductos] = useState("");
   const [cargandoUsuarios, setCargandoUsuarios] = useState(false);
   const [cargandoProductos, setCargandoProductos] = useState(false);
 
@@ -55,82 +60,45 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
 
   const resetForm = () => {
     setInventario([]);
-    setFormData({ usuarioId: '', direccionEnvio: '' });
-    setErrorUsuarios('');
-    setErrorProductos('');
+    setFormData({ usuarioId: "", direccionEnvio: "" });
+    setErrores({ direccionEnvio: "" });
+    setErrorUsuarios("");
+    setErrorProductos("");
   };
 
   const cargarUsuarios = async () => {
     try {
       setCargandoUsuarios(true);
-      setErrorUsuarios('');
-  
-      const authStorage = localStorage.getItem('auth-storage');
-      
-      if (!authStorage) {
-        throw new Error('No hay sesión activa. Inicia sesión primero.');
-      }
-      
-      let userData, token;
-      try {
-        const parsedStorage = JSON.parse(authStorage);
-        userData = parsedStorage.state?.user;
-        token = parsedStorage.state?.token;
-      } catch (error) {
-        throw new Error('Error al leer la sesión del usuario.');
-      }
-      
-      if (!userData || !token) {
-        throw new Error('No se encontraron datos de autenticación completos.');
-      }
-      
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
-      
-      const response = await fetch('http://localhost:5000/api/usuarios', {
-        method: 'GET',
-        headers: headers
+      setErrorUsuarios("");
+
+      const authStorage = localStorage.getItem("auth-storage");
+      if (!authStorage) throw new Error("No hay sesión activa");
+
+      const parsedStorage = JSON.parse(authStorage);
+      const userData = parsedStorage.state?.user;
+      const token = parsedStorage.state?.token;
+
+      if (!userData || !token) throw new Error("Datos de autenticación incompletos");
+
+      const response = await fetch("http://localhost:5000/api/usuarios", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
-      if (response.status === 401) {
-        throw new Error('No autorizado. Tu sesión puede haber expirado.');
-      }
-      
-      if (response.status === 403) {
-        throw new Error('No tienes permisos para ver usuarios.');
-      }
-      
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
-      }
-      
+
+      if (response.status === 401) throw new Error("Sesión expirada");
+      if (response.status === 403) throw new Error("Sin permisos para ver usuarios");
+      if (!response.ok) throw new Error(`Error ${response.status}`);
+
       const data = await response.json();
-      
-      let usuariosData = [];
-      if (Array.isArray(data)) {
-        usuariosData = data;
-      } else if (data.usuarios && Array.isArray(data.usuarios)) {
-        usuariosData = data.usuarios;
-      } else {
-        usuariosData = [];
-      }
-      
+      const usuariosData = Array.isArray(data) ? data : data.usuarios || [];
+
       setUsuarios(usuariosData);
-      
-      if (usuariosData.length === 0) {
-        setErrorUsuarios('No se encontraron usuarios en el sistema');
-      }
-      
+      if (usuariosData.length === 0) setErrorUsuarios("No se encontraron usuarios");
     } catch (error) {
       setErrorUsuarios(error.message);
-      
-      const usuariosEjemplo = [
-        { _id: '690ba421dfa3a0a4c8bc8633', nombreUsuario: 'admin-test', email: 'test@example.com' },
-        { _id: 'usuario-2', nombreUsuario: 'Cliente Demo', email: 'cliente@ejemplo.com' }
-      ];
-      setUsuarios(usuariosEjemplo);
     } finally {
       setCargandoUsuarios(false);
     }
@@ -139,84 +107,101 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
   const cargarProductos = async () => {
     try {
       setCargandoProductos(true);
-      setErrorProductos('');
-      
-      const response = await fetch('http://localhost:5000/api/productos');
-      
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: No se pudieron cargar los productos`);
-      }
-      
+      setErrorProductos("");
+
+      const response = await fetch("http://localhost:5000/api/productos");
+      if (!response.ok) throw new Error(`Error ${response.status}`);
+
       const data = await response.json();
-      
-      let productosData = [];
-      if (Array.isArray(data)) {
-        productosData = data;
-      } else if (data.productos && Array.isArray(data.productos)) {
-        productosData = data.productos;
-      } else if (data.data && Array.isArray(data.data)) {
-        productosData = data.data;
-      } else {
-        throw new Error('Formato de respuesta no válido');
-      }
-     
+      const productosData = Array.isArray(data) ? data : data.productos || data.data || [];
+
       setProductos(productosData);
-      
     } catch (error) {
-      setErrorProductos('No se pudieron cargar los productos reales: ' + error.message);
-      
-      const productosMock = [
-        { 
-          _id: '6993e0beba8b631c1cedc97', 
-          nombre: 'Mouse Gamer 8600 DPI', 
-          precio: 25999, 
-          stock: 36, 
-          descripcion: 'Mouse ergonómico con 7 botones programables.' 
-        },
-        { 
-          _id: '6993e0beba8b631c1cedc98', 
-          nombre: "Monitor 24' 144Hz", 
-          precio: 189999, 
-          stock: 3, 
-          descripcion: "Monitor Full HD con tasa de refresco de 144Hz." 
-        }
-      ];
-      setProductos(productosMock);
-      setErrorProductos('Usando datos de demostración con IDs reales');
+      setErrorProductos("No se pudieron cargar los productos reales");
     } finally {
       setCargandoProductos(false);
     }
   };
 
+  const validarDireccion = (direccion) => {
+    if (!direccion || direccion.trim() === "") {
+      return "La dirección es obligatoria";
+    }
+    
+    if (direccion.trim().length < 10) {
+      return "La dirección debe tener al menos 10 caracteres";
+    }
+    
+    if (direccion.trim().length > 200) {
+      return "La dirección no puede exceder los 200 caracteres";
+    }
+    
+    const tieneNumero = /\d/.test(direccion);
+    const tieneTexto = /[a-zA-Z]/.test(direccion);
+    
+    if (!tieneNumero || !tieneTexto) {
+      return "La dirección debe incluir número y nombre de calle";
+    }
+    
+    return "";
+  };
+
+  const manejarCambioDireccion = (e) => {
+    const nuevaDireccion = e.target.value;
+    setFormData({ ...formData, direccionEnvio: nuevaDireccion });
+    
+    if (nuevaDireccion.length > 0) {
+      const error = validarDireccion(nuevaDireccion);
+      setErrores({ ...errores, direccionEnvio: error });
+    } else {
+      setErrores({ ...errores, direccionEnvio: "" });
+    }
+  };
+
+  const validarFormulario = () => {
+    const erroresTemp = {
+      direccionEnvio: validarDireccion(formData.direccionEnvio),
+    };
+    
+    setErrores(erroresTemp);
+    
+    return !erroresTemp.direccionEnvio;
+  };
+
   const agregarAlInventario = (producto) => {
     if (producto.stock <= 0) {
-      alert('❌ Producto sin stock disponible');
+      alert("❌ Producto sin stock disponible");
       return;
     }
 
-    const existe = inventario.find(item => item.producto._id === producto._id);
-    
+    const existe = inventario.find((item) => item.producto._id === producto._id);
+
     if (existe) {
       if (existe.cantidad >= producto.stock) {
-        alert(`❌ No hay suficiente stock. Máximo: ${producto.stock}`);
+        alert(`❌ Stock máximo: ${producto.stock}`);
         return;
       }
-      setInventario(inventario.map(item =>
-        item.producto._id === producto._id
-          ? { ...item, cantidad: item.cantidad + 1 }
-          : item
-      ));
+      setInventario(
+        inventario.map((item) =>
+          item.producto._id === producto._id
+            ? { ...item, cantidad: item.cantidad + 1 }
+            : item
+        )
+      );
     } else {
-      setInventario([...inventario, {
-        producto,
-        cantidad: 1,
-        precioUnitario: producto.precio
-      }]);
+      setInventario([
+        ...inventario,
+        {
+          producto,
+          cantidad: 1,
+          precioUnitario: producto.precio,
+        },
+      ]);
     }
   };
 
   const removerDelInventario = (productoId) => {
-    setInventario(inventario.filter(item => item.producto._id !== productoId));
+    setInventario(inventario.filter((item) => item.producto._id !== productoId));
   };
 
   const actualizarCantidad = (productoId, nuevaCantidad) => {
@@ -225,114 +210,83 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
       return;
     }
 
-    const item = inventario.find(item => item.producto._id === productoId);
+    const item = inventario.find((item) => item.producto._id === productoId);
     if (item && nuevaCantidad > item.producto.stock) {
-      alert(`❌ No hay suficiente stock. Máximo: ${item.producto.stock}`);
+      alert(`❌ Stock máximo: ${item.producto.stock}`);
       return;
     }
 
-    setInventario(inventario.map(item =>
-      item.producto._id === productoId
-        ? { ...item, cantidad: nuevaCantidad }
-        : item
-    ));
+    setInventario(
+      inventario.map((item) =>
+        item.producto._id === productoId
+          ? { ...item, cantidad: nuevaCantidad }
+          : item
+      )
+    );
   };
 
   const calcularTotal = () => {
-    return inventario.reduce((total, item) => total + (item.precioUnitario * item.cantidad), 0);
+    return inventario.reduce(
+      (total, item) => total + item.precioUnitario * item.cantidad,
+      0
+    );
   };
 
   const crearPedido = async () => {
-    if (!formData.usuarioId) {
-      alert('❌ Selecciona un cliente');
-      return;
-    }
-
-    if (inventario.length === 0) {
-      alert('❌ Agrega al menos un producto al inventario');
-      return;
-    }
-
-    if (!formData.direccionEnvio?.trim()) {
-      alert('❌ La dirección de envío es requerida');
+    if (!formData.usuarioId) return alert("❌ Selecciona un cliente");
+    if (inventario.length === 0) return alert("❌ Agrega al menos un producto");
+    
+    if (!validarFormulario()) {
+      alert("❌ Por favor corrige los errores en el formulario");
       return;
     }
 
     setCargando(true);
     try {
+      const authStorage = localStorage.getItem("auth-storage");
+      if (!authStorage) throw new Error("No hay sesión activa");
+
+      const token = JSON.parse(authStorage).state?.token;
+      if (!token) throw new Error("Token no encontrado");
+
       const pedidoData = {
         usuario: formData.usuarioId,
-        productos: inventario.map(item => ({
+        productos: inventario.map((item) => ({
           producto: item.producto._id,
           cantidad: item.cantidad,
-          precioUnitario: item.precioUnitario
+          precioUnitario: item.precioUnitario,
         })),
         total: calcularTotal(),
         direccion: formData.direccionEnvio.trim(),
-        estado: 'pendiente'
+        estado: "pendiente",
       };
 
-      const authStorage = localStorage.getItem('auth-storage');
-      if (!authStorage) {
-        throw new Error('No hay sesión activa. Inicia sesión primero.');
-      }
-
-      const parsedStorage = JSON.parse(authStorage);
-      const token = parsedStorage.state?.token;
-
-      if (!token) {
-        throw new Error('No se encontró token de autenticación.');
-      }
-
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
-
-      const response = await fetch('http://localhost:5000/api/pedidos', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(pedidoData)
+      const response = await fetch("http://localhost:5000/api/pedidos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(pedidoData),
       });
 
-      const responseText = await response.text();
-      let responseData;
-      
-      try {
-        responseData = JSON.parse(responseText);
-      } catch (e) {
-        throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
-      }
-
-      if (!response.ok) {
-        const errorMessage = responseData.error || 
-                            responseData.message || 
-                            responseData.details || 
-                            `Error ${response.status}: ${response.statusText}`;
-        throw new Error(errorMessage);
-      }
+      const responseData = await response.json();
+      if (!response.ok) throw new Error(responseData.error || responseData.message || "Error del servidor");
 
       onPedidoCreado(responseData.pedido || responseData);
-      alert('✅ Pedido creado exitosamente');
+      alert("✅ Pedido creado exitosamente");
       onHide();
-      
     } catch (error) {
-      let mensajeError = `Error al crear pedido: ${error.message}`;
-      
-      if (error.message.includes('500') || error.message.includes('Internal Server')) {
-        mensajeError += '\n\nRevisa la consola del backend para más detalles.';
-      }
-      
-      alert(mensajeError);
+      alert(`Error al crear pedido: ${error.message}`);
     } finally {
       setCargando(false);
     }
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
     }).format(amount);
   };
 
@@ -347,13 +301,14 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
       <DialogTitle className="header-modal-crear">
         <Box className="titulo-modal-crear">
           <AddCircleIcon />
-          <Typography variant="h5" component="div">
-            Cargar un pedido manualmente
-          </Typography>
+          <Typography variant="h5">Cargar un pedido manualmente</Typography>
         </Box>
       </DialogTitle>
 
-      <DialogContent className="contenido-modal-crear">
+      <DialogContent
+        className="contenido-modal-crear"
+        sx={{ backgroundColor: theme.palette.background.default }}
+      >
         {errorUsuarios && (
           <Alert severity="warning" sx={{ mb: 3, borderRadius: 2 }}>
             <strong>Aviso:</strong> {errorUsuarios}
@@ -363,179 +318,181 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
         <Grid container spacing={3} className="seccion-cliente-direccion">
           <Grid size={{ xs: 12, md: 6 }}>
             <FormControl fullWidth>
-              <InputLabel>Cliente</InputLabel>
+              <InputLabel sx={{ color: theme.palette.text.primary }}>
+                Cliente
+              </InputLabel>
               {cargandoUsuarios ? (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, p: 2 }}>
                   <CircularProgress size={20} />
-                  <Typography>Cargando clientes...</Typography>
+                  <Typography sx={{ color: theme.palette.text.primary }}>
+                    Cargando clientes...
+                  </Typography>
                 </Box>
               ) : (
                 <Select
                   value={formData.usuarioId}
-                  onChange={(e) => setFormData({...formData, usuarioId: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, usuarioId: e.target.value })}
                   label="Cliente"
+                  sx={{ color: theme.palette.text.primary }}
                 >
                   <MenuItem value="">Selecciona un cliente</MenuItem>
-                  {usuarios && usuarios.length > 0 ? (
-                    usuarios.map(usuario => (
-                      <MenuItem key={usuario._id} value={usuario._id}>
-                        {usuario.nombreUsuario} - {usuario.email}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem value="" disabled>No hay clientes</MenuItem>
-                  )}
+                  {usuarios.map((usuario) => (
+                    <MenuItem key={usuario._id} value={usuario._id} sx={{ color: theme.palette.text.primary }}>
+                      {usuario.nombreUsuario} - {usuario.emailUsuario}
+                    </MenuItem>
+                  ))}
                 </Select>
               )}
             </FormControl>
           </Grid>
-          
+
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
               label="Dirección de Envío"
               value={formData.direccionEnvio}
-              onChange={(e) => setFormData({...formData, direccionEnvio: e.target.value})}
+              onChange={manejarCambioDireccion}
+              onBlur={() => {
+                const error = validarDireccion(formData.direccionEnvio);
+                setErrores({ ...errores, direccionEnvio: error });
+              }}
+              error={!!errores.direccionEnvio}
+              helperText={errores.direccionEnvio || "Ej: Av. Corrientes 1234, Buenos Aires"}
               placeholder="Ingresa la dirección completa"
+              multiline
+              rows={2}
+              inputProps={{ maxLength: 200 }}
             />
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+              {formData.direccionEnvio.length}/200 caracteres
+            </Typography>
           </Grid>
         </Grid>
 
         <Box className="seccion-productos">
           <Box className="contenedor-productos-inventario">
-            <Card className="tarjeta-seccion" variant="outlined">
-              <Typography variant="h6" className="titulo-seccion">
+            <Card className="tarjeta-seccion">
+              <Typography variant="h6" className="titulo-seccion" sx={{ color: theme.palette.text.primary }}>
                 <StoreIcon />
                 Productos Disponibles
               </Typography>
-              
+
               {errorProductos && (
                 <Alert severity="info" sx={{ mb: 2 }}>
                   {errorProductos}
                 </Alert>
               )}
-              
+
               {cargandoProductos ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", flex: 1 }}>
                   <CircularProgress />
                 </Box>
               ) : (
                 <Box className="lista-productos">
-                  {productos && productos.length > 0 ? (
-                    productos.map(producto => (
-                      <Card 
-                        key={producto._id}
-                        className="tarjeta-producto"
-                        onClick={() => agregarAlInventario(producto)}
-                        sx={{
-                          cursor: producto.stock > 0 ? 'pointer' : 'not-allowed',
-                          opacity: producto.stock > 0 ? 1 : 0.6
-                        }}
-                      >
-                        <CardContent className="contenido-producto">
-                          <Typography className="nombre-producto" variant="body1">
-                            {producto.nombre}
+                  {productos.map((producto) => (
+                    <Card
+                      key={producto._id}
+                      className="tarjeta-producto"
+                      onClick={() => agregarAlInventario(producto)}
+                      sx={{
+                        cursor: producto.stock > 0 ? "pointer" : "not-allowed",
+                        opacity: producto.stock > 0 ? 1 : 0.6,
+                      }}
+                    >
+                      <CardContent className="contenido-producto">
+                        <Typography className="nombre-producto" sx={{ color: "black" }}>
+                          {producto.nombre}
+                        </Typography>
+                        <Typography className="descripcion-producto" sx={{ color: "black" }}>
+                          {producto.descripcion}
+                        </Typography>
+                        <Box className="precio-stock">
+                          <Typography className="precio-producto" sx={{ color: "black !important" }}>
+                            {formatCurrency(producto.precio)}
                           </Typography>
-                          <Typography className="descripcion-producto" variant="body2">
-                            {producto.descripcion}
-                          </Typography>
-                          <Box className="precio-stock">
-                            <Typography className="precio-producto">
-                              {formatCurrency(producto.precio)}
-                            </Typography>
-                            <Chip
-                              label={`Stock: ${producto.stock}`}
-                              color={producto.stock > 0 ? 'success' : 'error'}
-                              size="small"
-                              className="badge-stock"
-                            />
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    ))
-                  ) : (
-                    <Box className="estado-vacio">
-                      <StoreIcon sx={{ fontSize: 48, mb: 2, color: 'text.secondary' }} />
-                      <Typography variant="h6" color="text.secondary">
-                        No hay productos disponibles
-                      </Typography>
-                    </Box>
-                  )}
+                          <Chip
+                            label={`Stock: ${producto.stock}`}
+                            color={producto.stock > 0 ? "success" : "error"}
+                            size="small"
+                          />
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </Box>
               )}
             </Card>
 
-            <Card className="tarjeta-seccion" variant="outlined">
-              <Typography variant="h6" className="titulo-seccion">
+            <Card className="tarjeta-seccion">
+              <Typography variant="h6" className="titulo-seccion" sx={{ color: theme.palette.text.primary }}>
                 <ListIcon />
                 Inventario del Pedido
               </Typography>
-              
+
               <Box className="lista-inventario">
                 {inventario.length === 0 ? (
                   <Box className="estado-vacio">
-                    <ListIcon sx={{ fontSize: 48, mb: 2, color: 'text.secondary' }} />
-                    <Typography variant="h6" color="text.secondary">
+                    <ListIcon sx={{ fontSize: 48, mb: 2, color: theme.palette.text.secondary }} />
+                    <Typography variant="h6" sx={{ color: theme.palette.text.secondary }}>
                       No hay productos en el inventario
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
                       Haz clic en los productos para agregarlos
                     </Typography>
                   </Box>
                 ) : (
-                  inventario.map(item => (
+                  inventario.map((item) => (
                     <Card key={item.producto._id} className="tarjeta-inventario">
                       <CardContent className="contenido-inventario">
                         <Box className="info-producto-inventario">
-                          <Typography variant="body1" fontWeight="600">
+                          <Typography variant="body1" fontWeight="600" sx={{ color: theme.palette.text.primary }}>
                             {item.producto.nombre}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" sx={{ color: "black !important" }}>
                             {formatCurrency(item.precioUnitario)} c/u
                           </Typography>
                         </Box>
-                        
+
                         <Box className="controles-cantidad">
                           <Box className="botones-cantidad">
                             <IconButton
                               size="small"
                               onClick={() => actualizarCantidad(item.producto._id, item.cantidad - 1)}
                               className="boton-cantidad"
+                              sx={{ color: theme.palette.text.primary }}
                             >
                               <RemoveIcon />
                             </IconButton>
-                            
+
                             <TextField
                               value={item.cantidad}
-                              onChange={(e) => {
-                                const valor = parseInt(e.target.value) || 1;
-                                actualizarCantidad(item.producto._id, valor);
-                              }}
+                              onChange={(e) => actualizarCantidad(item.producto._id, parseInt(e.target.value) || 1)}
                               type="number"
-                              inputProps={{ min: 1 }}
                               size="small"
                               className="input-cantidad"
                             />
-                            
+
                             <IconButton
                               size="small"
                               onClick={() => actualizarCantidad(item.producto._id, item.cantidad + 1)}
                               className="boton-cantidad"
+                              sx={{ color: theme.palette.text.primary }}
                             >
                               <AddIcon />
                             </IconButton>
                           </Box>
-                          
+
                           <IconButton
                             size="small"
                             onClick={() => removerDelInventario(item.producto._id)}
                             className="boton-eliminar"
+                            sx={{ color: theme.palette.error.main }}
                           >
                             <DeleteIcon />
                           </IconButton>
                         </Box>
-                        
-                        <Box sx={{ textAlign: 'right', mt: 1 }}>
+
+                        <Box sx={{ textAlign: "right", mt: 1 }}>
                           <Chip
                             label={`Subtotal: ${formatCurrency(item.precioUnitario * item.cantidad)}`}
                             color="primary"
@@ -547,33 +504,41 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
                   ))
                 )}
               </Box>
-              
+
               {inventario.length > 0 && (
-                <Card className="resumen-total">
-                  <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography className="texto-total" variant="h6">
-                        <MoneyIcon sx={{ mr: 1 }} />
-                        Total:
-                      </Typography>
-                      <Typography className="valor-total">
-                        {formatCurrency(calcularTotal())}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
+                <Box
+                  sx={{
+                    background: "linear-gradient(135deg, #083628ff 0%, #08684aff 100%)",
+                    color: "white",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    marginTop: "16px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography sx={{ fontWeight: "700", fontSize: "1.1rem", display: "flex", alignItems: "center" }}>
+                    <MoneyIcon sx={{ mr: 1 }} />
+                    Total:
+                  </Typography>
+                  <Typography sx={{ fontSize: "1.5rem", fontWeight: "700" }}>
+                    {formatCurrency(calcularTotal())}
+                  </Typography>
+                </Box>
               )}
             </Card>
           </Box>
         </Box>
       </DialogContent>
 
-      <DialogActions className="contenedor-botones-crear">
+      <DialogActions className="contenedor-botones-crear" sx={{ backgroundColor: theme.palette.background.default }}>
         <Button
           onClick={onHide}
           className="boton-cancelar-crear"
           variant="outlined"
           disabled={cargando}
+          sx={{ color: theme.palette.text.primary, backgroundColor: 'red' }}
         >
           Cancelar
         </Button>
@@ -584,7 +549,7 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
           disabled={cargando || inventario.length === 0 || !formData.usuarioId}
           startIcon={cargando ? <CircularProgress size={16} /> : <AddCircleIcon />}
         >
-          {cargando ? 'Creando Pedido...' : 'Crear Pedido'}
+          {cargando ? "Creando Pedido..." : "Crear Pedido"}
         </Button>
       </DialogActions>
     </Dialog>
