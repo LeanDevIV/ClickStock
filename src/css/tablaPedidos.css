@@ -1,0 +1,201 @@
+/* src/css/tablaPedidos.css */
+.contenedor-principal {
+  min-height: 100vh;
+  padding: 20px;
+  margin-top: 80px;
+  background-color: #f5f5f5;
+}
+
+.contenedor-cargando {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+/* Tabla que ocupa todo el espacio */
+.tabla-contenedor {
+  height: calc(100vh - 200px);
+  overflow: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Cabecera de tabla sticky */
+.tabla-cabecera {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tabla-celda-cabecera {
+  background-color: #f8f9fa !important;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+  border-bottom: 2px solid #dee2e6 !important;
+  white-space: nowrap;
+  padding: 16px 12px !important;
+}
+
+/* Celdas del cuerpo */
+.tabla-celda {
+  padding: 12px !important;
+  border-bottom: 1px solid #e9ecef !important;
+  vertical-align: top;
+}
+
+/* Manejo de texto largo */
+.tabla-celda-cliente {
+  max-width: 200px;
+  min-width: 150px;
+}
+
+.tabla-celda-productos {
+  max-width: 300px;
+  min-width: 200px;
+}
+
+.tabla-celda-total {
+  min-width: 100px;
+  text-align: right !important;
+}
+
+.tabla-celda-estado {
+  min-width: 120px;
+}
+
+.tabla-celda-fecha {
+  min-width: 130px;
+}
+
+.tabla-celda-acciones {
+  min-width: 150px;
+  text-align: center !important;
+}
+
+/* Texto que no se corta */
+.texto-cliente {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.texto-email {
+  font-size: 0.875rem;
+  color: #6c757d;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Productos con chips */
+.contenedor-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.chip-producto {
+  font-size: 0.75rem !important;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Estados con colores */
+.estado-pendiente {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+  font-weight: 600;
+}
+
+.estado-procesando {
+  background-color: #cce7ff !important;
+  color: #004085 !important;
+  font-weight: 600;
+}
+
+.estado-enviado {
+  background-color: #d1ecf1 !important;
+  color: #0c5460 !important;
+  font-weight: 600;
+}
+
+.estado-entregado {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+  font-weight: 600;
+}
+
+.estado-cancelado {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+  font-weight: 600;
+}
+
+/* Acciones */
+.contenedor-acciones {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.boton-accion {
+  min-width: 36px !important;
+  width: 36px;
+  height: 36px;
+}
+
+/* Estado vacío */
+.estado-vacio {
+  text-align: center;
+  padding: 60px 20px !important;
+  color: #6c757d;
+}
+
+/* Scrollbar personalizado */
+.tabla-contenedor::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tabla-contenedor::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.tabla-contenedor::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.tabla-contenedor::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contenedor-principal {
+    padding: 10px;
+  }
+  
+  .tabla-contenedor {
+    height: calc(100vh - 150px);
+  }
+  
+  .tabla-celda {
+    padding: 8px !important;
+    font-size: 0.875rem;
+  }
+  
+  .tabla-celda-cabecera {
+    padding: 12px 8px !important;
+    font-size: 0.875rem;
+  }
+}

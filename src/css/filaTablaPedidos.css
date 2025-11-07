@@ -1,0 +1,173 @@
+/* src/css/filaTablaPedidos.css */
+.fila-pedido:hover {
+  background-color: #f8f9fa !important;
+}
+
+.celda-numero {
+  font-weight: 700 !important;
+  color: #6c757d !important;
+}
+
+.celda-cliente {
+  min-width: 180px;
+  max-width: 200px;
+}
+
+.celda-productos {
+  min-width: 300px;
+  max-width: 350px;
+}
+
+.celda-direccion {
+  min-width: 200px;
+  max-width: 250px;
+}
+
+.celda-total {
+  min-width: 100px;
+  font-weight: 700 !important;
+}
+
+.celda-estado {
+  min-width: 140px;
+}
+
+.celda-fecha {
+  min-width: 120px;
+}
+
+.celda-acciones {
+  min-width: 120px;
+  text-align: center !important;
+}
+
+/* Texto del cliente */
+.texto-cliente {
+  font-weight: 600;
+  color: #2c3e50;
+  display: block;
+}
+
+.texto-email {
+  font-size: 0.75rem;
+  color: #6c757d;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Contenedor de productos */
+.contenedor-productos {
+  max-height: 80px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.producto-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  padding: 2px 0;
+}
+
+.nombre-producto {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+.cantidad-producto {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #495057;
+  background-color: #e9ecef;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 8px;
+}
+
+.mas-productos {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* Dirección */
+.texto-direccion {
+  font-size: 0.875rem;
+  line-height: 1.3;
+  max-height: 40px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Estados */
+.estado-chip {
+  font-weight: 600 !important;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.estado-pendiente {
+  background-color: #fff3cd !important;
+  color: #856404 !important;
+}
+
+.estado-procesando {
+  background-color: #cce7ff !important;
+  color: #004085 !important;
+}
+
+.estado-enviado {
+  background-color: #d1ecf1 !important;
+  color: #0c5460 !important;
+}
+
+.estado-entregado {
+  background-color: #d4edda !important;
+  color: #155724 !important;
+}
+
+.estado-cancelado {
+  background-color: #f8d7da !important;
+  color: #721c24 !important;
+}
+
+/* Botones de acción */
+.contenedor-botones {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.boton-accion {
+  min-width: 36px !important;
+  width: 36px;
+  height: 36px;
+}
+
+/* Scrollbar para productos */
+.contenedor-productos::-webkit-scrollbar {
+  width: 4px;
+}
+
+.contenedor-productos::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.contenedor-productos::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.contenedor-productos::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
