@@ -8,11 +8,14 @@ import AdminProductos from "../pages/AdminProductos";
 import ProductDetail from "../pages/ProductDetail";
 import AdminUsuarios from "../pages/AdminUsuarios";
 import AdminLayout from "../layouts/AdminLayout";
+import TablaPedidos from "../pages/admin/tablaPedidos";
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
     <Routes>
-      <Route element={<MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />}>
+      <Route
+        element={<MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />}
+      >
         <Route path="/" element={<Home />} />
         {/* Rutas públicas */}
         <Route path="/Acerca" element={<AboutUs />} />
@@ -22,6 +25,7 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
         {/* Rutas admin protegidas */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="productos" element={<AdminProductos />} />
+          <Route path="pedidos" element={<TablaPedidos />} />
           <Route path="usuarios" element={<AdminUsuarios />} />
         </Route>
       </Route>

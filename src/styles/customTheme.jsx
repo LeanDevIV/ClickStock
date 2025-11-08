@@ -5,30 +5,36 @@ export const getCustomTheme = (modoOscuro) =>
     palette: {
       mode: modoOscuro ? "dark" : "light",
       primary: {
-        main: "#D4AF37", // Gold
+        main: "#D4AF37", 
+        light: "#E6C869", 
+        dark: "#B8941F", 
         contrastText: "#000000",
       },
       secondary: {
-        main: "#B91C1C", // Cornell Red
-        contrastText: "#F5F5F5",
+        main: "#B91C1C", 
+        light: "#D33434", 
+        dark: "#8B0000",
+        contrastText: "#FFFFFF",
       },
       background: {
-        default: modoOscuro ? "#000000" : "#F5F5F5", // Black / White smoke
-        paper: modoOscuro ? "#404040" : "#ffffff", // Onyx / white
+        default: modoOscuro ? "#121212" : "#F5F5F5",
+        paper: modoOscuro ? "#1E1E1E" : "#FFFFFF",
       },
       text: {
-        primary: modoOscuro ? "#F5F5F5" : "#000000",
+        primary: modoOscuro ? "#FFFFFF" : "#000000", 
         secondary: modoOscuro ? "#D4AF37" : "#404040",
       },
-    },
-    typography: {
-      fontFamily: "Poppins, sans-serif",
-      fontWeightMedium: 600,
-      button: {
-        textTransform: "none",
+
+      success: {
+        main: "#22C55E",
       },
-    },
-    shape: {
-      borderRadius: 10,
-    },
-  });
+      error: {
+        main: "#EF4444",
+      },
+      warning: {
+        main: "#F59E0B",
+      },
+      info: {
+        main: "#3B82F6",
+      },
+    },})
