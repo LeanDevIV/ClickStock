@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Card,
@@ -30,7 +31,8 @@ import {
 import CrearPedidosModal from "./CrearPedidosModal";
 import EditarPedidosModal from "./editarPedidosModal";
 import "../../css/tablaPedidos.css";
-
+import clientaxios from "../../utils/clientAxios.js";
+import { Toaster, toast } from "react-hot-toast";
 const TablaPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -41,12 +43,10 @@ const TablaPedidos = () => {
   const obtenerPedidos = async () => {
     try {
       setCargando(true);
-      const response = await fetch("http://localhost:5000/api/pedidos");
-      if (response.ok) {
-        const data = await response.json();
-        setPedidos(data.pedidos || data);
-      }
+      const { data } = await axios.get("http://localhost:5000/api/pedidos");
+      setPedidos(data.pedidos || data);
     } catch (error) {
+      console.error("Error al obtener los pedidos:", error);
     } finally {
       setCargando(false);
     }
@@ -63,17 +63,13 @@ const TablaPedidos = () => {
 
   const manejarEditarPedido = async (pedidoActualizado) => {
     try {
-      setPedidos(
-        pedidos.map((p) =>
-          p._id === pedidoActualizado._id ? pedidoActualizado : p
-        )
-      );
-      await fetch(
+      await axios.put(
         `http://localhost:5000/api/pedidos/${pedidoActualizado._id}`,
+        pedidoActualizado,
         {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(pedidoActualizado),
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
       setPedidoEditando(null);
@@ -85,10 +81,11 @@ const TablaPedidos = () => {
   const manejarEliminarPedido = async (pedidoId) => {
     if (!window.confirm("¿Seguro que deseas eliminar este pedido?")) return;
     try {
-      setPedidos(pedidos.filter((p) => p._id !== pedidoId));
-      await fetch(`http://localhost:5000/api/pedidos/${pedidoId}`, {
-        method: "DELETE",
-      });
+      setPedidos((prev) => prev.filter((p) => p._id !== pedidoId));
+
+      await axios.delete(`http://localhost:5000/api/pedidos/${pedidoId}`);
+
+      toast.success("Pedido eliminado correctamente");
     } catch (err) {
       alert("Error al eliminar pedido: " + err.message);
     }
@@ -168,7 +165,11 @@ const TablaPedidos = () => {
                   value={filtroEstado}
                   onChange={(e) => setFiltroEstado(e.target.value)}
                   size="small"
-                  sx={{ minWidth: 150  ,backgroundColor:'#1a1919ff ',color:'white'}}
+                  sx={{
+                    minWidth: 150,
+                    backgroundColor: "#1a1919ff ",
+                    color: "white",
+                  }}
                 >
                   <MenuItem value="todos">Todos los estados</MenuItem>
                   <MenuItem value="pendiente">Pendiente</MenuItem>
@@ -310,7 +311,7 @@ const TablaPedidos = () => {
 
                       <TableCell className="tabla-celda tabla-celda-total">
                         <Typography
-                        className="texto-total"
+                          className="texto-total"
                           variant="subtitle1"
                           fontWeight="bold"
                           color="primary"
@@ -412,6 +413,7 @@ const TablaPedidos = () => {
         onHide={() => setPedidoEditando(null)}
         pedido={pedidoEditando}
         onPedidoEditado={manejarEditarPedido}
+        setPedidos={setPedidos}
       />
     </Box>
   );

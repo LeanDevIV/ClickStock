@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import {
   Dialog,
   DialogTitle,
@@ -30,22 +31,27 @@ import {
   Remove as RemoveIcon,
 } from "@mui/icons-material";
 import { toast } from "react-hot-toast";
+import clientaxios from "../../utils/clientAxios.js";
 import "../../css/editarPedidosModal.css";
 
-const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
+const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado,setPedidos }) => {
   const [formData, setFormData] = useState({
     direccionEnvio: "",
     estado: "pendiente",
     productos: [],
   });
   const [cargando, setCargando] = useState(false);
+  const [cargandoProductos, setCargandoProductos] = useState(false);
   const [error, setError] = useState("");
   const [errores, setErrores] = useState({
-    direccionEnvio: ""
+    direccionEnvio: "",
   });
+  const [productosDisponibles, setProductosDisponibles] = useState([]);
+  const [stockOriginal, setStockOriginal] = useState({});
 
   useEffect(() => {
-    if (pedido) {
+    if (show && pedido) {
+      cargarProductosDisponibles();
       setFormData({
         direccionEnvio: pedido.direccionEnvio || pedido.direccion || "",
         estado: pedido.estado || "pendiente",
@@ -54,35 +60,97 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
       setError("");
       setErrores({ direccionEnvio: "" });
     }
-  }, [pedido]);
+  }, [show, pedido]);
+
+  const cargarProductosDisponibles = async () => {
+    try {
+      setCargandoProductos(true);
+      const { data } = await clientaxios.get("/productos");
+      const productos = Array.isArray(data) ? data : data.productos || [];
+
+      const stockInicial = {};
+      productos.forEach((producto) => {
+        stockInicial[producto._id] = producto.stock;
+      });
+
+      setStockOriginal(stockInicial);
+      setProductosDisponibles(productos);
+    } catch (error) {
+      console.error("Error cargando productos:", error);
+      toast.error("No se pudieron cargar los productos disponibles");
+    } finally {
+      setCargandoProductos(false);
+    }
+  };
+
+  const calcularStockDisponible = useCallback(
+    (productoId) => {
+      const stockBase = stockOriginal[productoId] || 0;
+      const cantidadOriginal =
+        pedido?.productos?.find(
+          (item) => (item.producto?._id || item.producto) === productoId
+        )?.cantidad || 0;
+      const stockTotalDisponible = stockBase + cantidadOriginal;
+
+      return stockTotalDisponible;
+    },
+    [stockOriginal, pedido]
+  );
+
+  const obtenerProductoInfo = useCallback(
+    (productoId) => {
+      return productosDisponibles.find((p) => p._id === productoId);
+    },
+    [productosDisponibles]
+  );
 
   const validarDireccion = (direccion) => {
     if (!direccion || direccion.trim() === "") {
       return "La dirección es obligatoria";
     }
-    
+
     if (direccion.trim().length < 10) {
       return "La dirección debe tener al menos 10 caracteres";
     }
-    
+
     if (direccion.trim().length > 200) {
       return "La dirección no puede exceder los 200 caracteres";
     }
-    
+
     const tieneNumero = /\d/.test(direccion);
     const tieneTexto = /[a-zA-Z]/.test(direccion);
-    
+
     if (!tieneNumero || !tieneTexto) {
       return "La dirección debe incluir número y nombre de calle";
     }
-    
+
     return "";
   };
+ const manejarEliminarPedido = async (pedido) => {
+  if (!window.confirm("¿Seguro que deseas eliminar este pedido?")) return;
+  try {
+    for (const item of pedido.productos) {
+      const productoId = item.producto?._id || item.producto;
+      const cantidad = item.cantidad;
+      const { data: producto } = await clientaxios.get(`/productos/${productoId}`);
+      const nuevoStock = producto.stock + cantidad;
+      await clientaxios.put(`/productos/${productoId}`, { stock: nuevoStock });
+    }
 
+    await clientaxios.delete(`/pedidos/${pedido._id}`);
+    setPedidos((prev) => prev.filter((p) => p._id !== pedido._id)); 
+
+    toast.success("Pedido eliminado correctamente y stock restaurado");
+    onHide(); 
+  } catch (error) {
+    console.error(error);
+    toast.error("Error al eliminar pedido o actualizar stock");
+  }
+};
   const manejarCambioDireccion = (e) => {
     const nuevaDireccion = e.target.value;
     setFormData({ ...formData, direccionEnvio: nuevaDireccion });
-    
+
     if (nuevaDireccion.length > 0) {
       const error = validarDireccion(nuevaDireccion);
       setErrores({ ...errores, direccionEnvio: error });
@@ -92,8 +160,15 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
   };
 
   const actualizarCantidad = (index, nuevaCantidad) => {
-    if (nuevaCantidad < 1) return;
+    const productoItem = formData.productos[index];
+    const productoId = productoItem.producto?._id || productoItem.producto;
+    const stockBase = stockOriginal[productoId] || 0;
 
+    const cantidadOriginal =
+      pedido?.productos?.find(
+        (item) => (item.producto?._id || item.producto) === productoId
+      )?.cantidad || 0;
+  
     const productosActualizados = [...formData.productos];
     productosActualizados[index] = {
       ...productosActualizados[index],
@@ -112,25 +187,64 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
       return;
     }
 
+    const productoEliminado = formData.productos[index];
+    const productoId =
+      productoEliminado.producto?._id || productoEliminado.producto;
+    const cantidadEliminada = productoEliminado.cantidad;
+
+    const nuevoStock = { ...stockOriginal };
+    if (nuevoStock[productoId] !== undefined) {
+      nuevoStock[productoId] += cantidadEliminada;
+    }
     const productosActualizados = formData.productos.filter(
       (_, i) => i !== index
     );
+    setStockOriginal(nuevoStock);
     setFormData({
       ...formData,
       productos: productosActualizados,
     });
+
+    toast.success("Producto eliminado y stock actualizado");
   };
 
-  const calcularTotal = () => {
+  const calcularTotal = useCallback(() => {
     return formData.productos.reduce((total, item) => {
-      const precio = item.precioUnitario || item.producto?.precio || 0;
+      const productoId = item.producto?._id || item.producto;
+      const producto = obtenerProductoInfo(productoId);
+      const precio = item.precioUnitario || producto?.precio || 0;
       return total + precio * item.cantidad;
     }, 0);
+  }, [formData.productos, obtenerProductoInfo]);
+
+  const validarStockProductos = () => {
+    for (const item of formData.productos) {
+      const productoId = item.producto?._id || item.producto;
+      const producto = obtenerProductoInfo(productoId);
+
+      if (!producto) {
+        return `El producto "${
+          item.producto?.nombre || "Producto"
+        }" ya no existe`;
+      }
+
+      const stockDisponible = calcularStockDisponible(productoId);
+      if (item.cantidad > stockDisponible) {
+        return `Stock insuficiente para "${producto.nombre}". Disponible: ${stockDisponible}, Solicitado: ${item.cantidad}`;
+      }
+    }
+    return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!pedido) return;
+
+    if (cargando) {
+      toast.error("Ya se está procesando una actualización");
+      return;
+    }
+
     const errorDireccion = validarDireccion(formData.direccionEnvio);
     if (errorDireccion) {
       setErrores({ ...errores, direccionEnvio: errorDireccion });
@@ -143,11 +257,9 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
       return;
     }
 
-    const productoInvalido = formData.productos.find(
-      (item) => item.cantidad < 1
-    );
-    if (productoInvalido) {
-      setError("Todas las cantidades deben ser al menos 1");
+    const errorStock = validarStockProductos();
+    if (errorStock) {
+      setError(errorStock);
       return;
     }
 
@@ -167,26 +279,18 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
         total: calcularTotal(),
       };
 
-      const response = await fetch(
-        `http://localhost:5000/api/pedidos/${pedido._id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updateData),
-        }
+      const { data: responseData } = await clientaxios.put(
+        `/pedidos/${pedido._id}`,
+        updateData
       );
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.error || "Error al actualizar pedido");
-      }
 
       onPedidoEditado(responseData.pedido || responseData);
       toast.success("Pedido actualizado exitosamente", { id: toastId });
       onHide();
     } catch (error) {
-      toast.error(`Error al actualizar pedido: ${error.message}`, { id: toastId });
+      toast.error(`Error al actualizar pedido: ${error.message}`, {
+        id: toastId,
+      });
       setError("Error al actualizar pedido: " + error.message);
     } finally {
       setCargando(false);
@@ -229,8 +333,14 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
             </Alert>
           )}
 
+          {cargandoProductos && (
+            <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+              Cargando información de productos...
+            </Alert>
+          )}
+
           <Grid container spacing={3} className="seccion-datos">
-            <Grid item size={{ xs: 12, md: 7 }}>
+            <Grid xs={12} md={7}>
               <Box className="tarjeta-dato">
                 <Typography variant="body2" className="etiqueta-dato">
                   <PersonIcon sx={{ fontSize: 18, mr: 1 }} />
@@ -248,7 +358,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
               </Box>
             </Grid>
 
-            <Grid item size={{ xs: 12, md: 5 }}>
+            <Grid xs={12} md={5}>
               <Box className="tarjeta-dato">
                 <Typography variant="body2" className="etiqueta-dato">
                   <MoneyIcon sx={{ fontSize: 18, mr: 1 }} />
@@ -278,7 +388,15 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
               rows={3}
               error={!!errores.direccionEnvio}
               helperText={errores.direccionEnvio}
+              inputProps={{ maxLength: 200 }}
             />
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", mt: 0.5 }}
+            >
+              {formData.direccionEnvio.length}/200 caracteres
+            </Typography>
           </Box>
 
           <Box className="campo-estado">
@@ -291,36 +409,11 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                 }
                 label="Estado del Pedido"
               >
-                <MenuItem
-                  value="pendiente"
-                  className="estado-option estado-pendiente"
-                >
-                  Pendiente
-                </MenuItem>
-                <MenuItem
-                  value="procesando"
-                  className="estado-option estado-procesando"
-                >
-                  Procesando
-                </MenuItem>
-                <MenuItem
-                  value="enviado"
-                  className="estado-option estado-enviado"
-                >
-                  Enviado
-                </MenuItem>
-                <MenuItem
-                  value="entregado"
-                  className="estado-option estado-entregado"
-                >
-                  Entregado
-                </MenuItem>
-                <MenuItem
-                  value="cancelado"
-                  className="estado-option estado-cancelado"
-                >
-                  Cancelado
-                </MenuItem>
+                <MenuItem value="pendiente">Pendiente</MenuItem>
+                <MenuItem value="procesando">Procesando</MenuItem>
+                <MenuItem value="enviado">Enviado</MenuItem>
+                <MenuItem value="entregado">Entregado</MenuItem>
+                <MenuItem value="cancelado">Cancelado</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -335,74 +428,119 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                 Productos del Pedido
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Edita las cantidades según sea necesario
+                Stock disponible se actualiza en tiempo real
               </Typography>
             </Box>
 
             <Box className="contenedor-productos">
-              {formData.productos.map((item, index) => (
-                <Card
-                  key={index}
-                  className="tarjeta-producto"
-                  variant="outlined"
-                >
-                  <CardContent className="contenido-producto">
-                    <Box className="info-producto">
-                      <Typography className="nombre-producto" variant="body1">
-                        {item.producto?.nombre || "Producto no especificado"}
-                      </Typography>
-                      <Typography className="precio-producto" variant="body2">
-                        {formatCurrency(
-                          item.precioUnitario || item.producto?.precio || 0
-                        )}{" "}
-                        c/u
-                      </Typography>
-                    </Box>
+              {formData.productos.map((item, index) => {
+                const productoId = item.producto?._id || item.producto;
+                const producto = obtenerProductoInfo(productoId);
+                const stockDisponible = calcularStockDisponible(productoId);
+                const precio = item.precioUnitario || producto?.precio || 0;
+                const nombreProducto =
+                  producto?.nombre ||
+                  item.producto?.nombre ||
+                  "Producto no disponible";
+                const stockBase = stockOriginal[productoId] || 0;
 
-                    <Box className="controles-cantidad">
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          actualizarCantidad(index, item.cantidad - 1)
-                        }
-                        disabled={item.cantidad <= 1}
-                        sx={{ color: "#000000" }}
-                      >
-                        <RemoveIcon />
-                      </IconButton>
+                return (
+                  <Card
+                    key={index}
+                    className="tarjeta-producto"
+                    variant="outlined"
+                  >
+                    <CardContent className="contenido-producto">
+                      <Box className="info-producto">
+                        <Typography className="nombre-producto" variant="body1">
+                          {nombreProducto}
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: 1,
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            mt: 1,
+                          }}
+                        >
+                          <Typography
+                            className="precio-producto"
+                            variant="body2"
+                          >
+                            {formatCurrency(precio)} c/u
+                          </Typography>
+                          <Chip
+                            label={`Stock base: ${stockBase}`}
+                            sx={{ backgroundColor: "green" }}
+                            size="small"
+                            color="default"
+                            variant="outlined"
+                          />
+                        </Box>
+                      </Box>
 
-                      <TextField
-                        value={item.cantidad}
-                        onChange={(e) => {
-                          const valor = parseInt(e.target.value) || 1;
-                          actualizarCantidad(index, valor);
-                        }}
-                        type="number"
-                        size="small"
-                        className="input-cantidad"
-                      />
+                      <Box className="controles-cantidad">
+                        <IconButton
+                          size="small"
+                          onClick={() =>
+                            actualizarCantidad(index, item.cantidad - 1)
+                          }
+                          disabled={item.cantidad <= 1}
+                          sx={{ color: "#000000" }}
+                        >
+                          <RemoveIcon />
+                        </IconButton>
 
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          actualizarCantidad(index, item.cantidad + 1)
-                        }
-                        sx={{ color: "#000000" }}
-                      >
-                        <AddIcon />
-                      </IconButton>
+                        <TextField
+                          value={item.cantidad ?? 1}
+                          onChange={(e) => {
+                            const valor = parseInt(e.target.value) || 1;
+                            actualizarCantidad(index, valor);
+                          }}
+                          type="number"
+                          size="small"
+                          className="input-cantidad"
+                          inputProps={{
+                            min: 1,
+                            max: stockDisponible,
+                          }}
+                        />
 
-                      <IconButton
-                        size="small"
-                        onClick={() => eliminarProducto(index)}
-                        className="boton-eliminar-producto"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            if (item.cantidad >= stockDisponible) {
+                              toast.error(
+                                "Ya alcanzaste el stock máximo disponible"
+                              );
+                              return;
+                            }
+                            actualizarCantidad(index, item.cantidad + 1);
+                          }}
+                          sx={{ color: "#000000" }}
+                        >
+                          <AddIcon />
+                        </IconButton>
+
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => manejarEliminarPedido(pedido)}
+                        >
+                          <DeleteIcon />
+                        </Button>
+                      </Box>
+
+                      {stockDisponible === 0 && (
+                        <Alert severity="error" sx={{ mt: 1, py: 0 }}>
+                          Sin stock disponible
+                        </Alert>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </Box>
 
             <Card className="resumen-total">
@@ -427,7 +565,14 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
                     )}
                   </Typography>
                 </Box>
-                <Box className="fila-total total-final" sx={{padding:'5px 15px',borderRadius:'5px', borderTopColor:'black'}}>
+                <Box
+                  className="fila-total total-final"
+                  sx={{
+                    padding: "5px 15px",
+                    borderRadius: "5px",
+                    borderTopColor: "black",
+                  }}
+                >
                   <Typography variant="h6" fontWeight="700">
                     Total Final:
                   </Typography>
@@ -449,7 +594,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado }) => {
             onClick={onHide}
             className="boton-cancelar"
             variant="outlined"
-            sx={{color:'black!important',backgroundColor:'red !important'}}
+            sx={{ color: "black!important", backgroundColor: "red !important" }}
             disabled={cargando}
           >
             Cancelar
