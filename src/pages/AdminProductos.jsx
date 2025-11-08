@@ -9,19 +9,22 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ModalProducto from "../components/ModalProductos";
 import TablaProductos from "../components/TablaProductos";
 import { CircularProgress } from "@mui/material";
+import { subirMultiplesArchivos } from "../services/uploadService";
 
 const ProductosAdmin = () => {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editando, setEditando] = useState(false);
+  const [cargandoImagen, setCargandoImagen] = useState(false);
+  const [imagenesPreview, setImagenesPreview] = useState([]);
   const [productoActual, setProductoActual] = useState({
     nombre: "",
     descripcion: "",
     precio: "",
     stock: "",
     categoria: "",
-    imagen: "",
+    imagenes: [],
   });
 
   useEffect(() => {
@@ -68,21 +71,38 @@ const ProductosAdmin = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditando(false);
+    setCargandoImagen(false);
+    setImagenesPreview([]);
     setProductoActual({
       nombre: "",
       descripcion: "",
       precio: "",
       stock: "",
       categoria: "",
-      imagen: "",
+      imagenes: [],
     });
   };
 
   const handleShowModal = (producto = null) => {
     if (producto) {
-      setProductoActual(producto);
+      // Asegurarse de que las imágenes sean un array
+      setProductoActual({
+        ...producto,
+        imagenes: producto.imagenes || (producto.imagen ? [producto.imagen] : []),
+      });
       setEditando(true);
+    } else {
+      setProductoActual({
+        nombre: "",
+        descripcion: "",
+        precio: "",
+        stock: "",
+        categoria: "",
+        imagenes: [],
+      });
+      setEditando(false);
     }
+    setImagenesPreview([]);
     setShowModal(true);
   };
 
@@ -94,24 +114,94 @@ const ProductosAdmin = () => {
     }));
   };
 
+  // Manejar subida de archivos
+  const handleFileUpload = async (files) => {
+    try {
+      setCargandoImagen(true);
+      setImagenesPreview([]);
+
+      // Crear previews temporales
+      const previews = Array.from(files).map((file) => URL.createObjectURL(file));
+      setImagenesPreview(previews);
+
+      // Subir archivos
+      const urls = await subirMultiplesArchivos(files, "productos");
+
+      // Agregar URLs al producto actual
+      setProductoActual((prev) => ({
+        ...prev,
+        imagenes: [...(prev.imagenes || []), ...urls],
+      }));
+
+      // Limpiar previews
+      setImagenesPreview([]);
+      
+      // Liberar URLs de preview
+      previews.forEach((url) => URL.revokeObjectURL(url));
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: `${urls.length} imagen(es) subida(s) correctamente`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error al subir imágenes:", error);
+      setImagenesPreview([]);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudieron subir las imágenes",
+      });
+    } finally {
+      setCargandoImagen(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar que haya al menos una imagen
+    if (!productoActual.imagenes || productoActual.imagenes.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Imagen requerida",
+        text: "Debes agregar al menos una imagen al producto",
+      });
+      return;
+    }
+
     try {
+      // Preparar datos del producto
+      const datosProducto = {
+        nombre: productoActual.nombre,
+        descripcion: productoActual.descripcion,
+        precio: parseFloat(productoActual.precio),
+        stock: parseInt(productoActual.stock),
+        categoria: productoActual.categoria,
+        imagenes: productoActual.imagenes,
+      };
+
       if (editando) {
         await clientAxios.put(
           `/productos/${productoActual._id}`,
-          productoActual
+          datosProducto
         );
         Swal.fire("¡Éxito!", "Producto actualizado correctamente", "success");
       } else {
-        await clientAxios.post("/productos", productoActual);
+        await clientAxios.post("/productos", datosProducto);
         Swal.fire("¡Éxito!", "Producto creado correctamente", "success");
       }
       handleCloseModal();
       await obtenerProductos();
     } catch (error) {
       console.error("Error:", error);
-      Swal.fire("Error", "Hubo un problema al procesar la solicitud", "error");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.error || "Hubo un problema al procesar la solicitud",
+      });
     }
   };
 
@@ -145,6 +235,9 @@ const ProductosAdmin = () => {
         handleInputChange={handleInputChange}
         productoActual={productoActual}
         editando={editando}
+        handleFileUpload={handleFileUpload}
+        imagenesPreview={imagenesPreview}
+        cargandoImagen={cargandoImagen}
       />
 
       {/* Tabla de productos */}
