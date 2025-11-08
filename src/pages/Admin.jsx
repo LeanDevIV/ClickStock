@@ -1,7 +1,7 @@
-
+import TablaPedidos from "./admin/tablaPedidos"
 function Admin() {
   return (
-    <div>Admin</div>
+    <div><TablaPedidos></TablaPedidos></div>
   )
 }
 

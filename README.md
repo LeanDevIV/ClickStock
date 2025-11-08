@@ -1,106 +1,104 @@
-# 🧾 ClickStock – Control de Stock
+# 🛒 Click Stock
 
-## 🛒 Descripción del proyecto
-**ClickStock** es una aplicación web desarrollada con **React** que permite gestionar y visualizar el stock de productos de un negocio de manera sencilla, rápida y moderna.  
-El sistema está pensado para que **administradores** y **usuarios** interactúen con una base de datos central, manteniendo siempre actualizada la información de los productos.
+**Click Stock** es una aplicación web de **e-commerce** combinada con un sistema de **control de stock**, pensada para facilitar la gestión y venta de productos desde una sola plataforma.  
+El proyecto está desarrollado con tecnologías modernas de frontend y busca ofrecer una experiencia rápida, intuitiva y adaptable a cualquier tipo de negocio.
 
-Este frontend se conecta con un backend hecho en **Node.js + Express + MongoDB**, y juntos forman el proyecto final del curso de desarrollo web de Rolling Code School.
+---
 
----------------------------------
+## 🚀 Tecnologías principales
 
-## 🚀 Características principales
+- **React.js** – Framework principal del frontend  
+- **Vite** – Entorno de desarrollo ultrarrápido  
+- **React Bootstrap** – Componentes visuales y responsive design  
+- **Zustand** – Manejo de estado global  
+- **Axios** – Comunicación con el backend mediante API REST  
+- **React Router DOM** – Navegación entre vistas  
+- **JSDoc** – Documentación del código  
+- **ESLint / Prettier** – Normalización y formato del código  
 
-- 🏠 **Página principal** con listado de productos.
-- 🔍 **Filtro por categorías** para facilitar la búsqueda.
-- 🔐 **Sistema de registro e inicio de sesión** (autenticación con JWT).
-- ⚙️ **Panel de administrador** con CRUD completo de productos.
-- 👥 **Gestión de usuarios** (solo rol admin).
-- ⚡ **Conexión con API REST** mediante Axios.
-- 📱 **Diseño completamente responsive** (adaptado a todos los dispositivos).
-- ❌ **Página de error 404** personalizada.
+---
 
----------------------------------
+## ⚙️ Funcionalidades principales
 
-## 🧩 Tecnologías utilizadas
+- 🧾 **Catálogo de productos:** Visualización de productos disponibles con buscador y filtros.  
+- 🛍️ **Carrito de compras:** Agregar, modificar o eliminar productos del carrito.  
+- 👤 **Autenticación:** Registro e inicio de sesión con manejo de tokens JWT.  
+- 📦 **Control de stock:** Actualización automática del inventario al realizar ventas.  
+- 🧠 **Panel administrativo:** Gestión de usuarios, productos y roles.  
+- 💬 **Asistente virtual:** Chat con IA integrado para asistencia al usuario.  
 
-### 🖥️ Frontend
-- [React](https://react.dev/)
-- [Vite](https://vitejs.dev/)
-- [React Router DOM](https://reactrouter.com/)
-- [Axios](https://axios-http.com/)
-- [Bootstrap](https://getbootstrap.com/)  
-- HTML5 / CSS3 / JavaScript (ES6+)
+---
+## 🧩 Estructura del proyecto
 
----------------------------------
-
-## 🗂️ Estructura del proyecto
-
-clickstock-frontend/
+```bash
+click-stock-frontend/
 │
 ├── src/
-│ ├── assets/ # Recursos estáticos (imágenes, íconos)
-│ ├── components/ # Componentes reutilizables
-│ ├── pages/ # Vistas principales (Home, Login, Admin, etc.)
-│ ├── routes/ # Archivo de rutas de navegación
-│ ├── services/ # Configuración de Axios y conexión al backend
-│ ├── App.jsx # Estructura principal de la app
-│ └── main.jsx # Punto de entrada
+│   ├── assets/           # Recursos estáticos (imágenes, íconos, etc.)
+│   ├── components/       # Componentes reutilizables de UI
+│   ├── layouts/          # Estructuras base para distintas rutas
+│   ├── pages/            # Páginas principales de la app
+│   ├── services/         # Comunicación con la API (clientAxios)
+│   ├── store/            # Manejo de estado global (Zustand)
+│   ├── hooks/            # Hooks personalizados
+│   ├── utils/            # Funciones auxiliares
+│   └── main.jsx          # Punto de entrada del proyecto
 │
-├── public/
-│ └── index.html
-│
+├── .env                  # Variables de entorno
 ├── package.json
 └── README.md
 
----------------------------------
 
-## 🔧 Instalación y uso
+---
 
-### 1️⃣ Clonar el repositorio
+## 🧱 Estructura lógica de desarrollo
 
-git clone https://github.com/tuusuario/clickstock-frontend.git
+> La lógica del proyecto sigue una arquitectura separada por responsabilidades:
 
-2️⃣ Instalar dependencias
-npm install
+**Backend → Modelo > Ruta > Controlador > Servicio**  
+**Frontend → ClientAxios > Componentes > Páginas > Store (Zustand)**
 
-3️⃣ Ejecutar en entorno de desarrollo
-npm run dev
+Esto asegura una separación clara entre la capa de presentación, la lógica de negocio y la comunicación con la API.
 
-La aplicación estará disponible en:
-👉 http://localhost:5173/
+---
 
-🔗 Conexión con el backend
+## 🧾 Convenciones y normalización de código
 
-El proyecto se conecta a una API desarrollada en Node.js + Express + MongoDB.
-Para que funcione correctamente, asegurate de tener el backend ejecutándose y configurar la URL base en Axios.
+Para mantener un código limpio y consistente se siguen estas reglas:
 
-Ejemplo:
-// src/services/api.js
-import axios from "axios";
+- **Documentación con JSDoc** para describir funciones, clases y componentes.  
+- **Comentarios innecesarios** o redundantes son eliminados.  
+- **Nomenclatura estandarizada:**
+  - Archivos y módulos: `usuarios.controller.js`, `productos.service.js`, etc.  
+  - Componentes React: `Header.jsx`, `ProductCard.jsx`  
+  - Hooks: `useAuth.js`, `useScroll.js`  
+  - Variables y funciones en **camelCase**  
+  - Constantes en **MAYÚSCULAS_CON_GUIONES**
 
-const api = axios.create({
-  baseURL: "http://localhost:3000/api"
-});
+---
 
-export default api;
-------------------------------
-👥 Roles de usuario
-Rol	Permisos
-Usuario común	Puede visualizar productos y filtrar por categorías.
-Administrador	Puede crear, editar y eliminar productos. También gestionar usuarios.
-------------------------------
-📄 Documentación adicional
+## 🧠 Objetivo del proyecto
 
-🎨 Mockup del sitio (Figma/Canva)
+Crear una aplicación web moderna que funcione tanto como **tienda online** como **sistema de gestión de stock**, buscando optimizar la administración de productos, reducir errores humanos y mejorar la experiencia del usuario final.
 
-⚙️ Documentación técnica (PDF) – arquitectura, modelos, rutas
+---
 
-🧱 Repositorio Backend: https://github.com/LeanDevIV/ClickStock-server.git
-------------------------------
-💬 Créditos
+## 🧑‍💻 Autor
 
-Proyecto desarrollado por el equipo de Rolling Code School – Tucumán, Argentina
-Como parte del módulo final del curso de Desarrollo Web Full Stack.
+**Lean [@tuusuario]**  
+Desarrollador web apasionado por la tecnología, la IA y el aprendizaje constante.  
+Proyecto desarrollado como parte de una práctica formativa de desarrollo fullstack.
 
-💡 ClickStock: tu inventario, a un click de distancia.
- ------------------------------
+---
+
+## 🪄 Próximas mejoras
+
+- 📊 Dashboard con métricas de ventas  
+- 💳 Integración con pasarelas de pago (MercadoPago / Stripe)  
+- 🧾 Generación de facturas automáticas  
+- 🔔 Notificaciones en tiempo real  
+
+---
+
+## 🧰 DEPLOY
+https://stock-project-frontend-beta.vercel.app/
