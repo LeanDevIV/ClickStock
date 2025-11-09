@@ -26,7 +26,7 @@ function App() {
       <CssBaseline />
       {globalStyles(theme, modoOscuro)}
       <AppRoutes modoOscuro={modoOscuro} toggleModo={toggleModo} />
-      <ProductosRender />
+
       <Footer />
     </ThemeProvider>
   );

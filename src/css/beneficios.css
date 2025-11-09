@@ -1,0 +1,332 @@
+/* Título épico con múltiples efectos */
+.tituloBeneficios {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.tituloBeneficios h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #b91c1c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 4px 20px rgba(185, 28, 28, 0.15);
+  letter-spacing: -0.5px;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 15px;
+}
+
+.tituloBeneficios h1::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 5px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #dc2626 20%,
+    #b91c1c 50%,
+    #dc2626 80%,
+    transparent 100%
+  );
+  border-radius: 10px;
+  box-shadow: 0 2px 15px rgba(185, 28, 28, 0.4);
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateX(-50%) scaleX(1.1);
+  }
+}
+
+.tituloBeneficios h1::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(185, 28, 28, 0.08) 0%,
+    transparent 70%
+  );
+  z-index: -1;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.2;
+  }
+}
+
+/* Contenedor de beneficios con efectos premium */
+.beneficios-contenedor {
+  width: 100%;
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 50%, #fef2f2 100%);
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(185, 28, 28, 0.1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+/* Borde superior animado con gradiente */
+.beneficios-contenedor::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #ef4444 20%,
+    #dc2626 40%,
+    #b91c1c 60%,
+    #dc2626 80%,
+    transparent 100%
+  );
+  animation: slideGradient 3s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(185, 28, 28, 0.6);
+}
+
+@keyframes slideGradient {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Efecto de brillo de fondo */
+.beneficios-contenedor::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(185, 28, 28, 0.03) 0%,
+    transparent 70%
+  );
+  animation: rotate 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.beneficios-contenedor:hover {
+  transform: translateY(-12px) scale(1.01);
+  box-shadow: 0 20px 50px rgba(185, 28, 28, 0.25),
+    0 10px 25px rgba(220, 38, 38, 0.15), 0 5px 15px rgba(239, 68, 68, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(185, 28, 28, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #fef2f2 50%, #fee2e2 100%);
+}
+
+@media (max-width: 767px) {
+  .beneficios-contenedor:hover {
+    transform: translateY(-6px) scale(1.005);
+  }
+}
+.bi {
+  color: #b91c1c;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scale(1.2) rotate(360deg) translateY(-5px);
+  }
+  50% {
+    transform: scale(1.3) rotate(360deg) translateY(-10px);
+  }
+}
+
+/* Títulos con gradiente y animación */
+.itemBeneficio h6 {
+  margin-top: 1rem;
+  margin-bottom: 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  transition: all 0.3s ease;
+  letter-spacing: -0.3px;
+  position: relative;
+}
+.itemBeneficio1 h6 {
+  margin-top: 1rem;
+  margin-bottom: 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  transition: all 0.3s ease;
+  letter-spacing: -0.3px;
+  position: relative;
+}
+
+.itemBeneficio:hover h6 {
+  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transform: scale(1.05);
+  letter-spacing: 0.5px;
+}
+.itemBeneficio1:hover h6 {
+  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transform: scale(1.05);
+  letter-spacing: 0.5px;
+}
+/* Textos con transición suave */
+.itemBeneficio p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #4b5563;
+  transition: all 0.3s ease;
+}
+
+.itemBeneficio:hover p {
+  color: #1f2937;
+  transform: translateY(-2px);
+}
+.itemBeneficio1 p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #4b5563;
+  transition: all 0.3s ease;
+}
+
+.itemBeneficio1:hover p {
+  color: #1f2937;
+  transform: translateY(-2px);
+}
+
+/* Bordes responsivos con efectos de luz */
+@media (max-width: 575.98px) {
+  .itemBeneficio {
+    border-top: 2px solid transparent;
+    background-image: linear-gradient(white, white),
+      linear-gradient(90deg, #ef4444, #dc2626, #b91c1c);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+
+  .itemBeneficio:hover {
+    border-top: 2px solid transparent;
+  }
+}
+
+@media (min-width: 576px) {
+  .itemBeneficio {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .itemBeneficio {
+    border-left: 3px solid #b91c1c;
+    background-image: linear-gradient(white, white);
+  }
+
+  .itemBeneficio:first-child {
+    border-left: none;
+    background-image: none;
+  }
+
+  .itemBeneficio:hover {
+    background-image: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(254, 242, 242, 0.8) 100%
+    );
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .itemBeneficio {
+    border-left: 3px solid #b91c1c;
+    background-image: linear-gradient(white, white);
+  }
+
+  .itemBeneficio:first-child {
+    border-left: none;
+    background-image: none;
+  }
+}
+
+@media (min-width: 1200px) {
+  .itemBeneficio {
+    border-left: 3px solid #b91c1c;
+    background-image: linear-gradient(#f5f5f5, #f5f5f5);
+  }
+
+  .itemBeneficio:first-child {
+    border-left: none;
+    background-image: none;
+  }
+
+  .contenedorPadreBene {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .tituloBeneficios h1 {
+    font-size: 2.8rem;
+  }
+}
+
+/* Brillo que cruza el contenedor */
+.itemBeneficio:hover {
+  overflow: hidden;
+}
+
+.itemBeneficio:hover::before {
+  animation: shineLight 2s ease-in-out;
+}
+
+@keyframes shineLight {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(200%) rotate(45deg);
+  }
+}
