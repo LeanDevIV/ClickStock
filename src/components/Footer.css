@@ -1,26 +1,14 @@
 .footer {
-  background-color: #000000;
+  background: linear-gradient(to right, #000000, #363636);
   color: #F5F5F5;
   position: relative;
   overflow: hidden;
   padding-top: 80px;
   padding-bottom: 40px;
   text-align: center;
+  border-top-left-radius: 125px;
 }
 
-/* Curva SVG superior */
-/* .footer::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100px;
-  background: url("../assets/footer-wave-top.svg") no-repeat top center;
-  background-size: cover;
-  transform: translateY(-99%);
-
-} */
 
 .footer h5 {
   color: #D4AF37;
@@ -41,6 +29,7 @@
 
 .footer a:hover {
   color: #D4AF37;
+  padding-left: 6px;
 }
 
 /* Redes sociales */
