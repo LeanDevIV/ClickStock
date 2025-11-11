@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import AppRoutes from "./routes/AppRoutes.jsx";
+import AppRoutes from "./routes/Indexroutes.jsx";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer.jsx";
