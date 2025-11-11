@@ -13,32 +13,63 @@ const Contacto = () => {
 
   const [alert, setAlert] = useState({ show: false, variant: "", message: "" });
   const [validated, setValidated] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  // handleChange con validaciones
+  // Validaciones personalizadas
+  const validateFields = () => {
+    const newErrors = {};
+
+    if (!formData.nombre.trim()) {
+      newErrors.nombre = "El nombre es obligatorio";
+    } else if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/.test(formData.nombre)) {
+      newErrors.nombre = "Solo se permiten letras y espacios";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "El correo es obligatorio";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Correo inválido";
+    }
+
+    if (!formData.asunto.trim()) {
+      newErrors.asunto = "El asunto es obligatorio";
+    } else if (formData.asunto.length < 3) {
+      newErrors.asunto = "Debe tener al menos 3 caracteres";
+    }
+
+    if (!formData.mensaje.trim()) {
+      newErrors.mensaje = "El mensaje es obligatorio";
+    } else if (formData.mensaje.length < 10) {
+      newErrors.mensaje = "Debe tener mínimo 10 caracteres";
+    }
+
+    return newErrors;
+  };
+
+  // Control de inputs + limite palabras
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Validación de máximo 300 palabras (solo para "mensaje")
     if (name === "mensaje") {
       const words = value.trim().split(/\s+/);
       if (words.length > 300) return;
     }
 
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = e.currentTarget;
 
-    if (!form.checkValidity()) {
-      e.stopPropagation();
+    const newErrors = validateFields();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       setValidated(true);
       return;
     }
+
+    setErrors({});
+    setValidated(false);
 
     try {
       await axios.post("http://localhost:5000/api/contacto", {
@@ -53,7 +84,7 @@ const Contacto = () => {
       });
 
       setFormData({ nombre: "", email: "", asunto: "", mensaje: "" });
-      setValidated(false);
+
     } catch (error) {
       console.error(error);
       setAlert({
@@ -65,100 +96,134 @@ const Contacto = () => {
   };
 
   return (
-    <Container className="py-5 contact-container" style={{ maxWidth: "600px" }}>
-      <h2 className="text-center mb-4 fw-bold text-uppercase">
-        Formulario de contacto
-      </h2>
+    <div className="contact-page">
+      <div className="contact-overlay"></div>
 
-      {alert.show && (
-        <Alert
-          variant={alert.variant}
-          onClose={() => setAlert({ show: false })}
-          dismissible
-        >
-          {alert.message}
-        </Alert>
-      )}
+      <Container className="contact-wrapper">
+        <div className="contact-grid">
 
-      {/*Activamos las validaciones de Bootstrap */}
-      <Form noValidate validated={validated} onSubmit={handleSubmit}>
-        {/*Nombre */}
-        <Form.Group className="mb-3" controlId="formNombre">
-          <Form.Label>Nombre</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Tu nombre..."
-            name="nombre"
-            value={formData.nombre}
-            onChange={handleChange}
-            required
-            maxLength={40}
-            pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
-          />
-          <Form.Control.Feedback type="invalid">
-            El nombre solo puede contener letras y hasta 40 caracteres.
-          </Form.Control.Feedback>
-        </Form.Group>
+          {/* COLUMNA IZQUIERDA */}
+          <div className="contact-info-box">
+            <h2 className="contact-title">CONTÁCTATE CON<br />NOSOTROS</h2>
 
-        {/*Email */}
-        <Form.Group className="mb-3" controlId="formEmail">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="tuemail@mail.com"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            // pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
-          />
-          <Form.Control.Feedback type="invalid">
-            Ingresá un correo electrónico válido.
-          </Form.Control.Feedback>
-        </Form.Group>
+            <div className="info-item">
+              <i className="bi bi-telephone-fill"></i>
+              <span>+54 381 234 5678</span>
+            </div>
 
-        {/* Asunto */}
-        <Form.Group className="mb-3" controlId="formAsunto">
-          <Form.Label>Asunto</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Motivo del mensaje"
-            name="asunto"
-            value={formData.asunto}
-            onChange={handleChange}
-            required
-            maxLength={80}
-          />
-          <Form.Control.Feedback type="invalid">
-            El asunto no puede superar los 80 caracteres.
-          </Form.Control.Feedback>
-        </Form.Group>
+            <div className="info-item">
+              <i className="bi bi-envelope-fill"></i>
+              <span>contacto@mail.com</span>
+            </div>
 
-        {/*Mensaje */}
-        <Form.Group className="mb-4" controlId="formMensaje">
-          <Form.Label>Mensaje</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            placeholder="Escribí tu mensaje..."
-            name="mensaje"
-            value={formData.mensaje}
-            onChange={handleChange}
-            required
-          />
-          <small className="text-muted"></small>
-          <Form.Control.Feedback type="invalid">
-            El mensaje no puede exceder las 300 palabras.
-          </Form.Control.Feedback>
-        </Form.Group>
+            <div className="info-item">
+              <i className="bi bi-geo-alt-fill"></i>
+              <span>, Argentina</span>
+            </div>
+          </div>
 
-        <div className="text-center">
-          <Button variant="dark" type="submit" className="px-4">
-            Enviar
-          </Button>
+          {/* FORMULARIO */}
+          <div className="contact-form-box">
+            {alert.show && (
+              <Alert
+                variant={alert.variant}
+                onClose={() => setAlert({ show: false })}
+                dismissible
+              >
+                {alert.message}
+              </Alert>
+            )}
+
+            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+
+              {/* Nombre */}
+              <Form.Group className="mb-3">
+                <div className="input-with-icon">
+                  {/* <i className="bi bi-person-fill"></i> */}
+                  <Form.Control
+                    type="text"
+                    placeholder="Nombre"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    required
+                    maxLength={40}
+                    isInvalid={!!errors.nombre}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.nombre}
+                  </Form.Control.Feedback>
+                </div>
+              </Form.Group>
+
+              {/* Email */}
+              <Form.Group className="mb-3">
+                <div className="input-with-icon">
+                  {/* <i className="bi bi-envelope-fill"></i> */}
+                  <Form.Control
+                    type="email"
+                    placeholder="Correo electrónico"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    isInvalid={!!errors.email}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email}
+                  </Form.Control.Feedback>
+                </div>
+              </Form.Group>
+
+              {/* Asunto */}
+              <Form.Group className="mb-3">
+                <div className="input-with-icon">
+                  {/* <i className="bi bi-pencil-fill"></i> */}
+                  <Form.Control
+                    type="text"
+                    placeholder="Asunto"
+                    name="asunto"
+                    value={formData.asunto}
+                    onChange={handleChange}
+                    required
+                    maxLength={80}
+                    isInvalid={!!errors.asunto}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.asunto}
+                  </Form.Control.Feedback>
+                </div>
+              </Form.Group>
+
+              {/* Mensaje */}
+              <Form.Group className="mb-3">
+                <div className="input-with-icon textarea">
+                  {/* <i className="bi bi-chat-left-dots-fill"></i> */}
+                  <Form.Control
+                    as="textarea"
+                    rows={4}
+                    placeholder="Mensaje..."
+                    name="mensaje"
+                    value={formData.mensaje}
+                    onChange={handleChange}
+                    required
+                    isInvalid={!!errors.mensaje}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.mensaje}
+                  </Form.Control.Feedback>
+                </div>
+              </Form.Group>
+
+              <Button className="send-btn" type="submit">
+                Enviar mensaje
+              </Button>
+            </Form>
+          </div>
+
         </div>
-      </Form>
-    </Container>
+      </Container>
+    </div>
   );
 };
 
