@@ -1,32 +1,30 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import clientAxios from "../utils/clientAxios";
 import Swal from "sweetalert2";
+import { Container, Row, Col } from "react-bootstrap";
 import {
-  Table,
-  Button,
-  Container,
-  Row,
-  Col,
-  Spinner,
-  ButtonGroup,
-  Modal,
-  Form,
-} from "react-bootstrap";
-import { PencilSquare, TrashFill, PlusCircle } from "react-bootstrap-icons";
+  Button, 
+} from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import ModalProducto from "../components/ModalProductos";
+import TablaProductos from "../components/TablaProductos";
+import { CircularProgress } from "@mui/material";
+import { subirMultiplesArchivos } from "../services/uploadService";
 
 const ProductosAdmin = () => {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editando, setEditando] = useState(false);
+  const [cargandoImagen, setCargandoImagen] = useState(false);
+  const [imagenesPreview, setImagenesPreview] = useState([]);
   const [productoActual, setProductoActual] = useState({
     nombre: "",
     descripcion: "",
     precio: "",
     stock: "",
     categoria: "",
-    imagen: "",
+    imagenes: [],
   });
 
   useEffect(() => {
@@ -73,21 +71,38 @@ const ProductosAdmin = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditando(false);
+    setCargandoImagen(false);
+    setImagenesPreview([]);
     setProductoActual({
       nombre: "",
       descripcion: "",
       precio: "",
       stock: "",
       categoria: "",
-      imagen: "",
+      imagenes: [],
     });
   };
 
   const handleShowModal = (producto = null) => {
     if (producto) {
-      setProductoActual(producto);
+      // Asegurarse de que las imágenes sean un array
+      setProductoActual({
+        ...producto,
+        imagenes: producto.imagenes || (producto.imagen ? [producto.imagen] : []),
+      });
       setEditando(true);
+    } else {
+      setProductoActual({
+        nombre: "",
+        descripcion: "",
+        precio: "",
+        stock: "",
+        categoria: "",
+        imagenes: [],
+      });
+      setEditando(false);
     }
+    setImagenesPreview([]);
     setShowModal(true);
   };
 
@@ -99,21 +114,94 @@ const ProductosAdmin = () => {
     }));
   };
 
+  // Manejar subida de archivos
+  const handleFileUpload = async (files) => {
+    try {
+      setCargandoImagen(true);
+      setImagenesPreview([]);
+
+      // Crear previews temporales
+      const previews = Array.from(files).map((file) => URL.createObjectURL(file));
+      setImagenesPreview(previews);
+
+      // Subir archivos
+      const urls = await subirMultiplesArchivos(files, "productos");
+
+      // Agregar URLs al producto actual
+      setProductoActual((prev) => ({
+        ...prev,
+        imagenes: [...(prev.imagenes || []), ...urls],
+      }));
+
+      // Limpiar previews
+      setImagenesPreview([]);
+      
+      // Liberar URLs de preview
+      previews.forEach((url) => URL.revokeObjectURL(url));
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: `${urls.length} imagen(es) subida(s) correctamente`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error al subir imágenes:", error);
+      setImagenesPreview([]);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudieron subir las imágenes",
+      });
+    } finally {
+      setCargandoImagen(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar que haya al menos una imagen
+    if (!productoActual.imagenes || productoActual.imagenes.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Imagen requerida",
+        text: "Debes agregar al menos una imagen al producto",
+      });
+      return;
+    }
+
     try {
+      // Preparar datos del producto
+      const datosProducto = {
+        nombre: productoActual.nombre,
+        descripcion: productoActual.descripcion,
+        precio: parseFloat(productoActual.precio),
+        stock: parseInt(productoActual.stock),
+        categoria: productoActual.categoria,
+        imagenes: productoActual.imagenes,
+      };
+
       if (editando) {
-        await clientAxios.put(`/productos/${productoActual._id}`, productoActual);
+        await clientAxios.put(
+          `/productos/${productoActual._id}`,
+          datosProducto
+        );
         Swal.fire("¡Éxito!", "Producto actualizado correctamente", "success");
       } else {
-        await clientAxios.post("/productos", productoActual);
+        await clientAxios.post("/productos", datosProducto);
         Swal.fire("¡Éxito!", "Producto creado correctamente", "success");
       }
       handleCloseModal();
       await obtenerProductos();
     } catch (error) {
       console.error("Error:", error);
-      Swal.fire("Error", "Hubo un problema al procesar la solicitud", "error");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.error || "Hubo un problema al procesar la solicitud",
+      });
     }
   };
 
@@ -129,108 +217,33 @@ const ProductosAdmin = () => {
         </Col>
         <Col className="text-end">
           <Button
-            variant="success"
-            className="d-flex align-items-center gap-2"
+            variant="contained"
+            color="success"
+            startIcon={<AddCircleOutlineIcon />}
             onClick={() => handleShowModal()}
           >
-            <PlusCircle /> Agregar Producto
+            Agregar Producto
           </Button>
         </Col>
       </Row>
 
-      {/* Modal para crear/editar producto */}
-      <Modal show={showModal} onHide={handleCloseModal} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>{editando ? "Editar Producto" : "Crear Nuevo Producto"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Nombre del Producto</Form.Label>
-              <Form.Control
-                type="text"
-                name="nombre"
-                value={productoActual.nombre}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Descripción</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={3}
-                name="descripcion"
-                value={productoActual.descripcion}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Precio</Form.Label>
-              <Form.Control
-                type="number"
-                name="precio"
-                value={productoActual.precio}
-                onChange={handleInputChange}
-                required
-                min="0"
-                step="0.01"
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Stock</Form.Label>
-              <Form.Control
-                type="number"
-                name="stock"
-                value={productoActual.stock}
-                onChange={handleInputChange}
-                required
-                min="0"
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Categoría</Form.Label>
-              <Form.Control
-                type="text"
-                name="categoria"
-                value={productoActual.categoria}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>URL de la Imagen</Form.Label>
-              <Form.Control
-                type="url"
-                name="imagen"
-                value={productoActual.imagen}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-
-            <div className="text-end">
-              <Button variant="secondary" onClick={handleCloseModal} className="me-2">
-                Cancelar
-              </Button>
-              <Button variant="primary" type="submit">
-                {editando ? "Guardar Cambios" : "Crear Producto"}
-              </Button>
-            </div>
-          </Form>
-        </Modal.Body>
-      </Modal>
+      {/* MODAL MUI */}
+      <ModalProducto
+        open={showModal}
+        handleClose={handleCloseModal}
+        handleSubmit={handleSubmit}
+        handleInputChange={handleInputChange}
+        productoActual={productoActual}
+        editando={editando}
+        handleFileUpload={handleFileUpload}
+        imagenesPreview={imagenesPreview}
+        cargandoImagen={cargandoImagen}
+      />
 
       {/* Tabla de productos */}
       {cargando ? (
         <div className="text-center py-5">
-          <Spinner animation="border" variant="primary" />
+          <CircularProgress color="primary" />
           <p className="mt-3 text-muted">Cargando productos...</p>
         </div>
       ) : productos.length === 0 ? (
@@ -238,47 +251,12 @@ const ProductosAdmin = () => {
           <p>No hay productos cargados aún.</p>
         </div>
       ) : (
-        <div className="table-responsive">
-          <Table bordered hover striped className="align-middle shadow-sm">
-            <thead className="table-primary">
-              <tr>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th className="text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productos.map((producto) => (
-                <tr key={producto._id}>
-                  <td>{producto.nombre}</td>
-                  <td>${producto.precio}</td>
-                  <td>{producto.stock}</td>
-                  <td className="text-center">
-                    <ButtonGroup>
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        className="d-flex align-items-center gap-1"
-                        onClick={() => handleShowModal(producto)}
-                      >
-                        <PencilSquare /> Editar
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        className="d-flex align-items-center gap-1"
-                        onClick={() => eliminarProducto(producto._id)}
-                      >
-                        <TrashFill /> Eliminar
-                      </Button>
-                    </ButtonGroup>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </div>
+        <TablaProductos
+        productos={productos}
+        handleShowModal={handleShowModal}
+        eliminarProducto={eliminarProducto}
+      />
+        
       )}
     </Container>
   );
