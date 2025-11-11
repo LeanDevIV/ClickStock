@@ -30,7 +30,12 @@ const api = axios.create({
   },
 });
 
+import { useTheme } from "@mui/material/styles";
+
 const FloatingChat = () => {
+  const theme = useTheme();
+  // Detectar modo oscuro desde el theme
+  const modoOscuro = theme.palette.mode === "dark";
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -108,10 +113,17 @@ const FloatingChat = () => {
             width: 64,
             height: 64,
             zIndex: 1300,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
-            "&:hover": {
-              boxShadow: "0 12px 32px rgba(0,0,0,0.2)",
+            boxShadow: modoOscuro
+              ? "0 8px 24px rgba(0,0,0,0.7)"
+              : "0 8px 24px rgba(0,0,0,0.15)",
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            '&:hover': {
+              boxShadow: modoOscuro
+                ? "0 12px 32px rgba(0,0,0,0.9)"
+                : "0 12px 32px rgba(0,0,0,0.2)",
               transform: "scale(1.05)",
+              backgroundColor: theme.palette.primary.dark,
             },
             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           }}
@@ -137,14 +149,19 @@ const FloatingChat = () => {
             flexDirection: "column",
             borderRadius: 3,
             overflow: "hidden",
-            boxShadow: "0 16px 48px rgba(0,0,0,0.2)",
+            boxShadow: modoOscuro
+              ? "0 16px 48px rgba(0,0,0,0.7)"
+              : "0 16px 48px rgba(0,0,0,0.2)",
+            backgroundColor: theme.palette.background.paper,
           }}
         >
           {/* Header del chat */}
           <Box
             sx={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
+              background: modoOscuro
+                ? `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.secondary.dark} 100%)`
+                : `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
+              color: theme.palette.primary.contrastText,
               padding: 2,
               display: "flex",
               alignItems: "center",
@@ -154,9 +171,10 @@ const FloatingChat = () => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <Avatar
                 sx={{
-                  bgcolor: "rgba(255,255,255,0.2)",
+                  bgcolor: modoOscuro ? theme.palette.primary.main : "rgba(255,255,255,0.2)",
                   width: 40,
                   height: 40,
+                  color: modoOscuro ? theme.palette.primary.contrastText : theme.palette.primary.main,
                 }}
               >
                 <RobotIcon />
@@ -174,8 +192,8 @@ const FloatingChat = () => {
               label="En línea"
               size="small"
               sx={{
-                bgcolor: "rgba(255,255,255,0.2)",
-                color: "white",
+                bgcolor: modoOscuro ? theme.palette.primary.dark : "rgba(255,255,255,0.2)",
+                color: modoOscuro ? theme.palette.primary.contrastText : "white",
                 fontWeight: 500,
                 display: { xs: "none", sm: "flex" },
               }}
@@ -183,8 +201,10 @@ const FloatingChat = () => {
             <IconButton
               onClick={toggleChat}
               sx={{
-                color: "white",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
+                color: theme.palette.primary.contrastText,
+                '&:hover': {
+                  bgcolor: modoOscuro ? theme.palette.primary.main : "rgba(255,255,255,0.1)",
+                },
               }}
             >
               <CloseIcon />
@@ -197,7 +217,7 @@ const FloatingChat = () => {
               flex: 1,
               overflowY: "auto",
               padding: 2,
-              backgroundColor: "#f5f7fa",
+              backgroundColor: theme.palette.background.default,
               display: "flex",
               flexDirection: "column",
               gap: 2,
@@ -208,10 +228,10 @@ const FloatingChat = () => {
                 background: "transparent",
               },
               "&::-webkit-scrollbar-thumb": {
-                background: "#ccc",
+                background: modoOscuro ? theme.palette.primary.dark : "#ccc",
                 borderRadius: "3px",
                 "&:hover": {
-                  background: "#aaa",
+                  background: modoOscuro ? theme.palette.primary.main : "#aaa",
                 },
               },
             }}
@@ -247,7 +267,8 @@ const FloatingChat = () => {
                           sx={{
                             width: 24,
                             height: 24,
-                            bgcolor: "primary.main",
+                            bgcolor: theme.palette.primary.main,
+                            color: theme.palette.primary.contrastText,
                           }}
                         >
                           <RobotIcon sx={{ fontSize: 14 }} />
@@ -257,7 +278,8 @@ const FloatingChat = () => {
                           sx={{
                             width: 24,
                             height: 24,
-                            bgcolor: "secondary.main",
+                            bgcolor: theme.palette.secondary.main,
+                            color: theme.palette.secondary.contrastText,
                           }}
                         >
                           <PersonIcon sx={{ fontSize: 14 }} />
@@ -281,11 +303,16 @@ const FloatingChat = () => {
                         borderRadius: msg.sender === "bot"
                           ? "20px 20px 20px 4px"
                           : "20px 20px 4px 20px",
-                        backgroundColor: msg.sender === "bot" ? "white" : "primary.main",
-                        color: msg.sender === "bot" ? "text.primary" : "white",
+                        backgroundColor: msg.sender === "bot"
+                          ? theme.palette.background.paper
+                          : theme.palette.primary.main,
+                        color: msg.sender === "bot"
+                          ? theme.palette.text.primary
+                          : theme.palette.primary.contrastText,
                         wordWrap: "break-word",
                         lineHeight: 1.5,
                         maxWidth: "100%",
+                        border: modoOscuro && msg.sender === "bot" ? `1px solid ${theme.palette.primary.dark}` : undefined,
                       }}
                     >
                       <Typography variant="body2" sx={{ fontSize: "0.9rem" }}>
@@ -312,7 +339,8 @@ const FloatingChat = () => {
                     sx={{
                       width: 24,
                       height: 24,
-                      bgcolor: "primary.main",
+                      bgcolor: theme.palette.primary.main,
+                      color: theme.palette.primary.contrastText,
                     }}
                   >
                     <RobotIcon sx={{ fontSize: 14 }} />
@@ -322,16 +350,17 @@ const FloatingChat = () => {
                     sx={{
                       padding: 1.5,
                       borderRadius: "20px 20px 20px 4px",
-                      backgroundColor: "white",
+                      backgroundColor: theme.palette.background.paper,
                       display: "flex",
                       alignItems: "center",
                       gap: 1.5,
+                      color: theme.palette.text.primary,
                     }}
                   >
                     <CircularProgress size={16} thickness={4} />
                     <Typography
                       variant="caption"
-                      sx={{ color: "text.secondary", fontSize: "0.8rem" }}
+                      sx={{ color: theme.palette.text.secondary, fontSize: "0.8rem" }}
                     >
                       Escribiendo...
                     </Typography>
@@ -347,9 +376,8 @@ const FloatingChat = () => {
           <Box
             sx={{
               padding: 2,
-              borderTop: "1px solid",
-              borderColor: "divider",
-              backgroundColor: "white",
+              borderTop: `1px solid ${theme.palette.divider}`,
+              backgroundColor: theme.palette.background.paper,
             }}
           >
             <Box sx={{ display: "flex", gap: 1, alignItems: "flex-end" }}>
@@ -368,16 +396,21 @@ const FloatingChat = () => {
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: 3,
-                    backgroundColor: "#f5f7fa",
+                    backgroundColor: theme.palette.background.default,
+                    color: theme.palette.text.primary,
                     "& fieldset": {
                       borderColor: "transparent",
                     },
                     "&:hover fieldset": {
-                      borderColor: "primary.main",
+                      borderColor: theme.palette.primary.main,
                     },
                     "&.Mui-focused fieldset": {
-                      borderColor: "primary.main",
+                      borderColor: theme.palette.primary.main,
                     },
+                  },
+                  "& .MuiInputBase-input::placeholder": {
+                    color: modoOscuro ? "#aaaaaa" : "#555555",
+                    opacity: 1,
                   },
                 }}
               />
@@ -386,22 +419,22 @@ const FloatingChat = () => {
                 onClick={sendMessage}
                 disabled={loading || !input.trim()}
                 sx={{
-                  bgcolor: "primary.main",
-                  color: "white",
+                  bgcolor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
                   width: 40,
                   height: 40,
-                  "&:hover": {
-                    bgcolor: "primary.dark",
+                  '&:hover': {
+                    bgcolor: theme.palette.primary.dark,
                   },
-                  "&.Mui-disabled": {
-                    bgcolor: "action.disabledBackground",
-                    color: "action.disabled",
+                  '&.Mui-disabled': {
+                    bgcolor: theme.palette.action.disabledBackground,
+                    color: theme.palette.action.disabled,
                   },
                   transition: "all 0.2s",
                 }}
               >
                 {loading ? (
-                  <CircularProgress size={20} sx={{ color: "white" }} />
+                  <CircularProgress size={20} sx={{ color: theme.palette.primary.contrastText }} />
                 ) : (
                   <SendIcon fontSize="small" />
                 )}
@@ -413,7 +446,7 @@ const FloatingChat = () => {
                 display: "block",
                 textAlign: "center",
                 mt: 1,
-                color: "text.secondary",
+                color: theme.palette.text.secondary,
                 fontSize: "0.7rem",
               }}
             >

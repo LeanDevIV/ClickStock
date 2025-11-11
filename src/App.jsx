@@ -1,6 +1,6 @@
 import React from "react";
 import AppRoutes from "./routes/indexroutes.jsx";
-import FloatingChat from "./components/FloatingChat.jsx";
+import FloatingChat from "./components/Chatbot.jsx";
 import { useState, useMemo } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { Toaster } from "react-hot-toast";
@@ -25,7 +25,6 @@ function App() {
   };
 
   return (
- 
     <ThemeProvider theme={theme}>
       <CssBaseline />
       {globalStyles(theme, modoOscuro)}
@@ -52,7 +51,7 @@ function App() {
         }}
       />
       <AppRoutes modoOscuro={modoOscuro} toggleModo={toggleModo} />
-      <FloatingChat/>
+      <FloatingChat />
       <ProductosRender />
       <Footer />
     </ThemeProvider>
