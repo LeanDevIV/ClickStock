@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Splide from "@splidejs/splide";
 import "@splidejs/splide/dist/css/splide.min.css";
-import "../css/OfertaCarrusel.css";
+import "../css/ofertaCarrusel.css";
 
 const OfertaCarrusel = () => {
   const splideRef = useRef(null);
