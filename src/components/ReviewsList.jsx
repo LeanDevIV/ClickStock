@@ -1,32 +1,36 @@
 import { useEffect, useState } from "react";
-import { Card, Spinner } from "react-bootstrap";
+import { Card, Spinner, Alert } from "react-bootstrap";
 import { getReviewsByProduct, getAverageRating } from "../services/reviewService.js";
 
 const ReviewsList = ({ productId, refreshTrigger }) => {
   const [reviews, setReviews] = useState([]);
   const [average, setAverage] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const loadReviews = async () => {
+    const cargarReseñas = async () => {
       try {
         setLoading(true);
-        const [reviewsData, avgData] = await Promise.all([
+        const [dataReviews, dataPromedio] = await Promise.all([
           getReviewsByProduct(productId),
           getAverageRating(productId),
         ]);
-        setReviews(reviewsData);
-        setAverage(avgData.averageRating || 0);
-      } catch (err) {
-        console.error(err);
+
+        setReviews(Array.isArray(dataReviews) ? dataReviews : []);
+        setAverage(dataPromedio?.averageRating || 0);
+      } catch {
+        setError("No se pudieron cargar las reseñas.");
       } finally {
         setLoading(false);
       }
     };
-    loadReviews();
+
+    cargarReseñas();
   }, [productId, refreshTrigger]);
 
   if (loading) return <Spinner animation="border" />;
+  if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
     <div className="mt-4">

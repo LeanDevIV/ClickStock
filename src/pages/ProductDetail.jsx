@@ -4,10 +4,10 @@ import { Container, Spinner, Alert } from "react-bootstrap";
 import clientAxios from "../utils/clientAxios";
 import ReviewForm from "../components/ReviewForm";
 import ReviewsList from "../components/ReviewsList";
-import "../css/productDetail.css"; // tus estilos personalizados
+import "../css/productDetail.css";
 
 const ProductDetail = () => {
-  const { id } = useParams(); // 👈 Obtiene el ID desde la URL
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,10 +19,9 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const { data } = await clientAxios.get(`/productos/${id}`); // 👈 Petición real
-        setProduct(data.producto || data); // depende de cómo responde tu backend
-      } catch (err) {
-        console.error(err);
+        const { data } = await clientAxios.get(`/productos/${id}`);
+        setProduct(data.producto || data);
+      } catch {
         setError("No se pudo cargar el producto.");
       } finally {
         setLoading(false);
@@ -74,7 +73,6 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* Reseñas */}
       <div className="reviews-section mt-5">
         <ReviewForm productId={product._id} onReviewAdded={handleReviewAdded} />
         <ReviewsList productId={product._id} refreshTrigger={refresh} />

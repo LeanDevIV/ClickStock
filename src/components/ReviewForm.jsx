@@ -20,9 +20,8 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
       setLoading(true);
       await createReview({ ...formData, productId });
       setFormData({ user: "", rating: 5, comment: "" });
-      onReviewAdded(); // para refrescar lista
-    } catch (err) {
-      console.error(err);
+      onReviewAdded();
+    } catch {
       alert("Error al enviar la reseña");
     } finally {
       setLoading(false);
@@ -32,6 +31,7 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
   return (
     <Form onSubmit={handleSubmit} className="mt-4">
       <h5>Agregar una reseña</h5>
+
       <Form.Group className="mb-2">
         <Form.Label>Tu nombre</Form.Label>
         <Form.Control
@@ -45,9 +45,15 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
 
       <Form.Group className="mb-2">
         <Form.Label>Puntaje</Form.Label>
-        <Form.Select name="rating" value={formData.rating} onChange={handleChange}>
+        <Form.Select
+          name="rating"
+          value={formData.rating}
+          onChange={handleChange}
+        >
           {[1, 2, 3, 4, 5].map((n) => (
-            <option key={n} value={n}>{n} ⭐</option>
+            <option key={n} value={n}>
+              {n} ⭐
+            </option>
           ))}
         </Form.Select>
       </Form.Group>
