@@ -51,7 +51,6 @@ function App() {
       />
       <AppRoutes modoOscuro={modoOscuro} toggleModo={toggleModo} />
       <FloatingChat />
-      <ProductosRender />
       <Footer />
     </ThemeProvider>
   );

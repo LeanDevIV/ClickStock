@@ -1,7 +1,7 @@
-import HeroHomePage from "../components/hero.jsx";
-import BeneficiosHome from "../components/Beneficios.jsx";
-import OfertaCarrusel from "../components/OfertaCarrusel.jsx";
-import CategoriasBox from "../components/categoriasBox.jsx";
+import HeroHomePage from "../components/hero";
+import BeneficiosHome from "../components/Beneficios";
+import OfertaCarrusel from "../components/OfertaCarrusel";
+import CategoriasBox from "../components/categoriasBox";
 function Home() {
   return (
     <div>
