@@ -3,9 +3,9 @@ import { Container, Card } from "react-bootstrap";
 import ReviewForm from "../components/ReviewForm";
 import ReviewsList from "../components/ReviewsList";
 import { useState } from "react";
+import "../css/productDetail.css"; // 👈 importa los estilos
 
 const ProductDetail = () => {
-  // Producto hardcodeado — luego lo traeremos por ID desde el backend
   const product = {
     _id: "6728a1e1c2b3d6f49c3d8b12",
     name: "Camiseta React Dev",
@@ -20,23 +20,23 @@ const ProductDetail = () => {
 
   return (
     <Container className="mt-4">
-      <Card className="p-3 shadow-sm">
-        <div className="d-flex flex-column flex-md-row align-items-center">
-          <img
-            src={product.image}
-            alt={product.name}
-            style={{ width: "180px", marginRight: "1rem" }}
-          />
-          <div>
-            <h3>{product.name}</h3>
-            <p className="text-muted mb-1">${product.price}</p>
-            <p>{product.description}</p>
-          </div>
+      <div className="product-detail-container d-flex flex-column flex-md-row align-items-center">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="product-detail-image"
+        />
+        <div className="product-info">
+          <h3>{product.name}</h3>
+          <p className="price">${product.price}</p>
+          <p>{product.description}</p>
         </div>
-      </Card>
+      </div>
 
-      <ReviewForm productId={product._id} onReviewAdded={handleReviewAdded} />
-      <ReviewsList productId={product._id} refreshTrigger={refresh} />
+      <div className="reviews-section mt-4">
+        <ReviewForm productId={product._id} onReviewAdded={handleReviewAdded} />
+        <ReviewsList productId={product._id} refreshTrigger={refresh} />
+      </div>
     </Container>
   );
 };
