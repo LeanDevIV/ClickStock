@@ -13,7 +13,6 @@ import {
   Grid,
   Box,
   CircularProgress,
-  TextField,
   IconButton,
 } from "@mui/material";
 
@@ -32,7 +31,7 @@ function Products() {
       const response = await clientAxios.get("/productos");
       const productosData = response.data?.productos || response.data;
       if (Array.isArray(productosData)) {
-        // Filtrar productos: stock > 0 Y disponible === true
+        // Filtrar productos: stock > 0 y disponible === true
         const productosFiltrados = productosData.filter(
           (producto) => producto.stock > 0 && producto.disponible === true
         );
@@ -47,7 +46,6 @@ function Products() {
       setLoading(false);
     }
   }
-
 
   return (
     <Box sx={{ p: 4 }}>
@@ -83,8 +81,8 @@ function Products() {
               >
                 <Card
                   sx={{
-                    width: 280, 
-                    height: 400, 
+                    width: 280,
+                    height: 400,
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "space-between",
@@ -96,7 +94,10 @@ function Products() {
                     "&:hover": {
                       transform: "translateY(-6px)",
                       boxShadow: 20,
-                      "&:hover .favorito-btn": { opacity: 1, transform: "translateY(0)" },
+                      "&:hover .favorito-btn": {
+                        opacity: 1,
+                        transform: "translateY(0)",
+                      },
                     },
                   }}
                 >
@@ -126,6 +127,7 @@ function Products() {
                       objectFit: "cover",
                     }}
                   />
+
                   {/* Botón de favoritos */}
                   <IconButton
                     className="favorito-btn"
@@ -135,7 +137,9 @@ function Products() {
                       position: "absolute",
                       top: 10,
                       right: 10,
-                      color: esFavorito(producto._id) ? "error.main" : "white",
+                      color: esFavorito(producto._id)
+                        ? "error.main"
+                        : "white",
                       backgroundColor: "rgba(0,0,0,0.4)",
                       opacity: 0,
                       transform: "translateY(-10px)",
@@ -143,8 +147,13 @@ function Products() {
                       "&:hover": { backgroundColor: "rgba(0,0,0,0.6)" },
                     }}
                   >
-                    {esFavorito(producto._id) ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                    {esFavorito(producto._id) ? (
+                      <FavoriteIcon />
+                    ) : (
+                      <FavoriteBorderIcon />
+                    )}
                   </IconButton>
+
                   <CardContent
                     sx={{
                       flexGrow: 1,
@@ -167,6 +176,7 @@ function Products() {
                       >
                         {producto.nombre}
                       </Typography>
+
                       <Typography
                         variant="body2"
                         color="text.secondary"
@@ -187,6 +197,7 @@ function Products() {
                           {producto.stock}
                         </span>
                       </Typography>
+
                       <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                         ${producto.precio}
                       </Typography>
@@ -212,21 +223,6 @@ function Products() {
           )}
         </Grid>
       )}
-
-      {/* Sección para agregar producto */}
-      <Box sx={{ mt: 5 }}>
-        <Typography variant="h5" sx={{ mb: 2 }}>
-          Agregar nuevo producto
-        </Typography>
-        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-          <TextField label="Nombre" variant="outlined" />
-          <TextField label="Precio" variant="outlined" />
-          <TextField label="Stock" variant="outlined" />
-          <Button variant="contained" color="primary">
-            Guardar Producto
-          </Button>
-        </Box>
-      </Box>
     </Box>
   );
 }
