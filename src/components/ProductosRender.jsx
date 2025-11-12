@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // 👈 Importa esto
 import clientAxios from "../utils/clientAxios";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -21,6 +22,8 @@ function Products() {
   const [loading, setLoading] = useState(true);
   const { esFavorito, toggleFavorito, loading: loadingFavoritos } = useFavoritos();
 
+  const navigate = useNavigate(); // 👈 Hook de navegación
+
   useEffect(() => {
     obtenerProductos();
   }, []);
@@ -30,6 +33,7 @@ function Products() {
       setLoading(true);
       const response = await clientAxios.get("/productos");
       const productosData = response.data?.productos || response.data;
+
       if (Array.isArray(productosData)) {
         // Filtrar productos: stock > 0 y disponible === true
         const productosFiltrados = productosData.filter(
@@ -58,13 +62,7 @@ function Products() {
           <CircularProgress />
         </Box>
       ) : (
-        <Grid
-          container
-          spacing={3}
-          sx={{
-            justifyContent: "center",
-          }}
-        >
+        <Grid container spacing={3} sx={{ justifyContent: "center" }}>
           {productos.length > 0 ? (
             productos.map((producto) => (
               <Grid
@@ -74,10 +72,7 @@ function Products() {
                 sm={6}
                 md={4}
                 lg={3}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                }}
+                sx={{ display: "flex", justifyContent: "center" }}
               >
                 <Card
                   sx={{
@@ -203,6 +198,7 @@ function Products() {
                       </Typography>
                     </Box>
 
+                    {/* 👇 Navega al detalle */}
                     <Button
                       variant="contained"
                       sx={{
@@ -211,6 +207,7 @@ function Products() {
                         textTransform: "none",
                         fontWeight: "bold",
                       }}
+                      onClick={() => navigate(`/producto/detalle/${producto._id}`)}
                     >
                       Ver más
                     </Button>
