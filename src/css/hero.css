@@ -131,7 +131,6 @@
   right: 20px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .carousel-container {
     max-width: 100%;

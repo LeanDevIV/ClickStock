@@ -29,7 +29,6 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
           <Route path="usuarios" element={<AdminUsuarios />} />
         </Route>
       </Route>
-
       <Route path="*" element={<Error404 />} />
     </Routes>
   );

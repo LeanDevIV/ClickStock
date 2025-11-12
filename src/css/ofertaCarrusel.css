@@ -137,7 +137,8 @@
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   background: transparent;
-  color: var(--accent-color);
+  color: white;
+
 }
 
 .btn-icon {
@@ -177,7 +178,7 @@
   top: 50%;
   left: 0;
   right: 0;
-  transform: translateY(-50%);
+  transform: translateY(-10%);
   z-index: 3;
   pointer-events: none;
 }
@@ -226,7 +227,6 @@
   .ofertas-oferta {
     height: 500px;
     border-radius: 8px;
-    margin: 0 1rem;
   }
 
   .slide-contenido {
@@ -279,6 +279,7 @@
   .btn-oferta {
     padding: 0.875rem 1.5rem;
     font-size: 0.9rem;
+    color: white;
   }
 
   .splide__arrow {

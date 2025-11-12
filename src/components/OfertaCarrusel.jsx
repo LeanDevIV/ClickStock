@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Splide from "@splidejs/splide";
 import "@splidejs/splide/dist/css/splide.min.css";
 import "../css/OfertaCarrusel.css";
 
 const OfertaCarrusel = () => {
   const splideRef = useRef(null);
+  const navigate = useNavigate();
 
   const ofertas = [
     {
@@ -25,7 +27,7 @@ const OfertaCarrusel = () => {
     },
     {
       id: 3,
-      imagen: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&h=500&fit=crop",
+      imagen: "https://thumbs.dreamstime.com/b/etiquetas-de-venta-con-descuento-en-perchas-ropa-tienda-informal-temporada-por-concepto-moda-negro-viernes-d%C3%ADa-compras-fuera-230462056.jpg",
       categoria: "MODA",
       titulo: "30% OFF en Temporada",
       descripcion: "Renueva tu guardarropa con nuestros descuentos especiales",
@@ -33,7 +35,7 @@ const OfertaCarrusel = () => {
     },
     {
       id: 4,
-      imagen: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&h=500&fit=crop",
+      imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBjIhW7cp5ZTHBy20h-CpQUlvpurLNvv9zzQ&s",
       categoria: "ENVÍO",
       titulo: "Envío Gratis",
       descripcion: "En todas tus compras mayores a $500 - Aprovecha hoy",
@@ -54,14 +56,14 @@ const OfertaCarrusel = () => {
         speed: 1000,
         easing: "cubic-bezier(0.25, 1, 0.5, 1)",
       });
-
       splide.mount();
-
-      return () => {
-        splide.destroy();
-      };
+      return () => splide.destroy();
     }
   }, []);
+
+  const handleOfertaClick = () => {
+    navigate("/no-existe");
+  };
 
   return (
     <div className="ofertas-oferta">
@@ -70,15 +72,12 @@ const OfertaCarrusel = () => {
           <ul className="splide__list">
             {ofertas.map((oferta, index) => (
               <li className="splide__slide" key={oferta.id}>
-                <div 
-                  className="slide-oferta"
-                  style={{ '--accent-color': oferta.color }}
-                >
+                <div className="slide-oferta" style={{ "--accent-color": oferta.color }}>
                   <div className="slide-imagen">
                     <img src={oferta.imagen} alt={oferta.titulo} />
                     <div className="overlay-gradiente"></div>
                   </div>
-                  
+
                   <div className="slide-contenido">
                     <div className="contenido-interno">
                       <span className="categoria" style={{ color: oferta.color }}>
@@ -86,16 +85,20 @@ const OfertaCarrusel = () => {
                       </span>
                       <h2 className="titulo-principal">{oferta.titulo}</h2>
                       <p className="descripcion">{oferta.descripcion}</p>
-                      <button 
+                      <button
                         className="btn-oferta"
-                        style={{ 
-                          backgroundColor: oferta.color,
-                          borderColor: oferta.color
-                        }}
+                        style={{ backgroundColor: oferta.color, borderColor: oferta.color }}
+                        onClick={handleOfertaClick}
                       >
                         Descubrir Oferta
                         <svg className="btn-icon" viewBox="0 0 24 24" fill="none">
-                          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path
+                            d="M5 12H19M19 12L12 5M19 12L12 19"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -103,10 +106,10 @@ const OfertaCarrusel = () => {
 
                   <div className="slide-indicador">
                     {ofertas.map((_, i) => (
-                      <div 
+                      <div
                         key={i}
-                        className={`indicador-punto ${i === index ? 'activo' : ''}`}
-                        style={{ backgroundColor: i === index ? oferta.color : '#e5e7eb' }}
+                        className={`indicador-punto ${i === index ? "activo" : ""}`}
+                        style={{ backgroundColor: i === index ? oferta.color : "#e5e7eb" }}
                       ></div>
                     ))}
                   </div>
