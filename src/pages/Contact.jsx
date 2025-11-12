@@ -118,7 +118,7 @@ const Contacto = () => {
 
             <div className="info-item">
               <i className="bi bi-geo-alt-fill"></i>
-              <span>, Argentina</span>
+              <span>Gral. Paz 234 - Tucumán, Argentina</span>
             </div>
           </div>
 
@@ -139,7 +139,6 @@ const Contacto = () => {
               {/* Nombre */}
               <Form.Group className="mb-3">
                 <div className="input-with-icon">
-                  {/* <i className="bi bi-person-fill"></i> */}
                   <Form.Control
                     type="text"
                     placeholder="Nombre"
@@ -159,7 +158,6 @@ const Contacto = () => {
               {/* Email */}
               <Form.Group className="mb-3">
                 <div className="input-with-icon">
-                  {/* <i className="bi bi-envelope-fill"></i> */}
                   <Form.Control
                     type="email"
                     placeholder="Correo electrónico"
@@ -178,7 +176,6 @@ const Contacto = () => {
               {/* Asunto */}
               <Form.Group className="mb-3">
                 <div className="input-with-icon">
-                  {/* <i className="bi bi-pencil-fill"></i> */}
                   <Form.Control
                     type="text"
                     placeholder="Asunto"
@@ -198,7 +195,6 @@ const Contacto = () => {
               {/* Mensaje */}
               <Form.Group className="mb-3">
                 <div className="input-with-icon textarea">
-                  {/* <i className="bi bi-chat-left-dots-fill"></i> */}
                   <Form.Control
                     as="textarea"
                     rows={4}
