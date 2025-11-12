@@ -9,28 +9,29 @@ import ProductDetail from "../pages/ProductDetail";
 import AdminUsuarios from "../pages/AdminUsuarios";
 import AdminLayout from "../layouts/AdminLayout";
 import TablaPedidos from "../pages/admin/tablaPedidos";
+import ScrollToTop from "../components/ScrollToTop.jsx";
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
-    <Routes>
-      <Route
-        element={<MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />}
-      >
-        <Route path="/" element={<Home />} />
-        {/* Rutas públicas */}
-        <Route path="/Acerca" element={<AboutUs />} />
-        <Route path="/Contacto" element={<Contact />} />
-        <Route path="/Producto/detalle" element={<ProductDetail />} />
-
-        {/* Rutas admin protegidas */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="productos" element={<AdminProductos />} />
-          <Route path="pedidos" element={<TablaPedidos />} />
-          <Route path="usuarios" element={<AdminUsuarios />} />
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route
+          element={<MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />}
+        >
+          <Route path="/" element={<Home />} />
+          <Route path="/Acerca" element={<AboutUs />} />
+          <Route path="/Contacto" element={<Contact />} />
+          <Route path="/Producto/detalle" element={<ProductDetail />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="productos" element={<AdminProductos />} />
+            <Route path="pedidos" element={<TablaPedidos />} />
+            <Route path="usuarios" element={<AdminUsuarios />} />
+          </Route>
         </Route>
-      </Route>
-      <Route path="*" element={<Error404 />} />
-    </Routes>
+        <Route path="*" element={<Error404 />} />
+      </Routes>
+    </>
   );
 }
 
