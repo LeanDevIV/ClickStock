@@ -13,8 +13,9 @@ import {
   Yard,
   Kitchen,
   Computer
+
 } from '@mui/icons-material';
-import "../css/CategoriasBox.css";
+import "../css/categoriasBox.css";
 
 const CategoriasBox = () => {
   const theme = useTheme();
