@@ -1,10 +1,12 @@
 import { useState, useMemo } from "react";
-import { ThemeProvider, CssBaseline } from "@mui/material";
 import AppRoutes from "./routes/Indexroutes.jsx";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { Toaster } from "react-hot-toast";
 import Footer from "./components/Footer.jsx";
 import ProductosRender from "./components/ProductosRender.jsx";
 import { getCustomTheme } from "./styles/customTheme";
 import { globalStyles } from "./styles/globalStyles";
+import FloatingChat from "./components/Chatbot.jsx";
 
 function App() {
   const [modoOscuro, setModoOscuro] = useState(() => {
@@ -25,8 +27,31 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       {globalStyles(theme, modoOscuro)}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: modoOscuro ? "#333" : "#fff",
+            color: modoOscuro ? "#fff" : "#333",
+          },
+          success: {
+            iconTheme: {
+              primary: "#4caf50",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#f44336",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
       <AppRoutes modoOscuro={modoOscuro} toggleModo={toggleModo} />
-
+      <FloatingChat />
+      <ProductosRender />
       <Footer />
     </ThemeProvider>
   );
