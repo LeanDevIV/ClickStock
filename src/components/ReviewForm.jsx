@@ -1,14 +1,10 @@
-import { useForm } from "react-hook-form";
-import { Button, Form } from "react-bootstrap";
+import { useForm, Controller } from "react-hook-form";
+import { TextField, Button, MenuItem, Box, Typography } from "@mui/material";
+import toast from "react-hot-toast";
 import { createReview } from "../services/reviewService.js";
 
 const ReviewForm = ({ productId, onReviewAdded }) => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm({
+  const { handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
       user: "",
       rating: 5,
@@ -19,58 +15,76 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
   const onSubmit = async (data) => {
     try {
       await createReview({ ...data, productId });
-      reset(); // limpia el formulario
+      reset();
+      toast.success("✅ Reseña enviada correctamente");
       onReviewAdded();
     } catch (error) {
-      alert("Error al enviar la reseña");
       console.error(error);
+      toast.error("❌ Error al enviar la reseña");
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-      <h5>Agregar una reseña</h5>
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} mt={3}>
+      <Typography variant="h6" mb={2}>Agregar una reseña</Typography>
 
-      <Form.Group className="mb-2">
-        <Form.Label>Tu nombre</Form.Label>
-        <Form.Control
-          type="text"
-          {...register("user", { required: "El nombre es obligatorio" })}
-          isInvalid={!!errors.user}
-        />
-        <Form.Control.Feedback type="invalid">
-          {errors.user?.message}
-        </Form.Control.Feedback>
-      </Form.Group>
+      <Controller
+        name="user"
+        control={control}
+        rules={{ required: "El nombre es obligatorio" }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label="Tu nombre"
+            fullWidth
+            margin="normal"
+            error={!!errors.user}
+            helperText={errors.user?.message}
+          />
+        )}
+      />
 
-      <Form.Group className="mb-2">
-        <Form.Label>Puntaje</Form.Label>
-        <Form.Select {...register("rating", { required: true })}>
-          {[1, 2, 3, 4, 5].map((n) => (
-            <option key={n} value={n}>
-              {n} ⭐
-            </option>
-          ))}
-        </Form.Select>
-      </Form.Group>
+      <Controller
+        name="rating"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label="Puntaje"
+            select
+            fullWidth
+            margin="normal"
+          >
+            {[1,2,3,4,5].map((n) => (
+              <MenuItem key={n} value={n}>{n} ⭐</MenuItem>
+            ))}
+          </TextField>
+        )}
+      />
 
-      <Form.Group className="mb-2">
-        <Form.Label>Comentario</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={3}
-          {...register("comment", { required: "El comentario es obligatorio" })}
-          isInvalid={!!errors.comment}
-        />
-        <Form.Control.Feedback type="invalid">
-          {errors.comment?.message}
-        </Form.Control.Feedback>
-      </Form.Group>
+      <Controller
+        name="comment"
+        control={control}
+        rules={{ required: "El comentario es obligatorio" }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label="Comentario"
+            fullWidth
+            multiline
+            rows={4}
+            margin="normal"
+            error={!!errors.comment}
+            helperText={errors.comment?.message}
+          />
+        )}
+      />
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" variant="contained" color="error" disabled={isSubmitting} sx={{ mt: 2 }}>
         {isSubmitting ? "Enviando..." : "Enviar reseña"}
       </Button>
-    </Form>
+    </Box>
   );
 };
 
