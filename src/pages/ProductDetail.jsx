@@ -1,42 +1,82 @@
-// src/pages/ProductDetail.jsx
-import { Container, Card } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Container, Spinner, Alert } from "react-bootstrap";
+import clientAxios from "../utils/clientAxios";
 import ReviewForm from "../components/ReviewForm";
 import ReviewsList from "../components/ReviewsList";
-import { useState } from "react";
+import "../css/productDetail.css";
 
 const ProductDetail = () => {
-  // Producto hardcodeado — luego lo traeremos por ID desde el backend
-  const product = {
-    _id: "6728a1e1c2b3d6f49c3d8b12",
-    name: "Camiseta React Dev",
-    price: 59.99,
-    description: "Camiseta oficial para desarrolladores React 🧠",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg",
-  };
-
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
+
   const handleReviewAdded = () => setRefresh((prev) => prev + 1);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const { data } = await clientAxios.get(`/productos/${id}`);
+        setProduct(data.producto || data);
+      } catch {
+        setError("No se pudo cargar el producto.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (loading)
+    return (
+      <div className="d-flex justify-content-center align-items-center mt-5">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+
+  if (error)
+    return (
+      <Container className="mt-4">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    );
+
+  if (!product)
+    return (
+      <Container className="mt-4">
+        <Alert variant="warning">Producto no encontrado.</Alert>
+      </Container>
+    );
 
   return (
     <Container className="mt-4">
-      <Card className="p-3 shadow-sm">
-        <div className="d-flex flex-column flex-md-row align-items-center">
-          <img
-            src={product.image}
-            alt={product.name}
-            style={{ width: "180px", marginRight: "1rem" }}
-          />
-          <div>
-            <h3>{product.name}</h3>
-            <p className="text-muted mb-1">${product.price}</p>
-            <p>{product.description}</p>
-          </div>
+      <div className="product-detail-container d-flex flex-column flex-md-row align-items-center">
+        <img
+          src={
+            product.imagenes?.[0] ||
+            "https://via.placeholder.com/300x200?text=Sin+imagen"
+          }
+          alt={product.nombre}
+          className="product-detail-image"
+        />
+        <div className="product-info ms-md-4 mt-3 mt-md-0">
+          <h3>{product.nombre}</h3>
+          <p className="price">${product.precio}</p>
+          <p>{product.descripcion || "Sin descripción disponible."}</p>
+          <p>
+            <strong>Stock:</strong> {product.stock}
+          </p>
         </div>
-      </Card>
+      </div>
 
-      <ReviewForm productId={product._id} onReviewAdded={handleReviewAdded} />
-      <ReviewsList productId={product._id} refreshTrigger={refresh} />
+      <div className="reviews-section mt-5">
+        <ReviewForm productId={product._id} onReviewAdded={handleReviewAdded} />
+        <ReviewsList productId={product._id} refreshTrigger={refresh} />
+      </div>
     </Container>
   );
 };

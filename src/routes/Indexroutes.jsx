@@ -11,6 +11,8 @@ import AdminLayout from "../layouts/AdminLayout";
 import TablaPedidos from "../pages/admin/tablaPedidos";
 import ScrollToTop from "../components/ScrollToTop.jsx";
 import TestCompartir from "../components/testPrueba.jsx"
+import ProductList from "../pages/ProductList";
+
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
@@ -26,13 +28,16 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
           <Route path="/" element={<Home />} />
           <Route path="/Acerca" element={<AboutUs />} />
           <Route path="/Contacto" element={<Contact />} />
-          <Route path="/Producto/detalle" element={<ProductDetail />} />
+          <Route path="/productos" element={<ProductList />} />
+          <Route path="/producto/detalle/:id" element={<ProductDetail />} />
+
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="productos" element={<AdminProductos />} />
             <Route path="pedidos" element={<TablaPedidos />} />
             <Route path="usuarios" element={<AdminUsuarios />} />
           </Route>
         </Route>
+
         <Route path="*" element={<Error404 />} />
       </Routes>
     </>

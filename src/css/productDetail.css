@@ -1,0 +1,136 @@
+/* ---------- CONTENEDOR GENERAL ---------- */
+.product-detail-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #fafafa 0%, #fef2f2 100%);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(185, 28, 28, 0.15);
+    transition: all 0.4s ease;
+    border: 1px solid rgba(185, 28, 28, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .product-detail-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      #b91c1c 25%,
+      #dc2626 50%,
+      #b91c1c 75%,
+      transparent 100%
+    );
+    animation: slideGradient 3s linear infinite;
+  }
+  
+  @keyframes slideGradient {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+  
+  .product-detail-container:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 15px 40px rgba(185, 28, 28, 0.25);
+  }
+  
+  /* ---------- IMAGEN DEL PRODUCTO ---------- */
+  .product-detail-image {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    margin-right: 2rem;
+    filter: drop-shadow(0 4px 10px rgba(185, 28, 28, 0.2));
+    transition: transform 0.4s ease, filter 0.4s ease;
+  }
+  
+  .product-detail-image:hover {
+    transform: scale(1.05) rotate(-3deg);
+    filter: drop-shadow(0 8px 20px rgba(185, 28, 28, 0.3));
+  }
+  
+  /* ---------- INFORMACIÓN DEL PRODUCTO ---------- */
+  .product-info {
+    flex: 1;
+  }
+  
+  .product-info h3 {
+    font-weight: 800;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #1f2937 0%, #374151 40%, #b91c1c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+  
+  .product-info .price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #b91c1c;
+    margin-bottom: 0.8rem;
+  }
+  
+  .product-info p {
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.6;
+  }
+  
+  /* ---------- FORMULARIO Y REVIEWS ---------- */
+  .reviews-section {
+    margin-top: 2.5rem;
+    background: white;
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(185, 28, 28, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .reviews-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(185, 28, 28, 0.15);
+  }
+  
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .product-detail-container {
+      padding: 1.5rem;
+    }
+  
+    .product-detail-image {
+      width: 150px;
+      height: 150px;
+      margin-right: 1rem;
+    }
+  
+    .product-info h3 {
+      font-size: 1.6rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .product-detail-container {
+      border-radius: 10px;
+    }
+  
+    .product-detail-image {
+      margin: 0 auto 1rem;
+      display: block;
+    }
+  
+    .product-info {
+      text-align: center;
+    }
+  }
+  
