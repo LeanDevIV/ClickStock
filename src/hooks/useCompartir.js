@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from 'react-hot-toast'; 
 export const useCompartir = (idProducto, nombreProducto) => {
   const [enlaceCopiado, setEnlaceCopiado] = useState(false);
   const [mostrarOpciones, setMostrarOpciones] = useState(false);
@@ -7,11 +8,22 @@ export const useCompartir = (idProducto, nombreProducto) => {
     const urlBase = window.location.origin;
     return `${urlBase}/producto/${idProducto}`;
   };
+
   const copiarEnlace = async () => {
     try {
       const enlace = generarEnlace();
       await navigator.clipboard.writeText(enlace);
       setEnlaceCopiado(true);
+       toast.success('¡Enlace copiado al portapapeles!', {
+        duration: 2000,
+            position:"top-center",
+        style: {
+          background: '#4CAF50',
+          color: 'white',
+          fontWeight: 'bold',
+        },
+        icon: '',
+      });
       setTimeout(() => {
         setEnlaceCopiado(false);
       }, 2000);

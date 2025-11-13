@@ -1,6 +1,7 @@
 import React from "react";
 import { useCompartir } from "../hooks/useCompartir";
 import { QRCodeSVG } from "qrcode.react";
+import toast from 'react-hot-toast'; 
 import {
   Button,
   Box,
@@ -8,7 +9,6 @@ import {
   CardContent,
   Typography,
   IconButton,
-  Chip,
   Dialog,
   DialogContent,
   DialogActions,
@@ -53,14 +53,6 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
       >
         {enlaceCopiado ? "¡Enlace copiado!" : "Compartir producto"}
       </Button>
-      {enlaceCopiado && (
-        <Chip
-          label="¡Enlace copiado al portapapeles!"
-          color="success"
-          variant="outlined"
-          sx={{ position: "absolute", top: -45, left: "50%", transform: "translateX(-50%)" }}
-        />
-      )}
       <Button
         variant="outlined"
         onClick={alternarOpciones}
@@ -114,9 +106,37 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
               <Button
                 variant="outlined"
                 startIcon={<Link />}
-                onClick={() =>
-                  alert(`Enlace para copiar manualmente: ${generarEnlace()}`)
-                }
+                onClick={() => {
+                  toast((t) => (
+                    <Box sx={{ minWidth: 300 }}>
+                      <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                        Enlace para copiar:
+                      </Typography>
+                      <Typography variant="body2" sx={{ 
+                        wordBreak: 'break-all',
+                        bgcolor: 'grey.100',
+                        p: 1,
+                        borderRadius: 1,
+                        mb: 1
+                      }}>
+                        {generarEnlace()}
+                      </Typography>
+                      <Button 
+                        variant="contained" 
+                        size="small" 
+                        onClick={() => {
+                          navigator.clipboard.writeText(generarEnlace());
+                          toast.success('¡Enlace copiado!');
+                        }}
+                        fullWidth
+                      >
+                        Copiar enlace
+                      </Button>
+                    </Box>
+                  ), {
+                    duration: 10000,
+                  });
+                }}
                 fullWidth
               >
                 Mostrar enlace
@@ -191,24 +211,29 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
             startIcon={<Download />}
             onClick={() => {
               const svg = document.querySelector(".MuiDialogContent svg");
-              const svgData = new XMLSerializer().serializeToString(svg);
-              const canvas = document.createElement("canvas");
-              const ctx = canvas.getContext("2d");
-              const img = new Image();
+              if (svg) {
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                const img = new Image();
 
-              img.onload = () => {
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-                const pngFile = canvas.toDataURL("image/png");
+                img.onload = () => {
+                  canvas.width = img.width;
+                  canvas.height = img.height;
+                  ctx.drawImage(img, 0, 0);
+                  const pngFile = canvas.toDataURL("image/png");
 
-                const downloadLink = document.createElement("a");
-                downloadLink.download = `qr-${nombreProducto}.png`;
-                downloadLink.href = pngFile;
-                downloadLink.click();
-              };
+                  const downloadLink = document.createElement("a");
+                  downloadLink.download = `qr-${nombreProducto}.png`;
+                  downloadLink.href = pngFile;
+                  downloadLink.click();
+                  toast.success('QR descargado correctamente');
+                };
 
-              img.src = "data:image/svg+xml;base64," + btoa(svgData);
+                img.src = "data:image/svg+xml;base64," + btoa(svgData);
+              } else {
+                toast.error('Error al generar el QR para descargar');
+              }
             }}
           >
             Descargar QR
