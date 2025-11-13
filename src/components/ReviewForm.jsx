@@ -1,55 +1,51 @@
-import { useState } from "react";
-import { Form, Button } from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import { Button, Form } from "react-bootstrap";
 import { createReview } from "../services/reviewService.js";
 
 const ReviewForm = ({ productId, onReviewAdded }) => {
-  const [formData, setFormData] = useState({
-    user: "",
-    rating: 5,
-    comment: "",
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      user: "",
+      rating: 5,
+      comment: "",
+    },
   });
-  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     try {
-      setLoading(true);
-      await createReview({ ...formData, productId });
-      setFormData({ user: "", rating: 5, comment: "" });
+      await createReview({ ...data, productId });
+      reset(); // limpia el formulario
       onReviewAdded();
-    } catch {
+    } catch (error) {
       alert("Error al enviar la reseña");
-    } finally {
-      setLoading(false);
+      console.error(error);
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit} className="mt-4">
+    <Form onSubmit={handleSubmit(onSubmit)} className="mt-4">
       <h5>Agregar una reseña</h5>
 
       <Form.Group className="mb-2">
         <Form.Label>Tu nombre</Form.Label>
         <Form.Control
           type="text"
-          name="user"
-          value={formData.user}
-          onChange={handleChange}
-          required
+          {...register("user", { required: "El nombre es obligatorio" })}
+          isInvalid={!!errors.user}
         />
+        <Form.Control.Feedback type="invalid">
+          {errors.user?.message}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-2">
         <Form.Label>Puntaje</Form.Label>
-        <Form.Select
-          name="rating"
-          value={formData.rating}
-          onChange={handleChange}
-        >
+        <Form.Select {...register("rating", { required: true })}>
           {[1, 2, 3, 4, 5].map((n) => (
             <option key={n} value={n}>
               {n} ⭐
@@ -62,16 +58,17 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
         <Form.Label>Comentario</Form.Label>
         <Form.Control
           as="textarea"
-          name="comment"
           rows={3}
-          value={formData.comment}
-          onChange={handleChange}
-          required
+          {...register("comment", { required: "El comentario es obligatorio" })}
+          isInvalid={!!errors.comment}
         />
+        <Form.Control.Feedback type="invalid">
+          {errors.comment?.message}
+        </Form.Control.Feedback>
       </Form.Group>
 
-      <Button type="submit" disabled={loading}>
-        {loading ? "Enviando..." : "Enviar reseña"}
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Enviando..." : "Enviar reseña"}
       </Button>
     </Form>
   );
