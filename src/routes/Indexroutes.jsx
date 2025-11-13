@@ -10,7 +10,9 @@ import AdminUsuarios from "../pages/AdminUsuarios";
 import AdminLayout from "../layouts/AdminLayout";
 import TablaPedidos from "../pages/admin/tablaPedidos";
 import ScrollToTop from "../components/ScrollToTop.jsx";
+import TestCompartir from "../components/testPrueba.jsx"
 import ProductList from "../pages/ProductList";
+
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
@@ -18,8 +20,11 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
       <ScrollToTop />
       <Routes>
         <Route
-          element={<MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />}
+          element={
+            <MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />
+          }
         >
+          <Route path="/test-compartir" element={<TestCompartir />} />
           <Route path="/" element={<Home />} />
           <Route path="/Acerca" element={<AboutUs />} />
           <Route path="/Contacto" element={<Contact />} />
