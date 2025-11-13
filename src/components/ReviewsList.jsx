@@ -12,6 +12,7 @@ const ReviewsList = ({ productId, refreshTrigger }) => {
     const cargarReseñas = async () => {
       try {
         setLoading(true);
+        setError("");
         const [dataReviews, dataPromedio] = await Promise.all([
           getReviewsByProduct(productId),
           getAverageRating(productId),
@@ -20,7 +21,7 @@ const ReviewsList = ({ productId, refreshTrigger }) => {
         setReviews(Array.isArray(dataReviews) ? dataReviews : []);
         setAverage(dataPromedio?.averageRating || 0);
       } catch {
-        setError("No se pudieron cargar las reseñas.");
+        setError("❌ No se pudieron cargar las reseñas. Intenta más tarde.");
       } finally {
         setLoading(false);
       }

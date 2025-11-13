@@ -1,23 +1,16 @@
-const API_URL = "http://localhost:5000/api/reviews";
+import clientAxios from "../utils/clientAxios";
 
 export const getReviewsByProduct = async (productId) => {
-  const res = await fetch(`${API_URL}/${productId}`);
-  if (!res.ok) throw new Error("Error al obtener reseñas");
-  return res.json();
+  const { data } = await clientAxios.get(`/reviews/${productId}`);
+  return data;
 };
 
 export const createReview = async (reviewData) => {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(reviewData),
-  });
-  if (!res.ok) throw new Error("Error al crear reseña");
-  return res.json();
+  const { data } = await clientAxios.post("/reviews", reviewData);
+  return data;
 };
 
 export const getAverageRating = async (productId) => {
-  const res = await fetch(`${API_URL}/average/${productId}`);
-  if (!res.ok) throw new Error("Error al obtener promedio");
-  return res.json();
+  const { data } = await clientAxios.get(`/reviews/average/${productId}`);
+  return data;
 };
