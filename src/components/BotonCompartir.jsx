@@ -1,5 +1,6 @@
 import React from "react";
 import { useCompartir } from "../hooks/useCompartir";
+import "../../src/css/BotonCompartir.css"
 const BotonCompartir = ({ idProducto, nombreProducto }) => {
   const {
     enlaceCopiado,
@@ -10,8 +11,7 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
   } = useCompartir(idProducto, nombreProducto);
     return (
     <div className="contenedor-compartir">
-      
-      {/* Botón principal de compartir */}
+
       <button
         onClick={copiarEnlace}
         className={`boton-principal ${enlaceCopiado ? 'copiado' : ''}`}
@@ -29,23 +29,18 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
           </>
         )}
       </button>
-
-      {/* Mensaje temporal de confirmación */}
       {enlaceCopiado && (
         <div className="mensaje-copiado">
           ¡Enlace copiado al portapapeles!
         </div>
       )}
 
-      {/* Botón para opciones adicionales (opcional) */}
       <button 
         onClick={alternarOpciones}
         className="boton-opciones"
       >
         Más opciones ›
       </button>
-
-      {/* Opciones adicionales que se muestran/ocultan */}
       {mostrarOpciones && (
         <div className="opciones-adicionales">
           <button 
