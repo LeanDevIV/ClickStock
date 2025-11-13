@@ -11,6 +11,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import TablaPedidos from "../pages/admin/tablaPedidos";
 import ScrollToTop from "../components/ScrollToTop.jsx";
 import ProductList from "../pages/ProductList"; // ✅ Importamos la página de productos
+import PromocionesForm from "../pages/PromocionesForm.jsx";
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
@@ -26,12 +27,10 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
           <Route path="/" element={<Home />} />
           <Route path="/Acerca" element={<AboutUs />} />
           <Route path="/Contacto" element={<Contact />} />
-          <Route path="/productos" element={<ProductList />} />{" "}
+          <Route path="/productos" element={<ProductList />} />
+          <Route path="/promocion" element={<PromocionesForm />} />
           {/* ✅ Página de productos */}
-          <Route
-            path="/producto/detalle/:id"
-            element={<ProductDetail />}
-          />{" "}
+          <Route path="/producto/detalle/:id" element={<ProductDetail />} />
           {/* ✅ Dinámica */}
           {/* Layout administrativo */}
           <Route path="/admin" element={<AdminLayout />}>
