@@ -138,7 +138,7 @@ const FloatingChat = () => {
           elevation={8}
           sx={{
             position: "fixed",
-            bottom: 100,
+            bottom: 30,
             right: 24,
             width: { xs: "calc(100vw - 48px)", sm: 420 },
             maxWidth: 420,
