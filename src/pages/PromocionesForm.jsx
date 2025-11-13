@@ -1,5 +1,17 @@
-import React, { useState } from "react";
-import "./PromocionesForm.css";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import {
+  Box,
+  Grid,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Card,
+  CardMedia,
+  CardContent,
+  Stack,
+} from "@mui/material";
 
 function PromocionesForm() {
   const [formData, setFormData] = useState({
@@ -13,117 +25,192 @@ function PromocionesForm() {
 
   const [preview, setPreview] = useState(null);
 
+  useEffect(() => {
+    // Liberar objeto URL anterior cuando cambie la preview
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files && files[0]) {
-      setFormData({ ...formData, [name]: files[0] });
-      setPreview(URL.createObjectURL(files[0]));
+      const file = files[0];
+      setFormData((prev) => ({ ...prev, [name]: file }));
+      const url = URL.createObjectURL(file);
+      setPreview(url);
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(" Promoción creada con éxito (ver consola)");
+    // Usar react-hot-toast en lugar de alert
+    toast.success("Promoción creada con éxito");
     console.log("Datos de la promoción:", formData);
     // Aquí podés conectar con el backend usando axios.post(...)
   };
 
   return (
-    <div className="promo-main">
-      <div className="promo-form-container">
-        <h2>🛍️ Crear nueva promoción</h2>
-        <form className="promo-form" onSubmit={handleSubmit}>
-          <label>Título</label>
-          <input
-            type="text"
-            name="titulo"
-            value={formData.titulo}
-            onChange={handleChange}
-            placeholder="Ej: 20% OFF en zapatillas"
-            required
-          />
+    <Box sx={{ p: 2 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <Paper
+            sx={{ p: 3 }}
+            elevation={3}
+            component="form"
+            onSubmit={handleSubmit}
+          >
+            <Typography variant="h6" gutterBottom>
+              🛍️ Crear nueva promoción
+            </Typography>
 
-          <label>Descripción</label>
-          <textarea
-            name="descripcion"
-            value={formData.descripcion}
-            onChange={handleChange}
-            placeholder="Detalles de la promoción..."
-            required
-          ></textarea>
-
-          <label>Descuento (%)</label>
-          <input
-            type="number"
-            name="descuento"
-            value={formData.descuento}
-            onChange={handleChange}
-            min="0"
-            max="100"
-            required
-          />
-
-          <div className="fecha-group">
-            <div>
-              <label>Fecha inicio</label>
-              <input
-                type="date"
-                name="fechaInicio"
-                value={formData.fechaInicio}
+            <Stack spacing={2}>
+              <TextField
+                label="Título"
+                name="titulo"
+                value={formData.titulo}
                 onChange={handleChange}
+                placeholder="Ej: 20% OFF en zapatillas"
                 required
+                fullWidth
               />
-            </div>
-            <div>
-              <label>Fecha fin</label>
-              <input
-                type="date"
-                name="fechaFin"
-                value={formData.fechaFin}
+
+              <TextField
+                label="Descripción"
+                name="descripcion"
+                value={formData.descripcion}
                 onChange={handleChange}
+                placeholder="Detalles de la promoción..."
                 required
+                multiline
+                rows={4}
+                fullWidth
               />
-            </div>
-          </div>
 
-          <label>Imagen (opcional)</label>
-          <input
-            type="file"
-            name="imagen"
-            accept="image/*"
-            onChange={handleChange}
-          />
+              <TextField
+                label="Descuento (%)"
+                name="descuento"
+                type="number"
+                value={formData.descuento}
+                onChange={handleChange}
+                inputProps={{ min: 0, max: 100 }}
+                required
+                fullWidth
+              />
 
-          <button type="submit">Crear Promoción</button>
-        </form>
-      </div>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Fecha inicio"
+                    name="fechaInicio"
+                    type="date"
+                    value={formData.fechaInicio}
+                    onChange={handleChange}
+                    InputLabelProps={{ shrink: true }}
+                    required
+                    fullWidth
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    label="Fecha fin"
+                    name="fechaFin"
+                    type="date"
+                    value={formData.fechaFin}
+                    onChange={handleChange}
+                    InputLabelProps={{ shrink: true }}
+                    required
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
 
-      {/*  Vista previa */}
-      <div className="promo-preview">
-        <h3>👀 Vista previa</h3>
-        <div className="preview-card">
-          {preview ? (
-            <img src={preview} alt="Preview" className="preview-img" />
-          ) : (
-            <div className="preview-placeholder">Sin imagen</div>
-          )}
-          <div className="preview-info">
-            <h4>{formData.titulo || "Título de la promoción"}</h4>
-            <p>{formData.descripcion || "Descripción breve..."}</p>
-            {formData.descuento && (
-              <span className="descuento">{formData.descuento}% OFF</span>
-            )}
-            {(formData.fechaInicio || formData.fechaFin) && (
-              <p className="fechas">
-                 {formData.fechaInicio} → {formData.fechaFin}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+              <Box>
+                <input
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  id="promo-imagen"
+                  type="file"
+                  name="imagen"
+                  onChange={handleChange}
+                />
+                <label htmlFor="promo-imagen">
+                  <Button variant="outlined" component="span">
+                    Seleccionar imagen (opcional)
+                  </Button>
+                </label>
+              </Box>
+
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <Button type="submit" variant="contained">
+                  Crear Promoción
+                </Button>
+              </Box>
+            </Stack>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 3 }} elevation={3}>
+            <Typography variant="h6" gutterBottom>
+              👀 Vista previa
+            </Typography>
+
+            <Card>
+              {preview ? (
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={preview}
+                  alt="Preview"
+                />
+              ) : (
+                <Box
+                  sx={{
+                    height: 200,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    bgcolor: "grey.100",
+                  }}
+                >
+                  <Typography color="text.secondary">Sin imagen</Typography>
+                </Box>
+              )}
+              <CardContent>
+                <Typography variant="h6">
+                  {formData.titulo || "Título de la promoción"}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
+                  {formData.descripcion || "Descripción breve..."}
+                </Typography>
+
+                {formData.descuento && (
+                  <Typography
+                    component="span"
+                    sx={{ display: "block", fontWeight: 700 }}
+                  >
+                    {formData.descuento}% OFF
+                  </Typography>
+                )}
+
+                {(formData.fechaInicio || formData.fechaFin) && (
+                  <Typography variant="caption" color="text.secondary">
+                    {formData.fechaInicio} → {formData.fechaFin}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 
