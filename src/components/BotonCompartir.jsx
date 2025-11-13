@@ -1,7 +1,28 @@
 import React from "react";
 import { useCompartir } from "../hooks/useCompartir";
 import { QRCodeSVG } from "qrcode.react";
-import "../../src/css/BotonCompartir.css";
+import {
+  Button,
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+import {
+  Share,
+  Check,
+  Close,
+  Download,
+  WhatsApp,
+  Email,
+  Link,
+  QrCode2,
+} from "@mui/icons-material";
 
 const BotonCompartir = ({ idProducto, nombreProducto }) => {
   const {
@@ -13,109 +34,163 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
     alternarOpciones,
     alternarQR,
   } = useCompartir(idProducto, nombreProducto);
+
   return (
-    <div className="contenedor-compartir">
-      <button
+    <Box sx={{ position: "relative", maxWidth: 350 }}>
+      <Button
+        variant="contained"
+        color={enlaceCopiado ? "success" : "primary"}
         onClick={copiarEnlace}
-        className={`boton-principal ${enlaceCopiado ? "copiado" : ""}`}
         disabled={enlaceCopiado}
+        startIcon={enlaceCopiado ? <Check /> : <Share />}
+        fullWidth
+        sx={{
+          mb: 1,
+          py: 1.5,
+          fontWeight: "bold",
+          fontSize: "1rem",
+        }}
       >
-        {enlaceCopiado ? (
-          <>
-            <span className="icono">✓</span>
-            ¡Enlace copiado!
-          </>
-        ) : (
-          <>
-            <span className="icono">📤</span>
-            Compartir producto
-          </>
-        )}
-      </button>
+        {enlaceCopiado ? "¡Enlace copiado!" : "Compartir producto"}
+      </Button>
       {enlaceCopiado && (
-        <div className="mensaje-copiado">¡Enlace copiado al portapapeles!</div>
+        <Chip
+          label="¡Enlace copiado al portapapeles!"
+          color="success"
+          variant="outlined"
+          sx={{ position: "absolute", top: -45, left: "50%", transform: "translateX(-50%)" }}
+        />
       )}
-      <button onClick={alternarOpciones} className="boton-opciones">
-        Más opciones ›
-      </button>
-
+      <Button
+        variant="outlined"
+        onClick={alternarOpciones}
+        endIcon={mostrarOpciones ? "‹" : "›"}
+        fullWidth
+        sx={{ mb: 2 }}
+      >
+        {mostrarOpciones ? "Ocultar opciones" : "Más opciones"}
+      </Button>
       {mostrarOpciones && (
-        <div className="opciones-adicionales">
-          <button
-            className="opcion"
-            onClick={() =>
-              window.open(
-                `https://wa.me/?text=${encodeURIComponent(
-                  `Mira este producto: ${nombreProducto} - ${generarEnlace()}`
-                )}`,
-                "_blank"
-              )
-            }
-          >
-            Compartir en WhatsApp
-          </button>
+        <Card variant="outlined" sx={{ mb: 2 }}>
+          <CardContent sx={{ "&:last-child": { pb: 2 } }}>
+            <Typography variant="h6" gutterBottom>
+              Compartir en:
+            </Typography>
+            
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Button
+                variant="outlined"
+                startIcon={<WhatsApp />}
+                onClick={() =>
+                  window.open(
+                    `https://wa.me/?text=${encodeURIComponent(
+                      `Mira este producto: ${nombreProducto} - ${generarEnlace()}`
+                    )}`,
+                    "_blank"
+                  )
+                }
+                fullWidth
+              >
+                WhatsApp
+              </Button>
 
-          <button
-            className="opcion"
-            onClick={() =>
-              window.open(
-                `mailto:?subject=${encodeURIComponent(
-                  nombreProducto
-                )}&body=${encodeURIComponent(
-                  `Mira este producto: ${generarEnlace()}`
-                )}`
-              )
-            }
-          >
-            Compartir por Email
-          </button>
+              <Button
+                variant="outlined"
+                startIcon={<Email />}
+                onClick={() =>
+                  window.open(
+                    `mailto:?subject=${encodeURIComponent(
+                      nombreProducto
+                    )}&body=${encodeURIComponent(
+                      `Mira este producto: ${generarEnlace()}`
+                    )}`
+                  )
+                }
+                fullWidth
+              >
+                Email
+              </Button>
 
-          <button
-            className="opcion"
-            onClick={() =>
-              alert(`Enlace para copiar manualmente: ${generarEnlace()}`)
-            }
-          >
-            Mostrar enlace
-          </button>
-          <div className="contenedor-botones-opciones">
-            <button onClick={alternarOpciones} className="boton-opciones">
-              {mostrarOpciones ? "Ocultar opciones" : "Más opciones"} ›
-            </button>
+              <Button
+                variant="outlined"
+                startIcon={<Link />}
+                onClick={() =>
+                  alert(`Enlace para copiar manualmente: ${generarEnlace()}`)
+                }
+                fullWidth
+              >
+                Mostrar enlace
+              </Button>
 
-            <button onClick={alternarQR} className="boton-opciones">
-              {mostrarQR ? "Ocultar QR" : "Mostrar QR"} ›
-            </button>
-          </div>
-        </div>
+              <Button
+                variant="contained"
+                startIcon={<QrCode2 />}
+                onClick={alternarQR}
+                fullWidth
+                sx={{ mt: 1 }}
+              >
+                {mostrarQR ? "Ocultar QR" : "Mostrar QR"}
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
       )}
-      {mostrarQR && (
-        <div className="contenedor-qr">
-          <h4>Escanea el código QR</h4>
-          <button
-            className="boton-cerrar"
-            onClick={alternarQR}
-            title="Cerrar QR"
-          >
-            ×
-          </button>
-          <div className="qr-code">
-            <QRCodeSVG 
-              value={generarEnlace()}
-              size={200}
-              level="H"
-            //   includeMargin={true}
-              bgColor="#ffffff"
-              fgColor="#000000"
-            />
-          </div>
-          <p className="texto-qr">
-            Escanea con tu cámara para acceder al producto
-          </p>
-          <button
-            className="boton-descargar-qr"
+      <Dialog
+        open={mostrarQR}
+        onClose={alternarQR}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogContent>
+          <Box sx={{ textAlign: "center", position: "relative" }}>
+            <IconButton
+              onClick={alternarQR}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: "grey.500",
+              }}
+            >
+              <Close />
+            </IconButton>
+
+            <Typography variant="h5" gutterBottom>
+              Escanea el código QR
+            </Typography>
+
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: "white",
+                borderRadius: 2,
+                border: 1,
+                borderColor: "grey.300",
+                display: "inline-block",
+                my: 2,
+              }}
+            >
+              <QRCodeSVG
+                value={generarEnlace()}
+                size={200}
+                level="H"
+                bgColor="#ffffff"
+                fgColor="#000000"
+              />
+            </Box>
+
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Escanea con tu cámara para acceder al producto
+            </Typography>
+          </Box>
+        </DialogContent>
+        
+        <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
+          <Button
+            variant="contained"
+            startIcon={<Download />}
             onClick={() => {
-              const svg = document.querySelector(".qr-code svg");
+              const svg = document.querySelector(".MuiDialogContent svg");
               const svgData = new XMLSerializer().serializeToString(svg);
               const canvas = document.createElement("canvas");
               const ctx = canvas.getContext("2d");
@@ -136,11 +211,11 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
               img.src = "data:image/svg+xml;base64," + btoa(svgData);
             }}
           >
-            📥 Descargar QR
-          </button>
-        </div>
-      )}
-    </div>
+            Descargar QR
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
