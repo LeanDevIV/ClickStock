@@ -16,11 +16,11 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
     try {
       await createReview({ ...data, productId });
       reset();
-      toast.success("✅ Reseña enviada correctamente");
+      toast.success("Reseña enviada correctamente");
       onReviewAdded();
     } catch (error) {
       console.error(error);
-      toast.error("❌ Error al enviar la reseña");
+      toast.error("Error al enviar la reseña");
     }
   };
 
