@@ -7,7 +7,6 @@ const ReviewsList = ({ productId, refreshTrigger }) => {
   const [average, setAverage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [mensaje, setMensaje] = useState("");
 
   useEffect(() => {
     const cargarReseñas = async () => {
@@ -21,8 +20,6 @@ const ReviewsList = ({ productId, refreshTrigger }) => {
 
         setReviews(Array.isArray(dataReviews) ? dataReviews : []);
         setAverage(dataPromedio?.averageRating || 0);
-        setMensaje("✅ Reseña enviada correctamente.");
-        setTimeout(() => setMensaje(""), 3000);
       } catch {
         setError("❌ No se pudieron cargar las reseñas. Intenta más tarde.");
       } finally {
@@ -39,7 +36,6 @@ const ReviewsList = ({ productId, refreshTrigger }) => {
   return (
     <div className="mt-4">
       <h4>Reseñas</h4>
-      {mensaje && <Alert variant="success">{mensaje}</Alert>}
       <p>⭐ Promedio: <strong>{average}</strong>/5</p>
 
       {reviews.length === 0 ? (
