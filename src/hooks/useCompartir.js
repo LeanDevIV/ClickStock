@@ -2,7 +2,7 @@ import { useState } from "react";
 export const useCompartir = (idProducto, nombreProducto) => {
   const [enlaceCopiado, setEnlaceCopiado] = useState(false);
   const [mostrarOpciones, setMostrarOpciones] = useState(false);
-  const [mostrarQR, setMostrarQr] = useState(false);
+  const [mostrarQR, setMostrarQR] = useState(false);
   const generarEnlace = () => {
     const urlBase = window.location.origin;
     return `${urlBase}/producto/${idProducto}`;
@@ -20,9 +20,9 @@ export const useCompartir = (idProducto, nombreProducto) => {
       copiarConFallBack(generarEnlace());
     }
   };
-  const alternarQr = () => {
-    setMostrarQr(!mostrarQr);
-    if (!mostrarQr) {
+  const alternarQR = () => {
+    setMostrarQR(!mostrarQR);
+    if (!mostrarQR) {
       setMostrarOpciones(false);
     }
   };
@@ -55,6 +55,6 @@ export const useCompartir = (idProducto, nombreProducto) => {
     generarEnlace,
     copiarEnlace,
     alternarOpciones,
-    alternarQr,
+    alternarQR,
   };
 };
