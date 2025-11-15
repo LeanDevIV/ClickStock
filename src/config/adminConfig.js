@@ -99,3 +99,9 @@ export const CHIP_COLORS = {
     usuario: 'info',
   },
 };
+export const THEME = {
+  primaryColor: '#D4AF37',
+  darkColor: '#000',
+  drawerWidth: 240,
+  itemsPerPage: 5,
+};
