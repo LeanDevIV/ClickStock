@@ -14,10 +14,8 @@ import { styled, alpha } from "@mui/material/styles";
 import {
   Brightness7,
   Brightness4,
-  Inventory2,
-  People,
-  LocalShipping,
   Search as SearchIcon,
+  AdminPanelSettings,
 } from "@mui/icons-material";
 import { useStore } from "../hooks/useStore";
 import { useScrollDirection } from "../hooks/useScrollDirection";
@@ -124,36 +122,18 @@ export const Header = ({ modoOscuro, toggleModo }) => {
 
               {/* Enlaces de admin - CORREGIDO: SIN ANIDAMIENTO PERO MANTENIENDO ESTILO */}
               {user?.rolUsuario === "admin" && (
-                <div className="mx-2"> {/* Contenedor div en lugar de Nav.Link */}
+                <div className="mx-2">
+                  {" "}
+                  {/* Contenedor div en lugar de Nav.Link */}
                   <ButtonGroup variant="text" className="text-danger">
-                    <Tooltip title="Productos">
-                      <Button 
-                        component={Link} 
-                        to="/admin/productos" 
+                    <Tooltip title="Admin">
+                      <Button
+                        component={Link}
+                        to="/admin/dashboard"
                         color="error"
                         className="text-danger"
                       >
-                        <Inventory2 />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Pedidos">
-                      <Button 
-                        component={Link} 
-                        to="/admin/pedidos" 
-                        color="error"
-                        className="text-danger"
-                      >
-                        <LocalShipping />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Usuarios">
-                      <Button 
-                        component={Link} 
-                        to="/admin/usuarios" 
-                        color="error"
-                        className="text-danger"
-                      >
-                        <People />
+                        <AdminPanelSettings />
                       </Button>
                     </Tooltip>
                   </ButtonGroup>
