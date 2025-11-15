@@ -10,9 +10,9 @@ import AdminUsuarios from "../pages/AdminUsuarios";
 import AdminLayout from "../layouts/AdminLayout";
 import TablaPedidos from "../pages/admin/tablaPedidos";
 import ScrollToTop from "../components/ScrollToTop.jsx";
-import TestCompartir from "../components/testPrueba.jsx"
+import TestCompartir from "../components/testPrueba.jsx";
 import ProductList from "../pages/ProductList";
-
+import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
@@ -32,6 +32,8 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
           <Route path="/producto/detalle/:id" element={<ProductDetail />} />
 
           <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+
             <Route path="productos" element={<AdminProductos />} />
             <Route path="pedidos" element={<TablaPedidos />} />
             <Route path="usuarios" element={<AdminUsuarios />} />
