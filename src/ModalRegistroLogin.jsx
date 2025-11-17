@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import clientaxios from "../api/clientaxios"; // Ajusta la ruta según tu estructura
 
 function RegistroLogin() {
-  const [modo, setModo] = useState("registro"); // "registro" o "login"
+  const [modo, setModo] = useState("login"); // "registro" o "login"
   const [formData, setFormData] = useState({ nombre: "", email: "", password: "" });
   const [mensaje, setMensaje] = useState("");
   const [cargando, setCargando] = useState(false);
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
