@@ -101,13 +101,15 @@ export const EditableCell = ({
     fieldConfig === "number" ||
     (typeof fieldConfig === "object" && fieldConfig.type === "number");
 
-  if (
+  // --- SELECT ---
+  const isSelect =
     fieldConfig === "select" ||
-    (typeof fieldConfig === "object" && fieldConfig.type === "select")
-  ) {
+    (typeof fieldConfig === "object" && fieldConfig.type === "select");
+
+  if (isSelect) {
     return (
       <FormControl size="small" fullWidth>
-        <Select value={value} onChange={(e) => onChange(field, e.target.value)}>
+        <Select value={value} onChange={(e) => onChange(e.target.value)}>
           {SELECT_OPTIONS[field]?.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
@@ -118,11 +120,12 @@ export const EditableCell = ({
     );
   }
 
+  // --- MULTILINE ---
   if (fieldConfig === "multiline" || isMultiline) {
     return (
       <TextField
         value={value || ""}
-        onChange={(e) => onChange(field, e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         size="small"
         fullWidth
         multiline
@@ -131,11 +134,12 @@ export const EditableCell = ({
     );
   }
 
+  // --- TEXT / NUMBER ---
   return (
     <TextField
       value={value || ""}
       onChange={(e) =>
-        onChange(field, isNumeric ? parseFloat(e.target.value) : e.target.value)
+        onChange(isNumeric ? parseFloat(e.target.value) : e.target.value)
       }
       type={isNumeric ? "number" : "text"}
       size="small"
@@ -153,12 +157,12 @@ export const StatusChip = ({
   type = "estado",
   isEditing,
   onChange,
-  field,
+  
 }) => {
   if (isEditing) {
     return (
       <FormControl size="small" fullWidth>
-        <Select value={value} onChange={(e) => onChange(field, e.target.value)}>
+        <Select value={value} onChange={(e) => onChange( e.target.value)}>
           {SELECT_OPTIONS[type]?.[
             type === "Pedidos"
               ? "Pedidos"
