@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTableData } from "../../hooks/useTableData";
-import { TABLE_CONFIG, THEME } from "../../config/adminConfig";
+import { TABLE_CONFIG, THEME, SELECT_OPTIONS } from "../../config/adminConfig";
+import { useCategoriesStore } from "../../hooks/useCategoriesStore";
 import { Box, PaginationItem, Typography } from "@mui/material";
 import { ProductosTable } from "../../components/admin/ProductosTable";
 
@@ -8,6 +9,9 @@ export const AdminDashboard = () => {
   const [selectedSection, setSelectedSection] = useState("Productos");
 
   const [page, setPage] = useState(1);
+
+  // Hook para obtener categorías
+  const { categorias, fetchCategorias } = useCategoriesStore();
 
   const {
     data,
@@ -22,6 +26,21 @@ export const AdminDashboard = () => {
     handleFieldChange,
     handleRestore,
   } = useTableData(selectedSection);
+
+  // Cargar categorías al montar el componente
+  useEffect(() => {
+    fetchCategorias();
+  }, []);
+
+  // Actualizar SELECT_OPTIONS.categoria cuando se carguen las categorías
+  useEffect(() => {
+    if (categorias.length > 0) {
+      SELECT_OPTIONS.categoria = categorias.map((cat) => ({
+        value: cat._id || cat.id,
+        label: cat.nombre,
+      }));
+    }
+  }, [categorias]);
 
   useEffect(() => {
     fetchData();
@@ -57,7 +76,7 @@ export const AdminDashboard = () => {
     };
     switch (selectedSection) {
       case "Productos":
-        return <ProductosTable {...commonProps} onRestore={handleRestore} />;
+        return <ProductosTable {...commonProps} onRestore={handleRestore} categorias={categorias} />;
       case "Usuarios":
         return <UsuariosTable {...commonProps} onRestore={handleRestore} />;
       case "Pedidos":

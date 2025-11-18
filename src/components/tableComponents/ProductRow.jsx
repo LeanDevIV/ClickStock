@@ -18,11 +18,19 @@ export const ProductRow = ({
   onCancel,
   onFieldChange,
   onRestore,
+  categorias = [],
 }) => {
   const isEditing = editingId === producto._id;
 
   // Mezcla entre original y editado (lo que espera tu hook)
   const productoActual = isEditing ? { ...producto, ...editedData } : producto;
+
+  // Función para obtener el nombre de la categoría por ID
+  const getCategoriaNombre = (categoriaId) => {
+    if (!categoriaId) return "N/A";
+    const cat = categorias.find((categoria) => categoria._id === categoriaId || categoria.id === categoriaId);
+    return cat?.nombre || categoriaId;
+  };
 
   return (
     <TableRow
@@ -67,18 +75,22 @@ export const ProductRow = ({
 
       {/* Categoría */}
       <TableCell>
-        {isEditing ? (
-          <EditableCell
-            value={
-              productoActual.categoria?.nombre || productoActual.categoria || ""
-            }
-            field="categoria"
-            isEditing={isEditing}
-            onChange={(value) => onFieldChange("categoria", value)}
-          />
-        ) : (
-          producto.categoria?.nombre || producto.categoria || "N/A"
-        )}
+        <EditableCell
+          value={
+            productoActual.categoria?._id ||
+            productoActual.categoria?.id ||
+            productoActual.categoria ||
+            ""
+          }
+          displayValue={getCategoriaNombre(
+            productoActual.categoria?._id ||
+            productoActual.categoria?.id ||
+            productoActual.categoria
+          )}
+          field="categoria"
+          isEditing={isEditing}
+          onChange={(value) => onFieldChange("categoria", value)}
+        />
       </TableCell>
 
       {/* Stock */}

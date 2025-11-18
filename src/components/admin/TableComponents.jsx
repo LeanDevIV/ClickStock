@@ -91,9 +91,11 @@ export const EditableCell = ({
   isEditing,
   onChange,
   isMultiline = false,
+  displayValue,
 }) => {
   if (!isEditing) {
-    return value;
+    // Si hay un displayValue (ej: nombre de categoría), mostrarlo; si no, usar value
+    return displayValue !== undefined ? displayValue : value;
   }
 
   const fieldConfig = FIELD_TYPES[field];

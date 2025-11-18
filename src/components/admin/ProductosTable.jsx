@@ -19,6 +19,7 @@ export const ProductosTable = ({
   onCancel,
   onFieldChange,
   onRestore,
+  categorias = [],
 }) => {
   const tableHeader = [
     { key: "nombre", label: "Nombre" },
@@ -61,6 +62,7 @@ export const ProductosTable = ({
               onSave={onSave}
               onCancel={onCancel}
               onRestore={onRestore}
+              categorias={categorias}
             />
           ))}
         </TableBody>

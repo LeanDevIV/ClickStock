@@ -58,6 +58,7 @@ export const FIELD_TYPES = {
   direccion: "text",
   asunto: "text",
   mensaje: "multiline",
+  categoria: "select",
 };
 export const SELECT_OPTIONS = {
   disponible: [
@@ -82,6 +83,7 @@ export const SELECT_OPTIONS = {
       { value: "respondido", label: "Respondido" },
     ],
   },
+  categoria: [],
 };
 
 export const CHIP_COLORS = {
