@@ -7,10 +7,12 @@ export const MENU_ITEMS = [
 ];export const TABLE_CONFIG = {
   Productos: {
     endpoint: '/productos',
-    restoreEndpoint: '/productos/:id/restaurar',
+    restoreEndpoint: '/productos/:id/restore',
     updateEndpoint: '/productos/:id',
+    deleteEndpoint: '/productos/permanent/:id',
+    softDeleteEndpoint: '/productos/:id',
     editableFields: ['nombre', 'descripcion', 'precio', 'categoria', 'stock', 'disponible'],
-    displayFields: ['nombre', 'descripcion', 'precio', 'categoria', 'stock', 'disponible', 'isDeleted'],
+    displayFields: ['nombre', 'descripcion', 'precio', 'categoria', 'stock', 'disponible', 'isDeleted', 'deletedBy', 'deletedAt'],
   },
   Usuarios: {
     endpoint: '/usuarios',
