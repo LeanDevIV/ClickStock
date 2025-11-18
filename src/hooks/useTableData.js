@@ -95,6 +95,8 @@ export const useTableData = (section) => {
     error,
     fetchData,
     handleEdit,
+    // backward-compatible alias: algunas partes del código esperan `onEdit`
+    onEdit: handleEdit,
     handleSave,
     handleCancel,
     handleFieldChange,
