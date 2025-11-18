@@ -8,12 +8,22 @@ import {
   Select,
   MenuItem,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import {
   Edit as EditIcon,
   Check as CheckIcon,
   Close as CloseIcon,
   Refresh as RefreshIcon,
+  Delete as DeleteIcon,
+  DeleteForever as DeleteForeverIcon,
 } from "@mui/icons-material";
 import {
   FIELD_TYPES,
@@ -30,58 +40,139 @@ export const TableRowActions = ({
   id,
   isDeleted,
   onRestore,
+  onSoftDelete,
+  onHardDelete,
 }) => {
+  const [openConfirm, setOpenConfirm] = React.useState(false);
+  const [deleteType, setDeleteType] = React.useState(null); // 'soft' o 'hard'
+
   const showRestoreButton = isDeleted !== undefined;
 
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        gap: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {showRestoreButton && (
-        <Tooltip title={isDeleted ? "Restaurar" : "Elemento activo"}>
-          <span>
-            <IconButton
-              onClick={() => onRestore?.(id)}
-              disabled={!isDeleted}
-              sx={{ color: THEME.primaryColor }}
-              size="small"
-            >
-              <RefreshIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-      )}
+  const handleDeleteClick = (type) => {
+    setDeleteType(type);
+    setOpenConfirm(true);
+  };
 
-      {isEditing ? (
-        <>
-          <Tooltip title="Guardar cambios">
-            <IconButton onClick={() => onSave(id)} color="success" size="small">
-              <CheckIcon />
-            </IconButton>
+  const handleConfirmDelete = () => {
+    if (deleteType === "soft") {
+      onSoftDelete?.(id);
+    } else if (deleteType === "hard") {
+      onHardDelete?.(id);
+    }
+    setOpenConfirm(false);
+    setDeleteType(null);
+  };
+
+  const handleCancelDelete = () => {
+    setOpenConfirm(false);
+    setDeleteType(null);
+  };
+
+  return (
+    <>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {showRestoreButton && (
+          <Tooltip title={isDeleted ? "Restaurar" : "Elemento activo"}>
+            <span>
+              <IconButton
+                onClick={() => onRestore?.(id)}
+                disabled={!isDeleted}
+                sx={{ color: THEME.primaryColor }}
+                size="small"
+              >
+                <RefreshIcon />
+              </IconButton>
+            </span>
           </Tooltip>
-          <Tooltip title="Cancelar edición">
-            <IconButton onClick={onCancel} color="error" size="small">
-              <CloseIcon />
-            </IconButton>
-          </Tooltip>
-        </>
-      ) : (
-        <Tooltip title="Editar">
-          <IconButton
-            onClick={() => onEdit(id)}
-            sx={{ color: THEME.primaryColor }}
-            size="small"
+        )}
+
+        {isEditing ? (
+          <>
+            <Tooltip title="Guardar cambios">
+              <IconButton onClick={() => onSave(id)} color="success" size="small">
+                <CheckIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Cancelar edición">
+              <IconButton onClick={onCancel} color="error" size="small">
+                <CloseIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        ) : (
+          <>
+            <Tooltip title="Editar">
+              <IconButton
+                onClick={() => onEdit(id)}
+                sx={{ color: THEME.primaryColor }}
+                size="small"
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+
+            {/* Botón Soft Delete (solo si no está eliminado) */}
+            {!isDeleted && (
+              <Tooltip title="Eliminar (soft delete)">
+                <IconButton
+                  onClick={() => handleDeleteClick("soft")}
+                  color="warning"
+                  size="small"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* Botón Hard Delete (solo si está eliminado) */}
+            {isDeleted && (
+              <Tooltip title="Eliminar permanentemente">
+                <IconButton
+                  onClick={() => handleDeleteClick("hard")}
+                  color="error"
+                  size="small"
+                >
+                  <DeleteForeverIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </>
+        )}
+      </Box>
+
+      {/* Diálogo de confirmación */}
+      <Dialog open={openConfirm} onClose={handleCancelDelete}>
+        <DialogTitle>
+          {deleteType === "soft" ? "Eliminar producto" : "Eliminar permanentemente"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {deleteType === "soft"
+              ? "¿Estás seguro de que deseas eliminar este producto? Podrás restaurarlo después."
+              : "¿Estás seguro de que deseas eliminar permanentemente este producto? Esta acción no se puede deshacer."}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color={deleteType === "hard" ? "error" : "warning"}
+            variant="contained"
           >
-            <EditIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Box>
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
@@ -192,3 +283,70 @@ export const DeletedChip = ({ isDeleted }) => (
     color={isDeleted ? "error" : "success"}
   />
 );
+
+/**
+ * Componente reutilizable de controles para tablas administrativas
+ * Incluye botón de refresh y toggle para mostrar eliminados
+ */
+export const TableControls = ({
+  onRefresh,
+  showDeletedLabel = "Mostrar eliminados",
+  showDeletedInitial = true,
+  onShowDeletedChange,
+  isLoading = false,
+}) => {
+  const [showDeleted, setShowDeleted] = React.useState(showDeletedInitial);
+
+  const handleToggleDeleted = (e) => {
+    const newValue = e.target.checked;
+    setShowDeleted(newValue);
+    onShowDeletedChange?.(newValue);
+  };
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        mb: 2,
+        gap: 2,
+      }}
+    >
+      <Button
+        variant="contained"
+        startIcon={<RefreshIcon />}
+        onClick={onRefresh}
+        disabled={isLoading}
+        sx={{
+          bgcolor: THEME.primaryColor,
+          color: THEME.darkColor,
+          fontWeight: "bold",
+          "&:hover": { bgcolor: "rgba(212, 175, 55, 0.85)" },
+          "&:disabled": { opacity: 0.6 },
+        }}
+      >
+        Actualizar
+      </Button>
+
+      <FormControlLabel
+        control={
+          <Switch
+            checked={showDeleted}
+            onChange={handleToggleDeleted}
+            disabled={isLoading}
+            sx={{
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: THEME.primaryColor,
+              },
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: THEME.primaryColor,
+              },
+            }}
+          />
+        }
+        label={showDeletedLabel}
+      />
+    </Box>
+  );
+};
