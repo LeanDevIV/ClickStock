@@ -18,6 +18,8 @@ export const ProductRow = ({
   onCancel,
   onFieldChange,
   onRestore,
+  onSoftDelete,
+  onHardDelete,
   categorias = [],
 }) => {
   const isEditing = editingId === producto._id;
@@ -111,9 +113,55 @@ export const ProductRow = ({
         )}
       </TableCell>
 
+      {/* Disponible */}
+      <TableCell>
+        {isEditing ? (
+          <EditableCell
+            value={productoActual.disponible}
+            field="disponible"
+            isEditing={isEditing}
+            onChange={(value) => onFieldChange("disponible", value)}
+          />
+        ) : (
+          <Chip
+            label={productoActual.disponible ? "Sí" : "No"}
+            size="small"
+            color={productoActual.disponible ? "success" : "default"}
+          />
+        )}
+      </TableCell>
+
       {/* Eliminado */}
       <TableCell>
         <DeletedChip isDeleted={productoActual.isDeleted} />
+      </TableCell>
+
+      {/* Eliminado por (Admin) */}
+      <TableCell>
+        {productoActual.deletedBy ? (
+          <span title={productoActual.deletedBy.emailUsuario || ""}>
+            {productoActual.deletedBy.nombreUsuario || "Admin desconocido"}
+          </span>
+        ) : (
+          <span style={{ color: "#999" }}>-</span>
+        )}
+      </TableCell>
+
+      {/* Fecha de eliminación */}
+      <TableCell>
+        {productoActual.deletedAt ? (
+          <span>
+            {new Date(productoActual.deletedAt).toLocaleDateString('es-AR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+        ) : (
+          <span style={{ color: "#999" }}>-</span>
+        )}
       </TableCell>
 
       {/* Acciones */}
@@ -125,6 +173,8 @@ export const ProductRow = ({
           onSave={() => onSave(producto._id)}
           onCancel={onCancel}
           onRestore={() => onRestore(producto._id)}
+          onSoftDelete={() => onSoftDelete(producto._id)}
+          onHardDelete={() => onHardDelete(producto._id)}
           id={producto._id}
           isDeleted={producto.isDeleted}
         />
