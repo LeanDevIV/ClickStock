@@ -14,6 +14,7 @@ import ProductList from "../pages/ProductList"; // ✅ Importamos la página de 
 import PromocionesForm from "../pages/PromocionesForm.jsx";
 import TestCompartir from "../components/testPrueba.jsx"
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
+import CarritoPage from "../pages/CarritoPages.jsx";
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
@@ -28,6 +29,7 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
         >
           <Route path="/test-compartir" element={<TestCompartir />} />
           <Route path="/" element={<Home />} />
+          <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/Acerca" element={<AboutUs />} />
           <Route path="/Contacto" element={<Contact />} />
           <Route path="/productos" element={<ProductList />} />
