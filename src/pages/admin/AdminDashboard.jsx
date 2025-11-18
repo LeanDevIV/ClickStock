@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTableData } from "../../hooks/useTableData";
 import { TABLE_CONFIG, THEME, SELECT_OPTIONS } from "../../config/adminConfig";
 import { useCategoriesStore } from "../../hooks/useCategoriesStore";
@@ -12,6 +12,11 @@ export const AdminDashboard = () => {
 
   // Hook para obtener categorías
   const { categorias, fetchCategorias } = useCategoriesStore();
+  // Opciones estables para evitar recrear el objeto en cada render (previene loops de fetch)
+  const adminOptions = useMemo(
+    () => ({ includeDeleted: true, includeUnavailable: true }),
+    []
+  );
 
   const {
     data,
@@ -25,12 +30,14 @@ export const AdminDashboard = () => {
     handleCancel,
     handleFieldChange,
     handleRestore,
-  } = useTableData(selectedSection);
+    handleSoftDelete,
+    handleHardDelete,
+  } = useTableData(selectedSection, adminOptions);
 
   // Cargar categorías al montar el componente
   useEffect(() => {
     fetchCategorias();
-  }, []);
+  }, [fetchCategorias]);
 
   // Actualizar SELECT_OPTIONS.categoria cuando se carguen las categorías
   useEffect(() => {
@@ -53,7 +60,6 @@ export const AdminDashboard = () => {
   const paginatedData = Array.isArray(data)
     ? data.slice((page - 1) * THEME.itemsPerPage, page * THEME.itemsPerPage)
     : [];
-  console.log("datos de paginacion", paginatedData);
 
   const totalPages = Math.ceil(data.length / THEME.itemsPerPage);
 
@@ -64,7 +70,7 @@ export const AdminDashboard = () => {
     if (error) {
       return <p>{error}</p>;
     }
-    const displayFields = TABLE_CONFIG[selectedSection].displayFields;
+    // const displayFields = TABLE_CONFIG[selectedSection].displayFields; // not used currently
     const commonProps = {
       data: paginatedData,
       editingId,
@@ -76,7 +82,7 @@ export const AdminDashboard = () => {
     };
     switch (selectedSection) {
       case "Productos":
-        return <ProductosTable {...commonProps} onRestore={handleRestore} categorias={categorias} />;
+        return <ProductosTable {...commonProps} onRestore={handleRestore} onSoftDelete={handleSoftDelete} onHardDelete={handleHardDelete} onRefresh={fetchData} categorias={categorias} />;
       case "Usuarios":
         return <UsuariosTable {...commonProps} onRestore={handleRestore} />;
       case "Pedidos":
