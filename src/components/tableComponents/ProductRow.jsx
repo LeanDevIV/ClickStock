@@ -1,22 +1,28 @@
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Chip from "@mui/material/Chip";
-import { EditableCell, TableRowActions, DeletedChip } from "../admin/TableComponents";
+import {
+  EditableCell,
+  TableRowActions,
+  DeletedChip,
+} from "../admin/TableComponents";
 import { formatValue } from "../../utils/tableUtils";
 
+// ESTE COMPONENTE YA NO MANEJA STATE, USA TODO DESDE EL HOOK
 export const ProductRow = ({
   producto,
   editingId,
   editedData,
-  onFieldChange,
   onEdit,
   onSave,
   onCancel,
+  onFieldChange,
   onRestore,
 }) => {
-
   const isEditing = editingId === producto._id;
-  const productoActual = isEditing ? editedData : producto;
+
+  // Mezcla entre original y editado (lo que espera tu hook)
+  const productoActual = isEditing ? { ...producto, ...editedData } : producto;
 
   return (
     <TableRow
@@ -30,10 +36,8 @@ export const ProductRow = ({
         <EditableCell
           value={productoActual.nombre}
           field="nombre"
-          onChange={(value) =>
-            onFieldChange(producto._id, "nombre", value)
-          }
           isEditing={isEditing}
+          onChange={(value) => onFieldChange("nombre", value)}
         />
       </TableCell>
 
@@ -42,10 +46,8 @@ export const ProductRow = ({
         <EditableCell
           value={productoActual.descripcion}
           field="descripcion"
-          onChange={(value) =>
-            onFieldChange(producto._id, "descripcion", value)
-          }
           isEditing={isEditing}
+          onChange={(value) => onFieldChange("descripcion", value)}
         />
       </TableCell>
 
@@ -55,10 +57,8 @@ export const ProductRow = ({
           <EditableCell
             value={productoActual.precio}
             field="precio"
-            onChange={(value) =>
-              onFieldChange(producto._id, "precio", value)
-            }
             isEditing={isEditing}
+            onChange={(value) => onFieldChange("precio", value)}
           />
         ) : (
           formatValue(producto.precio, "price")
@@ -70,15 +70,11 @@ export const ProductRow = ({
         {isEditing ? (
           <EditableCell
             value={
-              productoActual.categoria?.nombre ||
-              productoActual.categoria ||
-              ""
+              productoActual.categoria?.nombre || productoActual.categoria || ""
             }
             field="categoria"
             isEditing={isEditing}
-            onChange={(value) =>
-              onFieldChange(producto._id, "categoria", value)
-            }
+            onChange={(value) => onFieldChange("categoria", value)}
           />
         ) : (
           producto.categoria?.nombre || producto.categoria || "N/A"
@@ -92,9 +88,7 @@ export const ProductRow = ({
             value={productoActual.stock}
             field="stock"
             isEditing={isEditing}
-            onChange={(value) =>
-              onFieldChange(producto._id, "stock", value)
-            }
+            onChange={(value) => onFieldChange("stock", value)}
           />
         ) : (
           <Chip
@@ -114,12 +108,13 @@ export const ProductRow = ({
       <TableCell align="center">
         <TableRowActions
           isEditing={isEditing}
+          // Adaptamos las llamadas para que el padre reciba lo que espera
           onEdit={() => onEdit(producto)}
-          onSave={onSave}
+          onSave={() => onSave(producto._id)}
           onCancel={onCancel}
+          onRestore={() => onRestore(producto._id)}
           id={producto._id}
           isDeleted={producto.isDeleted}
-          onRestore={onRestore}
         />
       </TableCell>
     </TableRow>
