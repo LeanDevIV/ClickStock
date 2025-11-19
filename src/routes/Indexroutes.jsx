@@ -19,7 +19,7 @@ import CarritoPage from "../pages/CarritoPages.jsx";
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
     <>
-      <ScrollToTop />
+      <ScrollToTop />    
       <Routes>
         {/* Layout público */}
         <Route
