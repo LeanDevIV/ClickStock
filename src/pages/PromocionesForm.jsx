@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import clientAxios from "../utils/clientAxios";
+
 import {
   Box,
   Grid,
@@ -26,7 +28,6 @@ function PromocionesForm() {
   const [preview, setPreview] = useState(null);
 
   useEffect(() => {
-    // Liberar objeto URL anterior cuando cambie la preview
     return () => {
       if (preview) URL.revokeObjectURL(preview);
     };
@@ -44,12 +45,20 @@ function PromocionesForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Usar react-hot-toast en lugar de alert
     toast.success("Promoción creada con éxito");
     console.log("Datos de la promoción:", formData);
-    // Aquí podés conectar con el backend usando axios.post(...)
+    try {
+      await clientAxios.post("/promociones", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    } catch (error) {
+      throw new Error("Error al crear la promoción",error);
+    }
+
   };
 
   return (
@@ -95,7 +104,12 @@ function PromocionesForm() {
                 type="number"
                 value={formData.descuento}
                 onChange={handleChange}
-                inputProps={{ min: 0, max: 100 }}
+                slotProps={{
+                  input: {
+                    min: 0,
+                    max: 100,
+                  },
+                }}
                 required
                 fullWidth
               />
@@ -108,7 +122,9 @@ function PromocionesForm() {
                     type="date"
                     value={formData.fechaInicio}
                     onChange={handleChange}
-                    InputLabelProps={{ shrink: true }}
+                    slotProps={{
+                      inputLabel: { shrink: true },
+                    }}
                     required
                     fullWidth
                   />
@@ -120,7 +136,9 @@ function PromocionesForm() {
                     type="date"
                     value={formData.fechaFin}
                     onChange={handleChange}
-                    InputLabelProps={{ shrink: true }}
+                    slotProps={{
+                      inputLabel: { shrink: true },
+                    }}
                     required
                     fullWidth
                   />
