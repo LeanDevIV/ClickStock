@@ -1,97 +1,31 @@
-import { useState } from "react";
-import axios from "axios";
 import { Container, Form, Button, Alert } from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import axios from "axios";
 import "../pages/Contact.css";
 
 const Contacto = () => {
-  const [formData, setFormData] = useState({
-    nombre: "",
-    email: "",
-    asunto: "",
-    mensaje: "",
-  });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+    watch,
+  } = useForm();
 
-  const [alert, setAlert] = useState({ show: false, variant: "", message: "" });
-  const [validated, setValidated] = useState(false);
-  const [errors, setErrors] = useState({});
+  const mensajeValor = watch("mensaje", "");
 
-  // Validaciones personalizadas
-  const validateFields = () => {
-    const newErrors = {};
-
-    if (!formData.nombre.trim()) {
-      newErrors.nombre = "El nombre es obligatorio";
-    } else if (!/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/.test(formData.nombre)) {
-      newErrors.nombre = "Solo se permiten letras y espacios";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "El correo es obligatorio";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Correo inválido";
-    }
-
-    if (!formData.asunto.trim()) {
-      newErrors.asunto = "El asunto es obligatorio";
-    } else if (formData.asunto.length < 3) {
-      newErrors.asunto = "Debe tener al menos 3 caracteres";
-    }
-
-    if (!formData.mensaje.trim()) {
-      newErrors.mensaje = "El mensaje es obligatorio";
-    } else if (formData.mensaje.length < 10) {
-      newErrors.mensaje = "Debe tener mínimo 10 caracteres";
-    }
-
-    return newErrors;
-  };
-
-  // Control de inputs + limite palabras
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "mensaje") {
-      const words = value.trim().split(/\s+/);
-      if (words.length > 300) return;
-    }
-
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const newErrors = validateFields();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setValidated(true);
-      return;
-    }
-
-    setErrors({});
-    setValidated(false);
-
+  const onSubmit = async (data) => {
     try {
       await axios.post("http://localhost:5000/api/contacto", {
-        ...formData,
+        ...data,
         estado: "pendiente",
       });
 
-      setAlert({
-        show: true,
-        variant: "success",
-        message: "✅ Tu mensaje fue enviado correctamente.",
-      });
+      alert("Mensaje enviado con éxito ✔");
 
-      setFormData({ nombre: "", email: "", asunto: "", mensaje: "" });
-
+      reset();
     } catch (error) {
-      console.error(error);
-      setAlert({
-        show: true,
-        variant: "danger",
-        message: "❌ Ocurrió un error al enviar el mensaje.",
-      });
+      alert("Error al enviar el mensaje ❌");
     }
   };
 
@@ -102,7 +36,7 @@ const Contacto = () => {
       <Container className="contact-wrapper">
         <div className="contact-grid">
 
-          {/* COLUMNA IZQUIERDA */}
+          {/* INFO IZQUIERDA */}
           <div className="contact-info-box">
             <h2 className="contact-title">CONTÁCTATE CON<br />NOSOTROS</h2>
 
@@ -124,17 +58,7 @@ const Contacto = () => {
 
           {/* FORMULARIO */}
           <div className="contact-form-box">
-            {alert.show && (
-              <Alert
-                variant={alert.variant}
-                onClose={() => setAlert({ show: false })}
-                dismissible
-              >
-                {alert.message}
-              </Alert>
-            )}
-
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit(onSubmit)}>
 
               {/* Nombre */}
               <Form.Group className="mb-3">
@@ -142,15 +66,19 @@ const Contacto = () => {
                   <Form.Control
                     type="text"
                     placeholder="Nombre"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    required
                     maxLength={40}
+                    minLength={4}
+                    {...register("nombre", {
+                      required: "El nombre es obligatorio",
+                      pattern: {
+                        value: /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/,
+                        message: "Solo se permiten letras y espacios",
+                      },
+                    })}
                     isInvalid={!!errors.nombre}
                   />
                   <Form.Control.Feedback type="invalid">
-                    {errors.nombre}
+                    {errors.nombre?.message}
                   </Form.Control.Feedback>
                 </div>
               </Form.Group>
@@ -161,14 +89,17 @@ const Contacto = () => {
                   <Form.Control
                     type="email"
                     placeholder="Correo electrónico"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
+                    {...register("email", {
+                      required: "El correo es obligatorio",
+                      pattern: {
+                        value: /\S+@\S+\.\S+/,
+                        message: "Correo inválido",
+                      },
+                    })}
                     isInvalid={!!errors.email}
                   />
                   <Form.Control.Feedback type="invalid">
-                    {errors.email}
+                    {errors.email?.message}
                   </Form.Control.Feedback>
                 </div>
               </Form.Group>
@@ -179,15 +110,18 @@ const Contacto = () => {
                   <Form.Control
                     type="text"
                     placeholder="Asunto"
-                    name="asunto"
-                    value={formData.asunto}
-                    onChange={handleChange}
-                    required
                     maxLength={80}
+                    {...register("asunto", {
+                      required: "El asunto es obligatorio",
+                      minLength: {
+                        value: 4,
+                        message: "Debe tener mínimo 4 caracteres",
+                      },
+                    })}
                     isInvalid={!!errors.asunto}
                   />
                   <Form.Control.Feedback type="invalid">
-                    {errors.asunto}
+                    {errors.asunto?.message}
                   </Form.Control.Feedback>
                 </div>
               </Form.Group>
@@ -199,21 +133,33 @@ const Contacto = () => {
                     as="textarea"
                     rows={4}
                     placeholder="Mensaje..."
-                    name="mensaje"
-                    value={formData.mensaje}
-                    onChange={handleChange}
-                    required
+                    {...register("mensaje", {
+                      required: "El mensaje es obligatorio",
+                      minLength: {
+                        value: 10,
+                        message: "Debe tener mínimo 10 caracteres",
+                      },
+                      validate: (value) =>
+                        value.trim().split(/\s+/).length <= 300 ||
+                        "Máximo 300 palabras",
+                    })}
                     isInvalid={!!errors.mensaje}
                   />
+
+                  <div className="word-counter">
+                    {mensajeValor.split(/\s+/).filter(Boolean).length}/300 palabras
+                  </div>
+
                   <Form.Control.Feedback type="invalid">
-                    {errors.mensaje}
+                    {errors.mensaje?.message}
                   </Form.Control.Feedback>
                 </div>
               </Form.Group>
 
-              <Button className="send-btn" type="submit">
-                Enviar mensaje
+              <Button className="send-btn" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Enviando..." : "Enviar mensaje"}
               </Button>
+
             </Form>
           </div>
 
