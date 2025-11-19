@@ -2,6 +2,7 @@ import { Container, Form, Button, Alert } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import "../pages/Contact.css";
+import Swal from "sweetalert2";
 
 const Contacto = () => {
   const {
@@ -21,11 +22,21 @@ const Contacto = () => {
         estado: "pendiente",
       });
 
-      alert("Mensaje enviado con éxito ✔");
+      Swal.fire({
+        title: "Enviado con éxito",
+        text: "Tu mensaje fue enviado correctamente",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+      });
 
       reset();
     } catch (error) {
-      alert("Error al enviar el mensaje ❌");
+      Swal.fire({
+        title: "Error",
+        text: "Error al enviar el mensaje ❌",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
     }
   };
 
@@ -35,10 +46,13 @@ const Contacto = () => {
 
       <Container className="contact-wrapper">
         <div className="contact-grid">
-
           {/* INFO IZQUIERDA */}
           <div className="contact-info-box">
-            <h2 className="contact-title">CONTÁCTATE CON<br />NOSOTROS</h2>
+            <h2 className="contact-title">
+              CONTÁCTATE CON
+              <br />
+              NOSOTROS
+            </h2>
 
             <div className="info-item">
               <i className="bi bi-telephone-fill"></i>
@@ -59,7 +73,6 @@ const Contacto = () => {
           {/* FORMULARIO */}
           <div className="contact-form-box">
             <Form onSubmit={handleSubmit(onSubmit)}>
-
               {/* Nombre */}
               <Form.Group className="mb-3">
                 <div className="input-with-icon">
@@ -147,7 +160,8 @@ const Contacto = () => {
                   />
 
                   <div className="word-counter">
-                    {mensajeValor.split(/\s+/).filter(Boolean).length}/300 palabras
+                    {mensajeValor.split(/\s+/).filter(Boolean).length}/300
+                    palabras
                   </div>
 
                   <Form.Control.Feedback type="invalid">
@@ -156,13 +170,15 @@ const Contacto = () => {
                 </div>
               </Form.Group>
 
-              <Button className="send-btn" type="submit" disabled={isSubmitting}>
+              <Button
+                className="send-btn"
+                type="submit"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? "Enviando..." : "Enviar mensaje"}
               </Button>
-
             </Form>
           </div>
-
         </div>
       </Container>
     </div>
