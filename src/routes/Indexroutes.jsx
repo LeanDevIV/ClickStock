@@ -12,6 +12,9 @@ import TablaPedidos from "../pages/admin/tablaPedidos";
 import ScrollToTop from "../components/ScrollToTop.jsx";
 import ProductList from "../pages/ProductList"; // ✅ Importamos la página de productos
 import PromocionesForm from "../pages/PromocionesForm.jsx";
+import TestCompartir from "../components/testPrueba.jsx"
+import ProductList from "../pages/ProductList";
+
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
@@ -24,6 +27,7 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
             <MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />
           }
         >
+          <Route path="/test-compartir" element={<TestCompartir />} />
           <Route path="/" element={<Home />} />
           <Route path="/Acerca" element={<AboutUs />} />
           <Route path="/Contacto" element={<Contact />} />

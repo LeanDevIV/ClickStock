@@ -1,79 +1,90 @@
-import { useState } from "react";
-import { Form, Button } from "react-bootstrap";
+import { useForm, Controller } from "react-hook-form";
+import { TextField, Button, MenuItem, Box, Typography } from "@mui/material";
+import toast from "react-hot-toast";
 import { createReview } from "../services/reviewService.js";
 
 const ReviewForm = ({ productId, onReviewAdded }) => {
-  const [formData, setFormData] = useState({
-    user: "",
-    rating: 5,
-    comment: "",
+  const { handleSubmit, control, reset, formState: { errors, isSubmitting } } = useForm({
+    defaultValues: {
+      user: "",
+      rating: 5,
+      comment: "",
+    },
   });
-  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     try {
-      setLoading(true);
-      await createReview({ ...formData, productId });
-      setFormData({ user: "", rating: 5, comment: "" });
+      await createReview({ ...data, productId });
+      reset();
+      toast.success("Reseña enviada correctamente");
       onReviewAdded();
-    } catch {
-      alert("Error al enviar la reseña");
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al enviar la reseña");
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit} className="mt-4">
-      <h5>Agregar una reseña</h5>
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} mt={3}>
+      <Typography variant="h6" mb={2}>Agregar una reseña</Typography>
 
-      <Form.Group className="mb-2">
-        <Form.Label>Tu nombre</Form.Label>
-        <Form.Control
-          type="text"
-          name="user"
-          value={formData.user}
-          onChange={handleChange}
-          required
-        />
-      </Form.Group>
+      <Controller
+        name="user"
+        control={control}
+        rules={{ required: "El nombre es obligatorio" }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label="Tu nombre"
+            fullWidth
+            margin="normal"
+            error={!!errors.user}
+            helperText={errors.user?.message}
+          />
+        )}
+      />
 
-      <Form.Group className="mb-2">
-        <Form.Label>Puntaje</Form.Label>
-        <Form.Select
-          name="rating"
-          value={formData.rating}
-          onChange={handleChange}
-        >
-          {[1, 2, 3, 4, 5].map((n) => (
-            <option key={n} value={n}>
-              {n} ⭐
-            </option>
-          ))}
-        </Form.Select>
-      </Form.Group>
+      <Controller
+        name="rating"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label="Puntaje"
+            select
+            fullWidth
+            margin="normal"
+          >
+            {[1,2,3,4,5].map((n) => (
+              <MenuItem key={n} value={n}>{n} ⭐</MenuItem>
+            ))}
+          </TextField>
+        )}
+      />
 
-      <Form.Group className="mb-2">
-        <Form.Label>Comentario</Form.Label>
-        <Form.Control
-          as="textarea"
-          name="comment"
-          rows={3}
-          value={formData.comment}
-          onChange={handleChange}
-          required
-        />
-      </Form.Group>
+      <Controller
+        name="comment"
+        control={control}
+        rules={{ required: "El comentario es obligatorio" }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            label="Comentario"
+            fullWidth
+            multiline
+            rows={4}
+            margin="normal"
+            error={!!errors.comment}
+            helperText={errors.comment?.message}
+          />
+        )}
+      />
 
-      <Button type="submit" disabled={loading}>
-        {loading ? "Enviando..." : "Enviar reseña"}
+      <Button type="submit" variant="contained" color="error" disabled={isSubmitting} sx={{ mt: 2 }}>
+        {isSubmitting ? "Enviando..." : "Enviar reseña"}
       </Button>
-    </Form>
+    </Box>
   );
 };
 
