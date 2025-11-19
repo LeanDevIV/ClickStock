@@ -9,6 +9,7 @@ import {
   InputBase,
   Switch,
   Tooltip,
+  Badge,
 } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import {
@@ -16,14 +17,14 @@ import {
   Brightness4,
   Search as SearchIcon,
   AdminPanelSettings,
+  ShoppingCart, 
 } from "@mui/icons-material";
 import { useStore } from "../hooks/useStore";
 import { useScrollDirection } from "../hooks/useScrollDirection";
 import { UserMenu } from "./MenuUsuario";
 import RegistroLogin from "../pages/RegistroLogin";
 import "./Header.css";
-
-// === 🔍 Estilos del buscador ===
+// === :lupa: Estilos del buscador ===
 const SearchContainer = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -38,7 +39,6 @@ const SearchContainer = styled("div")(({ theme }) => ({
     width: "auto",
   },
 }));
-
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
   height: "100%",
@@ -48,7 +48,6 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
 }));
-
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   width: "100%",
@@ -64,17 +63,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
   },
 }));
-
-// === 🧠 Componente principal ===
+// === :cerebro: Componente principal ===
 export const Header = ({ modoOscuro, toggleModo }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const showNavbar = useScrollDirection(10);
-
   const user = useStore((state) => state.user);
   const logout = useStore((state) => state.logout);
-
+  const totalArticulos = useStore((state) => state.cart.totalArticulos);
   const handleSubmit = (e) => {
     e.preventDefault();
     if (search.trim() !== "") {
@@ -82,15 +79,15 @@ export const Header = ({ modoOscuro, toggleModo }) => {
       setSearch("");
     }
   };
-
   const handleOpenAuth = () => setShowAuthModal(true);
   const handleCloseAuth = () => setShowAuthModal(false);
-
   const handleLogout = () => {
     logout();
     navigate("/");
   };
-
+  const handleGoToCart = () => {
+    navigate("/carrito");
+  };
   return (
     <>
       <Navbar
@@ -105,9 +102,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
           <Navbar.Brand as={Link} to="/" className="fw-bold fs-4 text-primary">
             Click<span className="text-dark">Stock</span>
           </Navbar.Brand>
-
           <Navbar.Toggle aria-controls="navbar-nav" />
-
           <Navbar.Collapse id="navbar-nav">
             <Nav className="ms-auto align-items-center">
               <Nav.Link as={Link} to="/" className="mx-2 fw-medium">
@@ -119,12 +114,9 @@ export const Header = ({ modoOscuro, toggleModo }) => {
               <Nav.Link as={Link} to="/contacto" className="mx-2 fw-medium">
                 Contacto
               </Nav.Link>
-
-              {/* Enlaces de admin - CORREGIDO: SIN ANIDAMIENTO PERO MANTENIENDO ESTILO */}
+              {/* Enlaces de admin */}
               {user?.rolUsuario === "admin" && (
                 <div className="mx-2">
-                  {" "}
-                  {/* Contenedor div en lugar de Nav.Link */}
                   <ButtonGroup variant="text" className="text-danger">
                     <Tooltip title="Admin">
                       <Button
@@ -139,8 +131,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   </ButtonGroup>
                 </div>
               )}
-
-              {/* 🔍 Buscador */}
+              {/* :lupa: Buscador */}
               <Box component="form" onSubmit={handleSubmit}>
                 <SearchContainer>
                   <SearchIconWrapper>
@@ -154,8 +145,36 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   />
                 </SearchContainer>
               </Box>
-
-              {/* 🌙/☀️ Modo oscuro */}
+              <Tooltip title="Ver carrito">
+                <IconButton
+                  color="inherit"
+                  onClick={handleGoToCart}
+                  className="ms-2"
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: modoOscuro
+                        ? "rgba(255, 255, 255, 0.1)"
+                        : "rgba(0, 0, 0, 0.1)"
+                    }
+                  }}
+                >
+                  <Badge
+                    badgeContent={totalArticulos}
+                    color="error"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: '0.7rem',
+                        fontWeight: 'bold',
+                        minWidth: '18px',
+                        height: '18px',
+                      }
+                    }}
+                  >
+                    <ShoppingCart />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+              {/* :luna_creciente:/:soleado: Modo oscuro */}
               <div className="d-flex align-items-center ms-3">
                 <IconButton color="inherit" onClick={toggleModo}>
                   {modoOscuro ? <Brightness7 /> : <Brightness4 />}
@@ -166,8 +185,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   color="default"
                 />
               </div>
-
-              {/* 👤 Usuario / Login */}
+              {/* :silueta_de_busto: Usuario / Login */}
               {user ? (
                 <UserMenu
                   user={user}
@@ -187,7 +205,6 @@ export const Header = ({ modoOscuro, toggleModo }) => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-
       <RegistroLogin show={showAuthModal} onHide={handleCloseAuth} />
     </>
   );
