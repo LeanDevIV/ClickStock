@@ -7,7 +7,10 @@ import { Modal, Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { PersonFill, KeyFill, EnvelopeFill, ArrowLeftCircleFill } from 'react-bootstrap-icons';
 
 function RegistroLogin({ show, onHide }) {
-  const [modo, setModo] = useState("registro");
+  const [modo, setModo] = useState("login");
+  React.useEffect(() => {
+  if (show) setModo("login");
+}, [show]);
   const [formData, setFormData] = useState({
     nombreUsuario: "",
     emailUsuario: "",

@@ -10,8 +10,9 @@ import AdminUsuarios from "../pages/AdminUsuarios";
 import AdminLayout from "../layouts/AdminLayout";
 import TablaPedidos from "../pages/admin/tablaPedidos";
 import ScrollToTop from "../components/ScrollToTop.jsx";
-import TestCompartir from "../components/testPrueba.jsx";
-import ProductList from "../pages/ProductList";
+import ProductList from "../pages/ProductList"; // ✅ Importamos la página de productos
+import PromocionesForm from "../pages/PromocionesForm.jsx";
+import TestCompartir from "../components/testPrueba.jsx"
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
@@ -19,6 +20,7 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
     <>
       <ScrollToTop />
       <Routes>
+        {/* Layout público */}
         <Route
           element={
             <MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />
@@ -29,8 +31,11 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
           <Route path="/Acerca" element={<AboutUs />} />
           <Route path="/Contacto" element={<Contact />} />
           <Route path="/productos" element={<ProductList />} />
+          <Route path="/promocion" element={<PromocionesForm />} />
+          {/* ✅ Página de productos */}
           <Route path="/producto/detalle/:id" element={<ProductDetail />} />
-
+          {/* ✅ Dinámica */}
+          {/* Layout administrativo */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
 
@@ -40,6 +45,7 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
           </Route>
         </Route>
 
+        {/* Página 404 */}
         <Route path="*" element={<Error404 />} />
       </Routes>
     </>
