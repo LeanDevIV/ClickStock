@@ -52,7 +52,7 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
       <TableCell className="celda-cliente">
         <Box>
           <Typography className="texto-cliente" variant="body2">
-            {pedido.usuario?.nombreUsuario || "Cliente"}
+            {pedido.usuario?.nombre || "Cliente"}
           </Typography>
           <Typography className="texto-email" variant="caption">
             {pedido.usuario?.emailUsuario || "N/A"}

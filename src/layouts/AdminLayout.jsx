@@ -41,7 +41,7 @@ const AdminLayout = () => {
     );
   }
 
-  if (user?.rolUsuario !== "admin") {
+  if (user?.rol !== "admin") {
     return <Navigate to="/" replace />;
   }
 

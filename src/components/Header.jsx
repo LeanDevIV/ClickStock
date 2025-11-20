@@ -22,7 +22,7 @@ import {
 import { useStore } from "../hooks/useStore";
 import { useScrollDirection } from "../hooks/useScrollDirection";
 import { UserMenu } from "./MenuUsuario";
-import RegistroLogin from "../pages/RegistroLogin";
+import AuthModal from "./AuthModal"; // ⬅️ Nuevo modal unificado
 import "./Header.css";
 
 // === 🔍 Estilos del buscador ===
@@ -85,9 +85,6 @@ export const Header = ({ modoOscuro, toggleModo }) => {
     }
   };
 
-  const handleOpenAuth = () => setShowAuthModal(true);
-  const handleCloseAuth = () => setShowAuthModal(false);
-
   const handleLogout = () => {
     logout();
     navigate("/");
@@ -115,43 +112,44 @@ export const Header = ({ modoOscuro, toggleModo }) => {
               <Nav.Link as={Link} to="/" className="mx-2 fw-medium">
                 Inicio
               </Nav.Link>
+
               <Nav.Link as={Link} to="/productos" className="mx-2 fw-medium">
                 Productos
               </Nav.Link>
+
               <Nav.Link as={Link} to="/contacto" className="mx-2 fw-medium">
                 Contacto
               </Nav.Link>
 
-              {/* Enlaces de admin - CORREGIDO: SIN ANIDAMIENTO PERO MANTENIENDO ESTILO */}
-              {user?.rolUsuario === "admin" && (
-                <div className="mx-2"> {/* Contenedor div en lugar de Nav.Link */}
+              {/* 🔥 Enlaces admin */}
+              {user?.rol === "admin" && (
+                <div className="mx-2">
                   <ButtonGroup variant="text" className="text-danger">
                     <Tooltip title="Productos">
-                      <Button 
-                        component={Link} 
-                        to="/admin/productos" 
+                      <Button
+                        component={Link}
+                        to="/admin/productos"
                         color="error"
-                        className="text-danger"
                       >
                         <Inventory2 />
                       </Button>
                     </Tooltip>
+
                     <Tooltip title="Pedidos">
-                      <Button 
-                        component={Link} 
-                        to="/admin/pedidos" 
+                      <Button
+                        component={Link}
+                        to="/admin/pedidos"
                         color="error"
-                        className="text-danger"
                       >
                         <LocalShipping />
                       </Button>
                     </Tooltip>
+
                     <Tooltip title="Usuarios">
-                      <Button 
-                        component={Link} 
-                        to="/admin/usuarios" 
+                      <Button
+                        component={Link}
+                        to="/admin/usuarios"
                         color="error"
-                        className="text-danger"
                       >
                         <People />
                       </Button>
@@ -166,6 +164,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   <SearchIconWrapper>
                     <SearchIcon />
                   </SearchIconWrapper>
+
                   <StyledInputBase
                     placeholder="Buscar..."
                     inputProps={{ "aria-label": "buscar" }}
@@ -175,11 +174,12 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                 </SearchContainer>
               </Box>
 
-              {/* 🌙/☀️ Modo oscuro */}
+              {/* 🌗 Modo oscuro */}
               <div className="d-flex align-items-center ms-3">
-                <IconButton color="inherit" onClick={toggleModo}>
+                <IconButton onClick={toggleModo}>
                   {modoOscuro ? <Brightness7 /> : <Brightness4 />}
                 </IconButton>
+
                 <Switch
                   checked={modoOscuro}
                   onChange={toggleModo}
@@ -187,7 +187,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                 />
               </div>
 
-              {/* 👤 Usuario / Login */}
+              {/* 👤 Usuario o botón para abrir AuthModal */}
               {user ? (
                 <UserMenu
                   user={user}
@@ -196,9 +196,8 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                 />
               ) : (
                 <Button
-                  color="inherit"
+                  onClick={() => setShowAuthModal(true)}
                   className="ms-2 px-4"
-                  onClick={handleOpenAuth}
                 >
                   Iniciar sesión
                 </Button>
@@ -208,7 +207,8 @@ export const Header = ({ modoOscuro, toggleModo }) => {
         </Container>
       </Navbar>
 
-      <RegistroLogin show={showAuthModal} onHide={handleCloseAuth} />
+      {/* ⬇️ Aquí se monta el modal de login+registro */}
+      <AuthModal show={showAuthModal} onHide={() => setShowAuthModal(false)} />
     </>
   );
 };

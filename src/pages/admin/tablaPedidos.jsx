@@ -267,7 +267,7 @@ const TablaPedidos = () => {
 
                       <TableCell className="tabla-celda tabla-celda-cliente">
                         <Typography className="texto-cliente">
-                          {pedido.usuario?.nombreUsuario ||
+                          {pedido.usuario?.nombre ||
                             "Cliente no disponible"}
                         </Typography>
                         <Typography

@@ -2,17 +2,17 @@ import clientAxios from "../utils/clientAxios";
 
 /**
  * Realiza la llamada al backend para registrar un usuario.
- * @param {{ nombreUsuario: string, emailUsuario: string, contrasenia: string }} payload
+ * @param {{ nombre: string, emailUsuario: string, contrasenia: string }} payload
  * @returns {Promise<object>} respuesta del servidor
  */
 export async function registroService({
-  nombreUsuario,
+  nombre,
   emailUsuario,
   contrasenia,
 }) {
   try {
     const { data } = await clientAxios.post("/usuarios/registro", {
-      nombreUsuario,
+      nombre,
       emailUsuario,
       contrasenia,
     });

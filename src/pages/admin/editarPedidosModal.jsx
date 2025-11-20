@@ -350,7 +350,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado,setPedidos }
                   variant="h6"
                   className="valor-dato valor-dato-cliente"
                 >
-                  {pedido.usuario?.nombreUsuario || "Cliente no especificado"}
+                  {pedido.usuario?.nombre || "Cliente no especificado"}
                 </Typography>
                 <Typography variant="body2" className="texto-email">
                   {pedido.usuario?.emailUsuario || "Email no disponible"}

@@ -14,7 +14,7 @@ export const UserMenu = ({ user, modoOscuro, handleLogout }) => {
     setAnchorEl(null);
   };
 
-  const nombre = user?.nombreUsuario || user?.nombre || user?.username || "?";
+  const nombre = user?.nombre || user?.nombre || user?.username || "?";
   const letra = nombre[0]?.toUpperCase();
   const avatarSrc = user?.imagen || null;
 
@@ -58,7 +58,7 @@ export const UserMenu = ({ user, modoOscuro, handleLogout }) => {
           Mi Perfil
         </MenuItem>
 
-        {user?.rolUsuario !== "admin" && (
+        {user?.rol !== "admin" && (
           <MenuItem component={Link} to="/admin">
             Panel Admin
           </MenuItem>
