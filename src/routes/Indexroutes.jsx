@@ -14,7 +14,7 @@ import ProductList from "../pages/ProductList"; // ✅ Importamos la página de 
 import PromocionesForm from "../pages/PromocionesForm.jsx";
 import TestCompartir from "../components/testPrueba.jsx"
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
-import CarritoPage from "../pages/CarritoPages.jsx";
+import CarritoPage from "../pages/CarritoPage.jsx";
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
