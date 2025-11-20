@@ -6,7 +6,7 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import clientAxios from "../utils/clientAxios";
 import ReviewForm from "../components/ReviewForm";
 import ReviewsList from "../components/ReviewsList";
-import useCart from "../hooks/useCart"; // Asegúrate de importar el hook corregido
+import useCart from "../hooks/useCart"; 
 import "../css/productDetail.css";
 
 const ProductDetail = () => {
@@ -28,12 +28,10 @@ const ProductDetail = () => {
     
     try {
       await añadirAlCarrito(product, 1);
-      // Mostrar snackbar de éxito
       setSnackbarMessage("Producto agregado al carrito correctamente");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
     } catch (error) {
-      // El hook ya muestra el toast de error, pero podemos agregar un snackbar adicional si quieres
       console.error("Error al agregar al carrito:", error);
     }
   };

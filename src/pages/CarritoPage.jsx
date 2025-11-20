@@ -12,6 +12,8 @@ import {
   Stack,
   Badge,
   Skeleton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Add,
@@ -26,80 +28,113 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import useCart from "../hooks/useCart";
 
-const colors = {
-  primary: "#000000",
-  background: "#F5F5F5",
-  accent: "#B91C1C",
-  secondary: "#D4AF37",
-  neutral: "#404040",
+// Eliminamos los colores fijos y usamos el tema
+
+const CartItemSkeleton = () => {
+  const theme = useTheme();
+  
+  return (
+    <Card 
+      sx={{ 
+        p: 2, 
+        borderRadius: 2, 
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        backgroundColor: theme.palette.background.paper,
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Skeleton 
+          variant="rectangular" 
+          width={80} 
+          height={80} 
+          sx={{ borderRadius: 2 }}
+        />
+        
+        <Box sx={{ flex: 1 }}>
+          <Skeleton variant="text" width="80%" height={32} sx={{ mb: 1 }} />
+          <Skeleton variant="text" width="40%" height={28} />
+          <Skeleton variant="text" width="60%" height={20} />
+        </Box>
+
+        <Stack spacing={1} alignItems="flex-end">
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Skeleton variant="circular" width={32} height={32} />
+            <Skeleton variant="text" width={20} height={24} />
+            <Skeleton variant="circular" width={32} height={32} />
+          </Box>
+          <Skeleton variant="circular" width={32} height={32} />
+        </Stack>
+      </Box>
+    </Card>
+  );
 };
-const CartItemSkeleton = () => (
-  <Card sx={{ p: 2, borderRadius: 2, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
-    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-      <Skeleton 
-        variant="rectangular" 
-        width={80} 
-        height={80} 
-        sx={{ borderRadius: 2 }}
-      />
-      
-      <Box sx={{ flex: 1 }}>
-        <Skeleton variant="text" width="80%" height={32} sx={{ mb: 1 }} />
-        <Skeleton variant="text" width="40%" height={28} />
-        <Skeleton variant="text" width="60%" height={20} />
-      </Box>
 
-      <Stack spacing={1} alignItems="flex-end">
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Skeleton variant="circular" width={32} height={32} />
-          <Skeleton variant="text" width={20} height={24} />
-          <Skeleton variant="circular" width={32} height={32} />
+const OrderSummarySkeleton = () => {
+  const theme = useTheme();
+  
+  return (
+    <Card 
+      sx={{ 
+        borderRadius: 2, 
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        backgroundColor: theme.palette.background.paper,
+      }}
+    >
+      <CardContent>
+        <Skeleton variant="text" width="60%" height={32} sx={{ mb: 2 }} />
+        
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+            <Skeleton variant="text" width="30%" height={20} />
+            <Skeleton variant="text" width="20%" height={20} />
+          </Box>
+          <Divider sx={{ my: 1 }} />
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Skeleton variant="text" width="20%" height={28} />
+            <Skeleton variant="text" width="40%" height={36} />
+          </Box>
         </Box>
-        <Skeleton variant="circular" width={32} height={32} />
-      </Stack>
-    </Box>
-  </Card>
-);
-const OrderSummarySkeleton = () => (
-  <Card sx={{ borderRadius: 2, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
-    <CardContent>
-      <Skeleton variant="text" width="60%" height={32} sx={{ mb: 2 }} />
-      
-      <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-          <Skeleton variant="text" width="30%" height={20} />
-          <Skeleton variant="text" width="20%" height={20} />
+
+        <Box 
+          sx={{ 
+            p: 2, 
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2B1A' : '#FEF3C7', 
+            borderRadius: 2, 
+            mb: 2 
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Skeleton variant="circular" width={24} height={24} />
+            <Skeleton variant="text" width="70%" height={20} />
+            <Skeleton variant="text" width="20%" height={20} />
+          </Box>
         </Box>
-        <Divider sx={{ my: 1 }} />
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <Skeleton variant="text" width="20%" height={28} />
-          <Skeleton variant="text" width="40%" height={36} />
+
+        <Stack spacing={1}>
+          <Skeleton variant="rectangular" height={48} sx={{ borderRadius: 1 }} />
+          <Skeleton variant="rectangular" height={40} sx={{ borderRadius: 1 }} />
+          <Skeleton variant="text" width="50%" height={32} />
+        </Stack>
+
+        <Box 
+          sx={{ 
+            mt: 2, 
+            p: 2, 
+            backgroundColor: theme.palette.background.default, 
+            borderRadius: 2 
+          }}
+        >
+          <Skeleton variant="text" width="100%" height={20} />
         </Box>
-      </Box>
-
-
-      <Box sx={{ p: 2, backgroundColor: "#FEF3C7", borderRadius: 2, mb: 2 }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Skeleton variant="circular" width={24} height={24} />
-          <Skeleton variant="text" width="70%" height={20} />
-          <Skeleton variant="text" width="20%" height={20} />
-        </Box>
-      </Box>
-
-      <Stack spacing={1}>
-        <Skeleton variant="rectangular" height={48} sx={{ borderRadius: 1 }} />
-        <Skeleton variant="rectangular" height={40} sx={{ borderRadius: 1 }} />
-        <Skeleton variant="text" width="50%" height={32} />
-      </Stack>
-
-      <Box sx={{ mt: 2, p: 2, backgroundColor: colors.background, borderRadius: 2 }}>
-        <Skeleton variant="text" width="100%" height={20} />
-      </Box>
-    </CardContent>
-  </Card>
-);
+      </CardContent>
+    </Card>
+  );
+};
 
 const CarritoPage = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   const {
     articulos,
     loading,
@@ -135,6 +170,7 @@ const CarritoPage = () => {
   const handleProcederPago = () => {
     console.log("Proceder al pago");
   };
+
   if (cargando) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -172,18 +208,21 @@ const CarritoPage = () => {
           startIcon={<ArrowBack />}
           component={Link}
           to="/productos"
-          sx={{ mb: 2, color: colors.neutral }}
+          sx={{ 
+            mb: 2, 
+            color: theme.palette.text.secondary 
+          }}
         >
           Volver a productos
         </Button>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <ShoppingCart sx={{ fontSize: 40, color: colors.primary }} />
+          <ShoppingCart sx={{ fontSize: 40, color: theme.palette.primary.main }} />
           <Box>
-            <Typography variant="h4" component="h1" fontWeight="bold">
+            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary">
               Tu Carrito de Compras
             </Typography>
-            <Typography variant="h6" color={colors.neutral}>
+            <Typography variant="h6" color="text.secondary">
               {totalArticulos} {totalArticulos === 1 ? "producto" : "productos"}{" "}
               en tu carrito
             </Typography>
@@ -192,8 +231,8 @@ const CarritoPage = () => {
             <Chip
               label={`${totalArticulos} items`}
               sx={{
-                backgroundColor: colors.accent,
-                color: "white",
+                backgroundColor: theme.palette.secondary.main,
+                color: theme.palette.secondary.contrastText,
                 fontWeight: "bold",
               }}
             />
@@ -214,24 +253,24 @@ const CarritoPage = () => {
               sx={{
                 textAlign: "center",
                 py: 8,
-                backgroundColor: colors.background,
+                backgroundColor: theme.palette.background.default,
               }}
             >
               <CardContent>
                 <ShoppingBag
                   sx={{
                     fontSize: 80,
-                    color: colors.neutral,
+                    color: theme.palette.text.secondary,
                     mb: 2,
                     opacity: 0.5,
                   }}
                 />
-                <Typography variant="h5" color={colors.neutral} gutterBottom>
+                <Typography variant="h5" color="text.secondary" gutterBottom>
                   Tu carrito está vacío
                 </Typography>
                 <Typography
                   variant="body1"
-                  color={colors.neutral}
+                  color="text.secondary"
                   sx={{ mb: 3, opacity: 0.7 }}
                 >
                   Descubre nuestros productos y encuentra lo que necesitas
@@ -241,8 +280,11 @@ const CarritoPage = () => {
                   size="large"
                   onClick={handleContinuarComprando}
                   sx={{
-                    backgroundColor: colors.primary,
-                    "&:hover": { backgroundColor: colors.neutral },
+                    color: theme.palette.primary.contrastText,
+                    backgroundColor: theme.palette.primary.main,
+                    "&:hover": { 
+                      backgroundColor: theme.palette.primary.dark,
+                    },
                   }}
                 >
                   Explorar Productos
@@ -263,6 +305,7 @@ const CarritoPage = () => {
                       p: 2,
                       borderRadius: 2,
                       boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      backgroundColor: theme.palette.background.paper,
                     }}
                   >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -276,11 +319,11 @@ const CarritoPage = () => {
                             width: 80,
                             height: 80,
                             borderRadius: 2,
-                            backgroundColor: colors.background,
+                            backgroundColor: theme.palette.background.default,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            border: `2px solid ${colors.secondary}`,
+                            border: `2px solid ${theme.palette.primary.main}`,
                           }}
                         >
                           {producto.imagen ? (
@@ -295,7 +338,7 @@ const CarritoPage = () => {
                               }}
                             />
                           ) : (
-                            <ShoppingBag sx={{ color: colors.neutral, opacity: 0.5 }} />
+                            <ShoppingBag sx={{ color: theme.palette.text.secondary, opacity: 0.5 }} />
                           )}
                         </Box>
                       </Badge>
@@ -304,7 +347,7 @@ const CarritoPage = () => {
                         <Typography
                           variant="h6"
                           fontWeight="bold"
-                          color={colors.primary}
+                          color="text.primary"
                           sx={{
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
@@ -318,11 +361,11 @@ const CarritoPage = () => {
                         <Typography
                           variant="h5"
                           fontWeight="bold"
-                          color={colors.accent}
+                          color="secondary.main"
                         >
                           ${producto.precio?.toLocaleString()}
                         </Typography>
-                        <Typography variant="body2" color={colors.neutral}>
+                        <Typography variant="body2" color="text.secondary">
                           Subtotal: $
                           {(producto.precio * producto.cantidad).toLocaleString()}
                         </Typography>
@@ -337,8 +380,9 @@ const CarritoPage = () => {
                             onClick={() => handleDecrementar(producto)}
                             disabled={loading || producto.cantidad <= 1}
                             sx={{
-                              border: `1px solid ${colors.neutral}`,
-                              "&:hover": { backgroundColor: colors.background },
+                              border: `1px solid ${theme.palette.divider}`,
+                              "&:hover": { backgroundColor: theme.palette.action.hover },
+                              color: theme.palette.text.primary,
                             }}
                           >
                             <Remove fontSize="small" />
@@ -347,6 +391,7 @@ const CarritoPage = () => {
                             variant="body1"
                             fontWeight="bold"
                             sx={{ minWidth: 30, textAlign: "center" }}
+                            color="text.primary"
                           >
                             {producto.cantidad}
                           </Typography>
@@ -355,8 +400,9 @@ const CarritoPage = () => {
                             onClick={() => handleIncrementar(producto)}
                             disabled={loading}
                             sx={{
-                              border: `1px solid ${colors.neutral}`,
-                              "&:hover": { backgroundColor: colors.background },
+                              border: `1px solid ${theme.palette.divider}`,
+                              "&:hover": { backgroundColor: theme.palette.action.hover },
+                              color: theme.palette.text.primary,
                             }}
                           >
                             <Add fontSize="small" />
@@ -367,8 +413,8 @@ const CarritoPage = () => {
                           onClick={() => handleEliminar(producto)}
                           disabled={loading}
                           sx={{
-                            color: colors.accent,
-                            "&:hover": { backgroundColor: "#FEE2E2" },
+                            color: theme.palette.error.main,
+                            "&:hover": { backgroundColor: theme.palette.error.light + '20' },
                           }}
                         >
                           <Delete />
@@ -393,10 +439,11 @@ const CarritoPage = () => {
                   top: 100,
                   borderRadius: 2,
                   boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  backgroundColor: theme.palette.background.paper,
                 }}
               >
                 <CardContent>
-                  <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  <Typography variant="h5" fontWeight="bold" gutterBottom color="text.primary">
                     Resumen del Pedido
                   </Typography>
                   <Box sx={{ mb: 2 }}>
@@ -407,8 +454,8 @@ const CarritoPage = () => {
                         mb: 1,
                       }}
                     >
-                      <Typography variant="body2">Productos:</Typography>
-                      <Typography variant="body2" fontWeight="bold">
+                      <Typography variant="body2" color="text.primary">Productos:</Typography>
+                      <Typography variant="body2" fontWeight="bold" color="text.primary">
                         {totalArticulos}
                       </Typography>
                     </Box>
@@ -420,46 +467,15 @@ const CarritoPage = () => {
                         alignItems: "center",
                       }}
                     >
-                      <Typography variant="h6">Total:</Typography>
+                      <Typography variant="h6" color="text.primary">Total:</Typography>
                       <Typography
                         variant="h4"
                         fontWeight="bold"
-                        sx={{ color: colors.accent }}
+                        color="secondary.main"
                       >
                         ${precioTotal?.toLocaleString()}
                       </Typography>
                     </Box>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      p: 2,
-                      backgroundColor: "#FEF3C7",
-                      borderRadius: 2,
-                      border: `1px dashed ${colors.secondary}`,
-                      mb: 2,
-                    }}
-                  >
-                    <LocalOffer sx={{ color: colors.secondary }} />
-                    <Typography
-                      variant="body2"
-                      sx={{ color: colors.neutral, flex: 1 }}
-                    >
-                      ¿Tienes un cupón de descuento?
-                    </Typography>
-                    <Button
-                      size="small"
-                      sx={{
-                        color: colors.secondary,
-                        fontWeight: "bold",
-                        textTransform: "none",
-                      }}
-                    >
-                      Aplicar
-                    </Button>
                   </Box>
 
                   <Stack spacing={1}>
@@ -470,10 +486,11 @@ const CarritoPage = () => {
                       disabled={loading}
                       onClick={handleProcederPago}
                       sx={{
-                        backgroundColor: colors.accent,
-                        "&:hover": { backgroundColor: "#991B1B" },
+                        backgroundColor: theme.palette.secondary.main,
+                        "&:hover": { backgroundColor: theme.palette.secondary.dark },
                         py: 1.5,
                         fontWeight: "bold",
+                        color: theme.palette.secondary.contrastText,
                       }}
                     >
                       Proceder al Pago
@@ -483,11 +500,11 @@ const CarritoPage = () => {
                       onClick={limpiarCarrito}
                       disabled={loading}
                       sx={{
-                        borderColor: colors.neutral,
-                        color: colors.neutral,
+                        borderColor: theme.palette.divider,
+                        color: theme.palette.text.primary,
                         "&:hover": {
-                          borderColor: colors.accent,
-                          backgroundColor: "#FEE2E2",
+                          borderColor: theme.palette.secondary.main,
+                          backgroundColor: theme.palette.action.hover,
                         },
                       }}
                     >
@@ -496,7 +513,7 @@ const CarritoPage = () => {
                     <Button
                       variant="text"
                       onClick={handleContinuarComprando}
-                      sx={{ color: colors.primary, fontWeight: "bold" }}
+                      sx={{ color: theme.palette.primary.main, fontWeight: "bold" }}
                     >
                       ← Continuar Comprando
                     </Button>
@@ -507,12 +524,12 @@ const CarritoPage = () => {
                       textAlign: "center",
                       mt: 2,
                       p: 2,
-                      backgroundColor: colors.background,
+                      backgroundColor: theme.palette.background.default,
                       borderRadius: 2,
                     }}
                   >
-                    <Typography variant="body2" color={colors.neutral}>
-                      🚚 <strong>Envío gratis</strong> en compras mayores a
+                    <Typography variant="body2" color="text.secondary">
+                       <strong>Envío gratis</strong> en compras mayores a
                       $50.000
                     </Typography>
                   </Box>
