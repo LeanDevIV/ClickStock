@@ -32,24 +32,24 @@ import useCart from "../hooks/useCart";
 
 const CartItemSkeleton = () => {
   const theme = useTheme();
-  
+
   return (
-    <Card 
-      sx={{ 
-        p: 2, 
-        borderRadius: 2, 
+    <Card
+      sx={{
+        p: 2,
+        borderRadius: 2,
         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         backgroundColor: theme.palette.background.paper,
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Skeleton 
-          variant="rectangular" 
-          width={80} 
-          height={80} 
+        <Skeleton
+          variant="rectangular"
+          width={80}
+          height={80}
           sx={{ borderRadius: 2 }}
         />
-        
+
         <Box sx={{ flex: 1 }}>
           <Skeleton variant="text" width="80%" height={32} sx={{ mb: 1 }} />
           <Skeleton variant="text" width="40%" height={28} />
@@ -71,36 +71,43 @@ const CartItemSkeleton = () => {
 
 const OrderSummarySkeleton = () => {
   const theme = useTheme();
-  
+
   return (
-    <Card 
-      sx={{ 
-        borderRadius: 2, 
+    <Card
+      sx={{
+        borderRadius: 2,
         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
         backgroundColor: theme.palette.background.paper,
       }}
     >
       <CardContent>
         <Skeleton variant="text" width="60%" height={32} sx={{ mb: 2 }} />
-        
+
         <Box sx={{ mb: 2 }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
             <Skeleton variant="text" width="30%" height={20} />
             <Skeleton variant="text" width="20%" height={20} />
           </Box>
           <Divider sx={{ my: 1 }} />
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Skeleton variant="text" width="20%" height={28} />
             <Skeleton variant="text" width="40%" height={36} />
           </Box>
         </Box>
 
-        <Box 
-          sx={{ 
-            p: 2, 
-            backgroundColor: theme.palette.mode === 'dark' ? '#2D2B1A' : '#FEF3C7', 
-            borderRadius: 2, 
-            mb: 2 
+        <Box
+          sx={{
+            p: 2,
+            backgroundColor:
+              theme.palette.mode === "dark" ? "#2D2B1A" : "#FEF3C7",
+            borderRadius: 2,
+            mb: 2,
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -111,17 +118,25 @@ const OrderSummarySkeleton = () => {
         </Box>
 
         <Stack spacing={1}>
-          <Skeleton variant="rectangular" height={48} sx={{ borderRadius: 1 }} />
-          <Skeleton variant="rectangular" height={40} sx={{ borderRadius: 1 }} />
+          <Skeleton
+            variant="rectangular"
+            height={48}
+            sx={{ borderRadius: 1 }}
+          />
+          <Skeleton
+            variant="rectangular"
+            height={40}
+            sx={{ borderRadius: 1 }}
+          />
           <Skeleton variant="text" width="50%" height={32} />
         </Stack>
 
-        <Box 
-          sx={{ 
-            mt: 2, 
-            p: 2, 
-            backgroundColor: theme.palette.background.default, 
-            borderRadius: 2 
+        <Box
+          sx={{
+            mt: 2,
+            p: 2,
+            backgroundColor: theme.palette.background.default,
+            borderRadius: 2,
           }}
         >
           <Skeleton variant="text" width="100%" height={20} />
@@ -133,8 +148,8 @@ const OrderSummarySkeleton = () => {
 
 const CarritoPage = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   const {
     articulos,
     loading,
@@ -184,8 +199,14 @@ const CarritoPage = () => {
             </Box>
           </Box>
         </Box>
-        
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            gap: 4,
+          }}
+        >
           <Box sx={{ flex: 1 }}>
             <Stack spacing={2}>
               {[...Array(3)].map((_, index) => (
@@ -208,18 +229,25 @@ const CarritoPage = () => {
           startIcon={<ArrowBack />}
           component={Link}
           to="/productos"
-          sx={{ 
-            mb: 2, 
-            color: theme.palette.text.secondary 
+          sx={{
+            mb: 2,
+            color: theme.palette.text.secondary,
           }}
         >
           Volver a productos
         </Button>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
-          <ShoppingCart sx={{ fontSize: 40, color: theme.palette.primary.main }} />
+          <ShoppingCart
+            sx={{ fontSize: 40, color: theme.palette.primary.main }}
+          />
           <Box>
-            <Typography variant="h4" component="h1" fontWeight="bold" color="text.primary">
+            <Typography
+              variant="h4"
+              component="h1"
+              fontWeight="bold"
+              color="text.primary"
+            >
               Tu Carrito de Compras
             </Typography>
             <Typography variant="h6" color="text.secondary">
@@ -239,7 +267,7 @@ const CarritoPage = () => {
           )}
         </Box>
       </Box>
-      
+
       <Box
         sx={{
           display: "flex",
@@ -282,7 +310,7 @@ const CarritoPage = () => {
                   sx={{
                     color: theme.palette.primary.contrastText,
                     backgroundColor: theme.palette.primary.main,
-                    "&:hover": { 
+                    "&:hover": {
                       backgroundColor: theme.palette.primary.dark,
                     },
                   }}
@@ -293,141 +321,159 @@ const CarritoPage = () => {
             </Card>
           ) : (
             <Stack spacing={2}>
-              {loading ? (
-                [...Array(articulos.length)].map((_, index) => (
-                  <CartItemSkeleton key={index} />
-                ))
-              ) : (
-                articulos.map((producto) => (
-                  <Card
-                    key={producto.idProducto}
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      backgroundColor: theme.palette.background.paper,
-                    }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                      <Badge
-                        badgeContent={producto.cantidad}
-                        color="error"
-                        overlap="circular"
+              {loading
+                ? [...Array(articulos.length)].map((_, index) => (
+                    <CartItemSkeleton key={index} />
+                  ))
+                : articulos.map((producto) => (
+                    <Card
+                      key={producto.idProducto}
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        backgroundColor: theme.palette.background.paper,
+                      }}
+                    >
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
                       >
-                        <Box
-                          sx={{
-                            width: 80,
-                            height: 80,
-                            borderRadius: 2,
-                            backgroundColor: theme.palette.background.default,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            border: `2px solid ${theme.palette.primary.main}`,
-                          }}
+                        <Badge
+                          badgeContent={producto.cantidad}
+                          color="error"
+                          overlap="circular"
                         >
-                          {producto.imagen ? (
-                            <img 
-                              src={producto.imagen} 
-                              alt={producto.nombre}
-                              style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                objectFit: 'cover',
-                                borderRadius: 2
-                              }}
-                            />
-                          ) : (
-                            <ShoppingBag sx={{ color: theme.palette.text.secondary, opacity: 0.5 }} />
-                          )}
-                        </Box>
-                      </Badge>
-
-                      <Box sx={{ flex: 1 }}>
-                        <Typography
-                          variant="h6"
-                          fontWeight="bold"
-                          color="text.primary"
-                          sx={{
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                            overflow: "hidden",
-                            mb: 1,
-                          }}
-                        >
-                          {producto.nombre}
-                        </Typography>
-                        <Typography
-                          variant="h5"
-                          fontWeight="bold"
-                          color="secondary.main"
-                        >
-                          ${producto.precio?.toLocaleString()}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Subtotal: $
-                          {(producto.precio * producto.cantidad).toLocaleString()}
-                        </Typography>
-                      </Box>
-
-                      <Stack spacing={1} alignItems="flex-end">
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                        >
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDecrementar(producto)}
-                            disabled={loading || producto.cantidad <= 1}
+                          <Box
                             sx={{
-                              border: `1px solid ${theme.palette.divider}`,
-                              "&:hover": { backgroundColor: theme.palette.action.hover },
-                              color: theme.palette.text.primary,
+                              width: 80,
+                              height: 80,
+                              borderRadius: 2,
+                              backgroundColor: theme.palette.background.default,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              border: `2px solid ${theme.palette.primary.main}`,
                             }}
                           >
-                            <Remove fontSize="small" />
-                          </IconButton>
+                            {producto.imagen ? (
+                              <img
+                                src={producto.imagen}
+                                alt={producto.nombre}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  borderRadius: 2,
+                                }}
+                              />
+                            ) : (
+                              <ShoppingBag
+                                sx={{
+                                  color: theme.palette.text.secondary,
+                                  opacity: 0.5,
+                                }}
+                              />
+                            )}
+                          </Box>
+                        </Badge>
+
+                        <Box sx={{ flex: 1 }}>
                           <Typography
-                            variant="body1"
+                            variant="h6"
                             fontWeight="bold"
-                            sx={{ minWidth: 30, textAlign: "center" }}
                             color="text.primary"
+                            sx={{
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                              mb: 1,
+                            }}
                           >
-                            {producto.cantidad}
+                            {producto.nombre}
                           </Typography>
+                          <Typography
+                            variant="h5"
+                            fontWeight="bold"
+                            color="secondary.main"
+                          >
+                            ${producto.precio?.toLocaleString()}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Subtotal: $
+                            {(
+                              producto.precio * producto.cantidad
+                            ).toLocaleString()}
+                          </Typography>
+                        </Box>
+
+                        <Stack spacing={1} alignItems="flex-end">
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDecrementar(producto)}
+                              disabled={loading || producto.cantidad <= 1}
+                              sx={{
+                                border: `1px solid ${theme.palette.divider}`,
+                                "&:hover": {
+                                  backgroundColor: theme.palette.action.hover,
+                                },
+                                color: theme.palette.text.primary,
+                              }}
+                            >
+                              <Remove fontSize="small" />
+                            </IconButton>
+                            <Typography
+                              variant="body1"
+                              fontWeight="bold"
+                              sx={{ minWidth: 30, textAlign: "center" }}
+                              color="text.primary"
+                            >
+                              {producto.cantidad}
+                            </Typography>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleIncrementar(producto)}
+                              disabled={loading}
+                              sx={{
+                                border: `1px solid ${theme.palette.divider}`,
+                                "&:hover": {
+                                  backgroundColor: theme.palette.action.hover,
+                                },
+                                color: theme.palette.text.primary,
+                              }}
+                            >
+                              <Add fontSize="small" />
+                            </IconButton>
+                          </Box>
                           <IconButton
                             size="small"
-                            onClick={() => handleIncrementar(producto)}
+                            onClick={() => handleEliminar(producto)}
                             disabled={loading}
                             sx={{
-                              border: `1px solid ${theme.palette.divider}`,
-                              "&:hover": { backgroundColor: theme.palette.action.hover },
-                              color: theme.palette.text.primary,
+                              color: theme.palette.error.main,
+                              "&:hover": {
+                                backgroundColor:
+                                  theme.palette.error.light + "20",
+                              },
                             }}
                           >
-                            <Add fontSize="small" />
+                            <Delete />
                           </IconButton>
-                        </Box>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEliminar(producto)}
-                          disabled={loading}
-                          sx={{
-                            color: theme.palette.error.main,
-                            "&:hover": { backgroundColor: theme.palette.error.light + '20' },
-                          }}
-                        >
-                          <Delete />
-                        </IconButton>
-                      </Stack>
-                    </Box>
-                  </Card>
-                ))
-              )}
+                        </Stack>
+                      </Box>
+                    </Card>
+                  ))}
             </Stack>
           )}
         </Box>
-        
+
         {articulos.length > 0 && (
           <Box sx={{ width: { xs: "100%", md: 400 } }}>
             {loading ? (
@@ -443,7 +489,12 @@ const CarritoPage = () => {
                 }}
               >
                 <CardContent>
-                  <Typography variant="h5" fontWeight="bold" gutterBottom color="text.primary">
+                  <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    gutterBottom
+                    color="text.primary"
+                  >
                     Resumen del Pedido
                   </Typography>
                   <Box sx={{ mb: 2 }}>
@@ -454,8 +505,14 @@ const CarritoPage = () => {
                         mb: 1,
                       }}
                     >
-                      <Typography variant="body2" color="text.primary">Productos:</Typography>
-                      <Typography variant="body2" fontWeight="bold" color="text.primary">
+                      <Typography variant="body2" color="text.primary">
+                        Productos:
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        fontWeight="bold"
+                        color="text.primary"
+                      >
                         {totalArticulos}
                       </Typography>
                     </Box>
@@ -467,7 +524,9 @@ const CarritoPage = () => {
                         alignItems: "center",
                       }}
                     >
-                      <Typography variant="h6" color="text.primary">Total:</Typography>
+                      <Typography variant="h6" color="text.primary">
+                        Total:
+                      </Typography>
                       <Typography
                         variant="h4"
                         fontWeight="bold"
@@ -487,7 +546,9 @@ const CarritoPage = () => {
                       onClick={handleProcederPago}
                       sx={{
                         backgroundColor: theme.palette.secondary.main,
-                        "&:hover": { backgroundColor: theme.palette.secondary.dark },
+                        "&:hover": {
+                          backgroundColor: theme.palette.secondary.dark,
+                        },
                         py: 1.5,
                         fontWeight: "bold",
                         color: theme.palette.secondary.contrastText,
@@ -513,7 +574,10 @@ const CarritoPage = () => {
                     <Button
                       variant="text"
                       onClick={handleContinuarComprando}
-                      sx={{ color: theme.palette.primary.main, fontWeight: "bold" }}
+                      sx={{
+                        color: theme.palette.primary.main,
+                        fontWeight: "bold",
+                      }}
                     >
                       ← Continuar Comprando
                     </Button>
@@ -529,8 +593,7 @@ const CarritoPage = () => {
                     }}
                   >
                     <Typography variant="body2" color="text.secondary">
-                       <strong>Envío gratis</strong> en compras mayores a
-                      $50.000
+                      <strong>Envío gratis</strong> en compras mayores a $50.000
                     </Typography>
                   </Box>
                 </CardContent>
