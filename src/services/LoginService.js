@@ -5,13 +5,13 @@ import clientAxios from "../utils/clientAxios";
  * @param {{ emailUsuario: string, contrasenia: string }} payload
  * @returns {Promise<object>} respuesta del servidor
  */
-export async function loginService({ emailUsuario, contrasenia }) {
+export async function loginService({ correo, contrasenia }) {
   try {
     const { data } = await clientAxios.post("/usuarios/login", {
-      emailUsuario,
+      correo,
       contrasenia,
     });
-    
+
     const token = data.token;
     const usuario = data.usuario || null;
     const msg = data.message || data.msg || null;

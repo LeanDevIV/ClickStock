@@ -7,13 +7,17 @@ import clientAxios from "../utils/clientAxios";
  */
 export async function registroService({
   nombre,
-  emailUsuario,
+  apellido,
+  correo,
+  telefono,
   contrasenia,
 }) {
   try {
     const { data } = await clientAxios.post("/usuarios/registro", {
       nombre,
-      emailUsuario,
+      apellido,
+      correo,
+      telefono,
       contrasenia,
     });
 
