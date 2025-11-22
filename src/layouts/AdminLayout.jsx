@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import clientAxios from "../utils/clientAxios";
 import { useStore } from "../hooks/useStore";
-import { Container, Spinner } from "react-bootstrap";
+import { Container, CircularProgress, Typography, Box } from "@mui/material";
 
 const AdminLayout = () => {
   const user = useStore((state) => state.user);
@@ -16,11 +16,9 @@ const AdminLayout = () => {
         return;
       }
       try {
-        // Llamada protegida sólo para validar token
         await clientAxios.get("/usuarios");
         setChecking(false);
       } catch {
-        // si el token es inválido el interceptor ya hará logout en 401, pero forzamos logout también
         logout();
         setChecking(false);
       }
@@ -34,9 +32,13 @@ const AdminLayout = () => {
 
   if (checking) {
     return (
-      <Container className="text-center py-5">
-        <Spinner animation="border" />
-        <p className="mt-3">Verificando permisos...</p>
+      <Container maxWidth="sm">
+        <Box sx={{ textAlign: "center", py: 5 }}>
+          <CircularProgress />
+          <Typography variant="body1" sx={{ mt: 3 }}>
+            Verificando permisos...
+          </Typography>
+        </Box>
       </Container>
     );
   }

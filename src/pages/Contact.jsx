@@ -1,12 +1,12 @@
-import { Container, Form, Button, Alert } from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import { Container, TextField, Button, Box, Typography } from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import "../pages/Contact.css";
 import Swal from "sweetalert2";
 
 const Contacto = () => {
   const {
-    register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -31,6 +31,7 @@ const Contacto = () => {
 
       reset();
     } catch (error) {
+      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al enviar el mensaje ❌",
@@ -72,116 +73,132 @@ const Contacto = () => {
 
           {/* FORMULARIO */}
           <div className="contact-form-box">
-            <Form onSubmit={handleSubmit(onSubmit)}>
+            <Box component="form" onSubmit={handleSubmit(onSubmit)}>
               {/* Nombre */}
-              <Form.Group className="mb-3">
-                <div className="input-with-icon">
-                  <Form.Control
-                    type="text"
+              <Controller
+                name="nombre"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: "El nombre es obligatorio",
+                  pattern: {
+                    value: /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/,
+                    message: "Solo se permiten letras y espacios",
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    margin="normal"
                     placeholder="Nombre"
-                    maxLength={40}
-                    minLength={4}
-                    {...register("nombre", {
-                      required: "El nombre es obligatorio",
-                      pattern: {
-                        value: /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+$/,
-                        message: "Solo se permiten letras y espacios",
-                      },
-                    })}
-                    isInvalid={!!errors.nombre}
+                    inputProps={{ maxLength: 40, minLength: 4 }}
+                    error={!!errors.nombre}
+                    helperText={errors.nombre?.message}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.nombre?.message}
-                  </Form.Control.Feedback>
-                </div>
-              </Form.Group>
+                )}
+              />
 
               {/* Email */}
-              <Form.Group className="mb-3">
-                <div className="input-with-icon">
-                  <Form.Control
+              <Controller
+                name="email"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: "El correo es obligatorio",
+                  pattern: {
+                    value: /\S+@\S+\.\S+/,
+                    message: "Correo inválido",
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    margin="normal"
                     type="email"
                     placeholder="Correo electrónico"
-                    {...register("email", {
-                      required: "El correo es obligatorio",
-                      pattern: {
-                        value: /\S+@\S+\.\S+/,
-                        message: "Correo inválido",
-                      },
-                    })}
-                    isInvalid={!!errors.email}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.email?.message}
-                  </Form.Control.Feedback>
-                </div>
-              </Form.Group>
+                )}
+              />
 
               {/* Asunto */}
-              <Form.Group className="mb-3">
-                <div className="input-with-icon">
-                  <Form.Control
-                    type="text"
+              <Controller
+                name="asunto"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: "El asunto es obligatorio",
+                  minLength: {
+                    value: 4,
+                    message: "Debe tener mínimo 4 caracteres",
+                  },
+                }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    margin="normal"
                     placeholder="Asunto"
-                    maxLength={80}
-                    {...register("asunto", {
-                      required: "El asunto es obligatorio",
-                      minLength: {
-                        value: 4,
-                        message: "Debe tener mínimo 4 caracteres",
-                      },
-                    })}
-                    isInvalid={!!errors.asunto}
+                    inputProps={{ maxLength: 80 }}
+                    error={!!errors.asunto}
+                    helperText={errors.asunto?.message}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.asunto?.message}
-                  </Form.Control.Feedback>
-                </div>
-              </Form.Group>
+                )}
+              />
 
               {/* Mensaje */}
-              <Form.Group className="mb-3">
-                <div className="input-with-icon textarea">
-                  <Form.Control
-                    as="textarea"
-                    rows={4}
-                    placeholder="Mensaje..."
-                    {...register("mensaje", {
-                      required: "El mensaje es obligatorio",
-                      maxLength: {
-                        value: 20,
-                        message: "Debe tener máximo 20 caracteres",
-                      },
-                      minLength: {
-                        value: 10,
-                        message: "Debe tener mínimo 10 caracteres",
-                      },
-                      validate: (value) =>
-                        value.trim().split(/\s+/).length <= 300 ||
-                        "Máximo 300 palabras",
-                    })}
-                    isInvalid={!!errors.mensaje}
-                  />
-
-                  <div className="word-counter">
-                    {mensajeValor.split(/\s+/).filter(Boolean).length}/300
-                    palabras
-                  </div>
-
-                  <Form.Control.Feedback type="invalid">
-                    {errors.mensaje?.message}
-                  </Form.Control.Feedback>
-                </div>
-              </Form.Group>
+              <Controller
+                name="mensaje"
+                control={control}
+                defaultValue=""
+                rules={{
+                  required: "El mensaje es obligatorio",
+                  maxLength: {
+                    value: 2000,
+                    message: "Debe tener máximo 2000 caracteres",
+                  },
+                  minLength: {
+                    value: 10,
+                    message: "Debe tener mínimo 10 caracteres",
+                  },
+                  validate: (value) =>
+                    value.trim().split(/\s+/).length <= 300 ||
+                    "Máximo 300 palabras",
+                }}
+                render={({ field }) => (
+                  <Box sx={{ position: "relative" }}>
+                    <TextField
+                      {...field}
+                      fullWidth
+                      margin="normal"
+                      multiline
+                      rows={4}
+                      placeholder="Mensaje..."
+                      error={!!errors.mensaje}
+                      helperText={errors.mensaje?.message}
+                    />
+                    <Typography variant="caption" className="word-counter">
+                      {mensajeValor.split(/\s+/).filter(Boolean).length}/300
+                      palabras
+                    </Typography>
+                  </Box>
+                )}
+              />
 
               <Button
                 className="send-btn"
                 type="submit"
+                variant="contained"
+                fullWidth
                 disabled={isSubmitting}
+                sx={{ mt: 2 }}
               >
                 {isSubmitting ? "Enviando..." : "Enviar mensaje"}
               </Button>
-            </Form>
+            </Box>
           </div>
         </div>
       </Container>

@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
-import { Card, Spinner, Alert } from "react-bootstrap";
-import { getReviewsByProduct, getAverageRating } from "../services/reviewService.js";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CircularProgress,
+  Alert,
+  Typography,
+  Box,
+} from "@mui/material";
+import {
+  getReviewsByProduct,
+  getAverageRating,
+} from "../services/reviewService.js";
 
 const ReviewsList = ({ productId, refreshTrigger }) => {
   const [reviews, setReviews] = useState([]);
@@ -30,30 +41,43 @@ const ReviewsList = ({ productId, refreshTrigger }) => {
     cargarReseñas();
   }, [productId, refreshTrigger]);
 
-  if (loading) return <Spinner animation="border" />;
-  if (error) return <Alert variant="danger">{error}</Alert>;
+  if (loading)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+        <CircularProgress />
+      </Box>
+    );
+  if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <div className="mt-4">
-      <h4>Reseñas</h4>
-      <p>⭐ Promedio: <strong>{average}</strong>/5</p>
+    <Box sx={{ mt: 4 }}>
+      <Typography variant="h5" gutterBottom>
+        Reseñas
+      </Typography>
+      <Typography variant="body1" gutterBottom>
+        ⭐ Promedio: <strong>{average}</strong>/5
+      </Typography>
 
       {reviews.length === 0 ? (
-        <p>No hay reseñas aún. ¡Sé el primero en comentar!</p>
+        <Typography variant="body2">
+          No hay reseñas aún. ¡Sé el primero en comentar!
+        </Typography>
       ) : (
         reviews.map((r) => (
-          <Card key={r._id} className="mb-2">
-            <Card.Body>
-              <Card.Title>{r.user}</Card.Title>
-              <Card.Subtitle className="mb-2 text-muted">
-                ⭐ {r.rating} — {new Date(r.createdAt).toLocaleDateString()}
-              </Card.Subtitle>
-              <Card.Text>{r.comment}</Card.Text>
-            </Card.Body>
+          <Card key={r._id} sx={{ mb: 2 }}>
+            <CardHeader
+              title={r.user}
+              subheader={`⭐ ${r.rating} — ${new Date(
+                r.createdAt
+              ).toLocaleDateString()}`}
+            />
+            <CardContent>
+              <Typography variant="body2">{r.comment}</Typography>
+            </CardContent>
           </Card>
         ))
       )}
-    </div>
+    </Box>
   );
 };
 

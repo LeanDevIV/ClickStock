@@ -1,15 +1,18 @@
-import { useState, useEffect } from "react";
-import clientAxios from "../utils/clientAxios";
-import Swal from "sweetalert2";
-import { Container, Row, Col } from "react-bootstrap";
+import TablaProductos from "../components/TablaProductos";
+import ModalProducto from "../components/ModalProductos";
 import {
-  Button, 
+  CircularProgress,
+  Container,
+  Grid,
+  Typography,
+  Button,
+  Box,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import ModalProducto from "../components/ModalProductos";
-import TablaProductos from "../components/TablaProductos";
-import { CircularProgress } from "@mui/material";
 import { subirMultiplesArchivos } from "../services/uploadService";
+import { useEffect, useState } from "react";
+import clientAxios from "../utils/clientAxios";
+import Swal from "sweetalert2";
 
 const ProductosAdmin = () => {
   const [productos, setProductos] = useState([]);
@@ -88,7 +91,8 @@ const ProductosAdmin = () => {
       // Asegurarse de que las imágenes sean un array
       setProductoActual({
         ...producto,
-        imagenes: producto.imagenes || (producto.imagen ? [producto.imagen] : []),
+        imagenes:
+          producto.imagenes || (producto.imagen ? [producto.imagen] : []),
       });
       setEditando(true);
     } else {
@@ -121,7 +125,9 @@ const ProductosAdmin = () => {
       setImagenesPreview([]);
 
       // Crear previews temporales
-      const previews = Array.from(files).map((file) => URL.createObjectURL(file));
+      const previews = Array.from(files).map((file) =>
+        URL.createObjectURL(file)
+      );
       setImagenesPreview(previews);
 
       // Subir archivos
@@ -135,7 +141,7 @@ const ProductosAdmin = () => {
 
       // Limpiar previews
       setImagenesPreview([]);
-      
+
       // Liberar URLs de preview
       previews.forEach((url) => URL.revokeObjectURL(url));
 
@@ -161,7 +167,7 @@ const ProductosAdmin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validar que haya al menos una imagen
     if (!productoActual.imagenes || productoActual.imagenes.length === 0) {
       Swal.fire({
@@ -200,32 +206,48 @@ const ProductosAdmin = () => {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error.response?.data?.error || "Hubo un problema al procesar la solicitud",
+        text:
+          error.response?.data?.error ||
+          "Hubo un problema al procesar la solicitud",
       });
     }
   };
 
   return (
-    <Container className="my-4">
+    <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Encabezado */}
-      <Row className="align-items-center mb-4">
-        <Col>
-          <h2 className="fw-bold text-primary mb-0">Gestión de Productos</h2>
-          <small className="text-muted">
-            Administra tus productos fácilmente
-          </small>
-        </Col>
-        <Col className="text-end">
-          <Button
-            variant="contained"
-            color="success"
-            startIcon={<AddCircleOutlineIcon />}
-            onClick={() => handleShowModal()}
+      <Box sx={{ mb: 4 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={6}>
+            <Typography
+              variant="h4"
+              component="h2"
+              color="primary"
+              fontWeight="bold"
+            >
+              Gestión de Productos
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Administra tus productos fácilmente
+            </Typography>
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={6}
+            sx={{ textAlign: { xs: "left", md: "right" } }}
           >
-            Agregar Producto
-          </Button>
-        </Col>
-      </Row>
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<AddCircleOutlineIcon />}
+              onClick={() => handleShowModal()}
+            >
+              Agregar Producto
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
 
       {/* MODAL MUI */}
       <ModalProducto
@@ -242,21 +264,24 @@ const ProductosAdmin = () => {
 
       {/* Tabla de productos */}
       {cargando ? (
-        <div className="text-center py-5">
+        <Box sx={{ textAlign: "center", py: 5 }}>
           <CircularProgress color="primary" />
-          <p className="mt-3 text-muted">Cargando productos...</p>
-        </div>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+            Cargando productos...
+          </Typography>
+        </Box>
       ) : productos.length === 0 ? (
-        <div className="text-center py-5 text-muted">
-          <p>No hay productos cargados aún.</p>
-        </div>
+        <Box sx={{ textAlign: "center", py: 5 }}>
+          <Typography variant="body1" color="text.secondary">
+            No hay productos cargados aún.
+          </Typography>
+        </Box>
       ) : (
         <TablaProductos
-        productos={productos}
-        handleShowModal={handleShowModal}
-        eliminarProducto={eliminarProducto}
-      />
-        
+          productos={productos}
+          handleShowModal={handleShowModal}
+          eliminarProducto={eliminarProducto}
+        />
       )}
     </Container>
   );

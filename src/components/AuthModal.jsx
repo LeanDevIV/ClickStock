@@ -1,91 +1,98 @@
-import React, { useState } from "react";
-import { Modal, Container, Row, Col } from "react-bootstrap";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Box,
+  Tabs,
+  Tab,
+} from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
 import RegistroForm from "./RegistroForm";
 import LoginForm from "./LoginForm";
-import "./AuthModal.css"; // ⬅️ estilos manuales
+import "./AuthModal.css";
 
-function AuthModal({ show, onHide }) {
-  const [modo, setModo] = useState("login");
+function AuthModal({ show, handleClose }) {
+  const [modo, setModo] = useState(0); // 0 = login, 1 = registro
   const [mensaje, setMensaje] = useState("");
-  const [animacion, setAnimacion] = useState("slide-in");
 
-  const cambiarModo = (nuevoModo) => {
-    if (nuevoModo === modo) return;
-
-    setAnimacion("slide-out");
-
-    setTimeout(() => {
-      setModo(nuevoModo);
-      setMensaje("");
-      setAnimacion("slide-in");
-    }, 300);
+  const handleTabChange = (event, newValue) => {
+    setModo(newValue);
+    setMensaje("");
   };
 
   const handleSuccess = () => {
     setMensaje("✔ Operación exitosa!");
     setTimeout(() => {
-      onHide();
+      handleClose();
     }, 700);
   };
 
   return (
-    <Modal show={!!show} onHide={onHide} dialogClassName="modal-dialog-top">
-      <Modal.Header closeButton>
-        <Modal.Title>Mi Cuenta</Modal.Title>
-      </Modal.Header>
+    <Dialog
+      open={!!show}
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          m: 0,
+          p: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        Mi Cuenta
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
 
-      <Modal.Body>
-        <Container>
-          {/* === ❗ NUEVAS TABS PERSONALIZADAS === */}
-          <div className="custom-tabs">
-            <button
-              className={`tab-btn ${modo === "login" ? "active" : ""}`}
-              onClick={() => cambiarModo("login")}
-            >
-              Iniciar Sesión
-            </button>
+      <DialogContent dividers>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+          <Tabs value={modo} onChange={handleTabChange} centered>
+            <Tab label="Iniciar Sesión" />
+            <Tab label="Registrarse" />
+          </Tabs>
+        </Box>
 
-            <button
-              className={`tab-btn ${modo === "registro" ? "active" : ""}`}
-              onClick={() => cambiarModo("registro")}
-            >
-              Registrarse
-            </button>
+        {mensaje && (
+          <Box
+            sx={{
+              mb: 2,
+              p: 2,
+              bgcolor: "success.light",
+              borderRadius: 1,
+              textAlign: "center",
+            }}
+          >
+            {mensaje}
+          </Box>
+        )}
 
-            <div
-              className="tab-underline"
-              style={{
-                left: modo === "login" ? "0%" : "50%",
-              }}
-            />
-          </div>
-
-          {/* === ALERTA === */}
-          {mensaje && (
-            <Row>
-              <Col>
-                <div
-                  className={`alert ${
-                    mensaje.includes("Error") ? "alert-danger" : "alert-success"
-                  }`}
-                >
-                  {mensaje}
-                </div>
-              </Col>
-            </Row>
+        <Box>
+          {modo === 0 ? (
+            <LoginForm setMensaje={setMensaje} onSuccess={handleSuccess} />
+          ) : (
+            <RegistroForm setMensaje={setMensaje} onSuccess={handleSuccess} />
           )}
-
-          {/* === FORMULARIO CON ANIMACIÓN === */}
-          <div className={`form-slide ${animacion}`}>
-            {modo === "login" ? (
-              <LoginForm setMensaje={setMensaje} onSuccess={handleSuccess} />
-            ) : (
-              <RegistroForm setMensaje={setMensaje} onSuccess={handleSuccess} />
-            )}
-          </div>
-        </Container>
-      </Modal.Body>
-    </Modal>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 }
 
