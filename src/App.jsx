@@ -7,10 +7,11 @@ import ProductosRender from "./components/ProductosRender.jsx";
 import { getCustomTheme } from "./styles/customTheme";
 import { globalStyles } from "./styles/globalStyles";
 import FloatingChat from "./components/Chatbot.jsx";
+import { getItem, setItem } from "./utils/localStorageHelper";
 
 function App() {
   const [modoOscuro, setModoOscuro] = useState(() => {
-    return localStorage.getItem("modoOscuro") === "true";
+    return getItem("modoOscuro", false); // Retorna boolean directamente
   });
 
   const theme = useMemo(() => getCustomTheme(modoOscuro), [modoOscuro]);
@@ -18,7 +19,7 @@ function App() {
   const toggleModo = () => {
     setModoOscuro((prev) => {
       const nuevoModo = !prev;
-      localStorage.setItem("modoOscuro", nuevoModo);
+      setItem("modoOscuro", nuevoModo); // Guarda boolean directamente
       return nuevoModo;
     });
   };

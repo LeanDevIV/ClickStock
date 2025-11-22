@@ -1,15 +1,15 @@
 import axios from "axios";
 import { useStore } from "../hooks/useStore";
+import { getItem } from "./localStorageHelper";
 
 const clientAxios = axios.create({
-
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   headers: { "Content-Type": "application/json" },
 });
 
 // 🔹 Interceptor para incluir token si existe
 clientAxios.interceptors.request.use((config) => {
-  const token = useStore.getState().token || localStorage.getItem("token");
+  const token = useStore.getState().token || getItem("token", null);
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
