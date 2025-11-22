@@ -1,72 +1,61 @@
-// src/pages/ProductList.jsx
 import React from "react";
-import { Container, Typography, Box } from "@mui/material";
+import { Container, Typography, Box, useTheme, Paper } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import Products from "../components/ProductosRender"; // 👈 Importa tu componente renderizador
+import Products from "../components/ProductosRender";
 
 const ProductList = () => {
+  const theme = useTheme();
+
   return (
-    <Container
-      maxWidth="xl"
-      sx={{
-        py: 6,
-        position: "relative",
-        overflow: "hidden",
-        background: "linear-gradient(135deg, #fafafa 0%, #fef2f2 100%)",
-        borderRadius: "20px",
-        boxShadow: "0 8px 30px rgba(185, 28, 28, 0.15)",
-        border: "1px solid rgba(185, 28, 28, 0.1)",
-        minHeight: "100vh",
-      }}
-    >
-      {/* Título principal */}
-      <Box
-        sx={{
-          textAlign: "center",
-          mb: 5,
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Paper 
+        elevation={3}
+        sx={{ 
+          p: 4,
+          borderRadius: 3,
+          background: theme.palette.background.paper,
+          minHeight: "80vh",
         }}
       >
-        <Typography
-          variant="h3"
-          sx={{
-            fontWeight: 800,
-            fontSize: { xs: "2rem", md: "2.8rem" },
-            background:
-              "linear-gradient(135deg, #1f2937 0%, #374151 50%, #b91c1c 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 1,
-          }}
-        >
-          <ShoppingBagIcon
+        {/* Título principal */}
+        <Box sx={{ textAlign: "center", mb: 5 }}>
+          <Typography
+            variant="h3"
+            component="h1"
             sx={{
-              color: "#b91c1c",
-              fontSize: "2.5rem",
-              animation: "bounceIcon 2s infinite ease-in-out",
+              fontWeight: 800,
+              fontSize: { xs: "2rem", md: "2.8rem" },
+              background: theme.palette.mode === 'dark'
+                ? 'linear-gradient(45deg, #D4AF37, #FFD700)'
+                : 'linear-gradient(45deg, #B91C1C, #D4AF37)',
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+              mb: 2,
+            }}
+          >
+            <ShoppingBagIcon sx={{ fontSize: "2.5rem" }} />
+            Catálogo de Productos
+          </Typography>
+
+          <Box
+            sx={{
+              width: "120px",
+              height: "4px",
+              background: theme.palette.primary.main,
+              borderRadius: "10px",
+              mx: "auto",
+              opacity: 0.7,
             }}
           />
-          Catálogo de Productos
-        </Typography>
+        </Box>
 
-        <Box
-          sx={{
-            width: "120px",
-            height: "5px",
-            background:
-              "linear-gradient(90deg, transparent, #dc2626, #b91c1c, #dc2626, transparent)",
-            borderRadius: "10px",
-            mx: "auto",
-            mt: 1.5,
-            animation: "shimmerBar 3s infinite ease-in-out",
-          }}
-        />
-      </Box>
-
-      {/* Render del componente de productos */}
-      <Products />
+        {/* Render del componente de productos */}
+        <Products />
+      </Paper>
     </Container>
   );
 };

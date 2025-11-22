@@ -6,20 +6,40 @@ export const useStore = create(
     (set) => ({
       user: null,
       token: null,
+      cart: {
+        productos: [],
+        total: 0,
+        totalArticulos: 0,
+        cargando: false
+      },
 
-      // 🔹 Guarda el usuario y token
       setUser: (userData, token) => {
         set({ user: userData, token });
       },
 
-      // 🔹 Limpia la sesión (logout)
+      // 🔹 Limpia la sesión (logout) 
       logout: () => {
-        set({ user: null, token: null });
+        set({ 
+          user: null, 
+          token: null,
+          cart: {
+            productos: [],
+            total: 0,
+            totalArticulos: 0,
+            cargando: false
+          }
+        });
       },
+      setCart: (cart) => set({ cart }),
+
+      setCartLoading: (cargando) => set((state) => ({ 
+        cart: { ...state.cart, cargando } 
+      })),
+
     }),
     {
-      name: "auth-storage", // nombre del storage
-      getStorage: () => localStorage, // usa localStorage
+      name: "auth-storage",
+      getStorage: () => localStorage,
     }
   )
 );
