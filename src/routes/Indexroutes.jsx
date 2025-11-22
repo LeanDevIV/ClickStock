@@ -12,9 +12,7 @@ import TablaPedidos from "../pages/admin/tablaPedidos";
 import ScrollToTop from "../components/ScrollToTop.jsx";
 import ProductList from "../pages/ProductList"; // ✅ Importamos la página de productos
 import PromocionesForm from "../pages/PromocionesForm.jsx";
-import TestCompartir from "../components/testPrueba.jsx"
-import ProductList from "../pages/ProductList";
-
+import TestCompartir from "../components/testPrueba.jsx";
 
 function IndexRoutes({ modoOscuro, toggleModo }) {
   return (
