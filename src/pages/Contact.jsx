@@ -148,6 +148,10 @@ const Contacto = () => {
                     placeholder="Mensaje..."
                     {...register("mensaje", {
                       required: "El mensaje es obligatorio",
+                      maxLength: {
+                        value: 20,
+                        message: "Debe tener máximo 20 caracteres",
+                      },
                       minLength: {
                         value: 10,
                         message: "Debe tener mínimo 10 caracteres",
