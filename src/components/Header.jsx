@@ -17,7 +17,7 @@ import {
   Brightness4,
   Search as SearchIcon,
   AdminPanelSettings,
-  ShoppingCart, 
+  ShoppingCart,
 } from "@mui/icons-material";
 import { useStore } from "../hooks/useStore";
 import { useScrollDirection } from "../hooks/useScrollDirection";
@@ -156,8 +156,8 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                     "&:hover": {
                       backgroundColor: modoOscuro
                         ? "rgba(255, 255, 255, 0.1)"
-                        : "rgba(0, 0, 0, 0.1)"
-                    }
+                        : "rgba(0, 0, 0, 0.1)",
+                    },
                   }}
                 >
                   <Badge
@@ -165,11 +165,11 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                     color="error"
                     sx={{
                       "& .MuiBadge-badge": {
-                        fontSize: '0.7rem',
-                        fontWeight: 'bold',
-                        minWidth: '18px',
-                        height: '18px',
-                      }
+                        fontSize: "0.7rem",
+                        fontWeight: "bold",
+                        minWidth: "18px",
+                        height: "18px",
+                      },
                     }}
                   >
                     <ShoppingCart />
@@ -196,10 +196,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   handleLogout={handleLogout}
                 />
               ) : (
-                <Button
-                  onClick={() => setShowAuthModal(true)}
-                  className="ms-2 px-4"
-                >
+                <Button onClick={handleOpenAuth} className="ms-2 px-4">
                   Iniciar sesión
                 </Button>
               )}
@@ -207,7 +204,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <RegistroLogin show={showAuthModal} onHide={handleCloseAuth} />
+      <AuthModal show={showAuthModal} onHide={handleCloseAuth} />
     </>
   );
 };

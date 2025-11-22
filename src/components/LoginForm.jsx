@@ -1,40 +1,31 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { TextField, Button, Box, InputAdornment } from "@mui/material";
 import { Email, Lock } from "@mui/icons-material";
 import { useStore } from "../hooks/useStore";
 import { loginService } from "../services/LoginService";
 
-function LoginForm({ setMensaje }) {
-  const [formData, setFormData] = useState({
-    correo: "",
-    contrasenia: "",
-  });
+function LoginForm({ setMensaje, onSuccess }) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const [cargando, setCargando] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.correo || !formData.contrasenia) {
-      setMensaje("Completa todos los campos.");
-      return;
-    }
-
+  const onSubmit = async (data) => {
     try {
       setCargando(true);
-      const data = await loginService(formData);
+      const response = await loginService(data);
 
-      setMensaje(data.msg || "Inicio de sesión exitoso");
+      setMensaje(response.msg || "Inicio de sesión exitoso");
 
-      if (data.usuario || data.token) {
-        useStore.getState().setUser(data.usuario, data.token);
+      if (response.usuario || response.token) {
+        useStore.getState().setUser(response.usuario, response.token);
       }
 
-      setFormData({ correo: "", contrasenia: "" });
+      if (onSuccess) onSuccess();
     } catch (error) {
       setMensaje(error.message || "Correo o contraseña incorrectos.");
     } finally {
@@ -43,16 +34,21 @@ function LoginForm({ setMensaje }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
       <TextField
         fullWidth
         label="Correo electrónico"
-        name="correo"
         type="email"
         margin="normal"
-        value={formData.correo}
-        onChange={handleChange}
-        required
+        {...register("correo", {
+          required: "El correo es requerido",
+          pattern: {
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            message: "Dirección de correo inválida",
+          },
+        })}
+        error={!!errors.correo}
+        helperText={errors.correo?.message}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -65,12 +61,11 @@ function LoginForm({ setMensaje }) {
       <TextField
         fullWidth
         label="Contraseña"
-        name="contrasenia"
         type="password"
         margin="normal"
-        value={formData.contrasenia}
-        onChange={handleChange}
-        required
+        {...register("contrasenia", { required: "La contraseña es requerida" })}
+        error={!!errors.contrasenia}
+        helperText={errors.contrasenia?.message}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">

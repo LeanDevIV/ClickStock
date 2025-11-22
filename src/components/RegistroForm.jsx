@@ -1,78 +1,39 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { TextField, Button, Box, InputAdornment } from "@mui/material";
 import { Person, Email, Lock } from "@mui/icons-material";
 import { useStore } from "../hooks/useStore";
 import { registroService } from "../services/RegistroService";
 
-function RegistroForm({ setMensaje }) {
-  const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    correo: "",
-    telefono: "",
-    contrasenia: "",
-    confirmarContrasenia: "",
-  });
+function RegistroForm({ setMensaje, onSuccess }) {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
 
   const [cargando, setCargando] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const {
-      nombre,
-      apellido,
-      correo,
-      telefono,
-      contrasenia,
-      confirmarContrasenia,
-    } = formData;
-
-    if (
-      !nombre ||
-      !apellido ||
-      !correo ||
-      !contrasenia ||
-      !confirmarContrasenia
-    ) {
-      setMensaje("Por favor completa todos los campos.");
-      return;
-    }
-
-    if (contrasenia !== confirmarContrasenia) {
-      setMensaje("Las contraseñas no coinciden.");
-      return;
-    }
-
+  const onSubmit = async (data) => {
     try {
       setCargando(true);
 
-      const data = await registroService({
-        nombre,
-        apellido,
-        correo,
-        telefono,
-        contrasenia,
+      const response = await registroService({
+        nombre: data.nombre,
+        apellido: data.apellido,
+        correo: data.correo,
+        telefono: data.telefono,
+        contrasenia: data.contrasenia,
       });
 
-      setMensaje(data.msg || "Registro exitoso");
+      setMensaje(response.msg || "Registro exitoso");
 
-      if (data.usuario || data.token) {
-        useStore.getState().setUser(data.usuario, data.token);
+      if (response.usuario || response.token) {
+        useStore.getState().setUser(response.usuario, response.token);
       }
 
-      setFormData({
-        nombre: "",
-        apellido: "",
-        correo: "",
-        telefono: "",
-        contrasenia: "",
-        confirmarContrasenia: "",
-      });
+      if (onSuccess) onSuccess();
     } catch (error) {
       setMensaje(error.message || "Error en el registro.");
     } finally {
@@ -81,15 +42,14 @@ function RegistroForm({ setMensaje }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
       <TextField
         fullWidth
         label="Nombre"
-        name="nombre"
         margin="normal"
-        value={formData.nombre}
-        onChange={handleChange}
-        required
+        {...register("nombre", { required: "El nombre es requerido" })}
+        error={!!errors.nombre}
+        helperText={errors.nombre?.message}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -102,11 +62,10 @@ function RegistroForm({ setMensaje }) {
       <TextField
         fullWidth
         label="Apellido"
-        name="apellido"
         margin="normal"
-        value={formData.apellido}
-        onChange={handleChange}
-        required
+        {...register("apellido", { required: "El apellido es requerido" })}
+        error={!!errors.apellido}
+        helperText={errors.apellido?.message}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -119,10 +78,10 @@ function RegistroForm({ setMensaje }) {
       <TextField
         fullWidth
         label="Teléfono"
-        name="telefono"
         margin="normal"
-        value={formData.telefono}
-        onChange={handleChange}
+        {...register("telefono")}
+        error={!!errors.telefono}
+        helperText={errors.telefono?.message}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -135,12 +94,17 @@ function RegistroForm({ setMensaje }) {
       <TextField
         fullWidth
         label="Correo electrónico"
-        name="correo"
         type="email"
         margin="normal"
-        value={formData.correo}
-        onChange={handleChange}
-        required
+        {...register("correo", {
+          required: "El correo es requerido",
+          pattern: {
+            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+            message: "Dirección de correo inválida",
+          },
+        })}
+        error={!!errors.correo}
+        helperText={errors.correo?.message}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -153,12 +117,11 @@ function RegistroForm({ setMensaje }) {
       <TextField
         fullWidth
         label="Contraseña"
-        name="contrasenia"
         type="password"
         margin="normal"
-        value={formData.contrasenia}
-        onChange={handleChange}
-        required
+        {...register("contrasenia", { required: "La contraseña es requerida" })}
+        error={!!errors.contrasenia}
+        helperText={errors.contrasenia?.message}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -171,12 +134,18 @@ function RegistroForm({ setMensaje }) {
       <TextField
         fullWidth
         label="Confirmar contraseña"
-        name="confirmarContrasenia"
         type="password"
         margin="normal"
-        value={formData.confirmarContrasenia}
-        onChange={handleChange}
-        required
+        {...register("confirmarContrasenia", {
+          required: "Confirma tu contraseña",
+          validate: (val) => {
+            if (watch("contrasenia") != val) {
+              return "Las contraseñas no coinciden";
+            }
+          },
+        })}
+        error={!!errors.confirmarContrasenia}
+        helperText={errors.confirmarContrasenia?.message}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
