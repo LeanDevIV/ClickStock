@@ -29,7 +29,11 @@ export async function registroService({
   } catch (error) {
     // Normalizar el error para que el componente lo muestre
     const mensaje =
-      error.response?.data?.msg || error.message || "Error en el registro";
+      error.response?.data?.msg ||
+      error.response?.data?.message ||
+      error.response?.data?.error?.message ||
+      error.message ||
+      "Error en el registro";
     throw new Error(mensaje);
   }
 }
