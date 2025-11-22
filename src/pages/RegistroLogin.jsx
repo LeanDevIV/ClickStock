@@ -6,12 +6,17 @@ import { registroService } from "../services/RegistroService";
 
 function RegistroLogin({ show, onHide }) {
   const [modo, setModo] = useState("login");
+  const [mensaje, setMensaje] = useState("");
+
   React.useEffect(() => {
-  if (show) setModo("login");
-}, [show]);
+    if (show) setModo("login");
+  }, [show]);
+
   const [formData, setFormData] = useState({
     nombre: "",
-    emailUsuario: "",
+    apellido: "",
+    correo: "",
+    telefono: "",
     contrasenia: "",
     confirmarContrasenia: "",
   });
@@ -24,10 +29,22 @@ function RegistroLogin({ show, onHide }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { nombre, emailUsuario, contrasenia, confirmarContrasenia } =
-      formData;
+    const {
+      nombre,
+      apellido,
+      correo,
+      telefono,
+      contrasenia,
+      confirmarContrasenia,
+    } = formData;
 
-    if (!nombre || !emailUsuario || !contrasenia || !confirmarContrasenia) {
+    if (
+      !nombre ||
+      !apellido ||
+      !correo ||
+      !contrasenia ||
+      !confirmarContrasenia
+    ) {
       setMensaje("Por favor completa todos los campos.");
       return;
     }
@@ -41,7 +58,9 @@ function RegistroLogin({ show, onHide }) {
       setCargando(true);
       const data = await registroService({
         nombre,
-        emailUsuario,
+        apellido,
+        correo,
+        telefono,
         contrasenia,
       });
 
@@ -54,7 +73,9 @@ function RegistroLogin({ show, onHide }) {
       // Limpiar
       setFormData({
         nombre: "",
-        emailUsuario: "",
+        apellido: "",
+        correo: "",
+        telefono: "",
         contrasenia: "",
         confirmarContrasenia: "",
       });
@@ -67,8 +88,9 @@ function RegistroLogin({ show, onHide }) {
 
   return (
     <Form onSubmit={handleSubmit}>
+      {mensaje && <div className="alert alert-info">{mensaje}</div>}
       <Form.Group className="mb-3">
-        <Form.Label>Nombre completo</Form.Label>
+        <Form.Label>Nombre</Form.Label>
         <div className="input-group">
           <span className="input-group-text">
             <PersonFill />
@@ -84,6 +106,37 @@ function RegistroLogin({ show, onHide }) {
       </Form.Group>
 
       <Form.Group className="mb-3">
+        <Form.Label>Apellido</Form.Label>
+        <div className="input-group">
+          <span className="input-group-text">
+            <PersonFill />
+          </span>
+          <Form.Control
+            type="text"
+            name="apellido"
+            value={formData.apellido}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Teléfono</Form.Label>
+        <div className="input-group">
+          <span className="input-group-text">
+            <PersonFill />
+          </span>
+          <Form.Control
+            type="text"
+            name="telefono"
+            value={formData.telefono}
+            onChange={handleChange}
+          />
+        </div>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
         <Form.Label>Correo electrónico</Form.Label>
         <div className="input-group">
           <span className="input-group-text">
@@ -91,8 +144,8 @@ function RegistroLogin({ show, onHide }) {
           </span>
           <Form.Control
             type="email"
-            name="emailUsuario"
-            value={formData.emailUsuario}
+            name="correo"
+            value={formData.correo}
             onChange={handleChange}
             required
           />

@@ -8,7 +8,8 @@ function RegistroForm({ setMensaje }) {
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
-    emailUsuario: "",
+    correo: "",
+    telefono: "",
     contrasenia: "",
     confirmarContrasenia: "",
   });
@@ -25,7 +26,8 @@ function RegistroForm({ setMensaje }) {
     const {
       nombre,
       apellido,
-      emailUsuario,
+      correo,
+      telefono,
       contrasenia,
       confirmarContrasenia,
     } = formData;
@@ -33,7 +35,7 @@ function RegistroForm({ setMensaje }) {
     if (
       !nombre ||
       !apellido ||
-      !emailUsuario ||
+      !correo ||
       !contrasenia ||
       !confirmarContrasenia
     ) {
@@ -52,7 +54,8 @@ function RegistroForm({ setMensaje }) {
       const data = await registroService({
         nombre,
         apellido,
-        emailUsuario,
+        correo,
+        telefono,
         contrasenia,
       });
 
@@ -65,7 +68,8 @@ function RegistroForm({ setMensaje }) {
       setFormData({
         nombre: "",
         apellido: "",
-        emailUsuario: "",
+        correo: "",
+        telefono: "",
         contrasenia: "",
         confirmarContrasenia: "",
       });
@@ -114,11 +118,27 @@ function RegistroForm({ setMensaje }) {
 
       <TextField
         fullWidth
+        label="Teléfono"
+        name="telefono"
+        margin="normal"
+        value={formData.telefono}
+        onChange={handleChange}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Person />
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      <TextField
+        fullWidth
         label="Correo electrónico"
-        name="emailUsuario"
+        name="correo"
         type="email"
         margin="normal"
-        value={formData.emailUsuario}
+        value={formData.correo}
         onChange={handleChange}
         required
         InputProps={{

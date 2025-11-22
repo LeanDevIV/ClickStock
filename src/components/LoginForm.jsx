@@ -6,7 +6,7 @@ import { loginService } from "../services/LoginService";
 
 function LoginForm({ setMensaje }) {
   const [formData, setFormData] = useState({
-    emailUsuario: "",
+    correo: "",
     contrasenia: "",
   });
 
@@ -19,7 +19,7 @@ function LoginForm({ setMensaje }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.emailUsuario || !formData.contrasenia) {
+    if (!formData.correo || !formData.contrasenia) {
       setMensaje("Completa todos los campos.");
       return;
     }
@@ -34,7 +34,7 @@ function LoginForm({ setMensaje }) {
         useStore.getState().setUser(data.usuario, data.token);
       }
 
-      setFormData({ emailUsuario: "", contrasenia: "" });
+      setFormData({ correo: "", contrasenia: "" });
     } catch (error) {
       setMensaje(error.message || "Correo o contraseña incorrectos.");
     } finally {
@@ -47,10 +47,10 @@ function LoginForm({ setMensaje }) {
       <TextField
         fullWidth
         label="Correo electrónico"
-        name="emailUsuario"
+        name="correo"
         type="email"
         margin="normal"
-        value={formData.emailUsuario}
+        value={formData.correo}
         onChange={handleChange}
         required
         InputProps={{
