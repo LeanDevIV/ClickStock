@@ -267,18 +267,16 @@ const TablaPedidos = () => {
 
                       <TableCell className="tabla-celda tabla-celda-cliente">
                         <Typography className="texto-cliente">
-                          {pedido.usuario?.nombre ||
-                            "Cliente no disponible"}
+                          {pedido.usuario?.nombre || "Cliente no disponible"}
+                          {pedido.usuario?.correo || "Email no disponible"}
                         </Typography>
                         <Typography
                           className="texto-email"
                           title={
-                            pedido.usuario?.emailUsuario ||
-                            "Email no disponible"
+                            pedido.usuario?.correo || "Email no disponible"
                           }
                         >
-                          {pedido.usuario?.emailUsuario ||
-                            "Email no disponible"}
+                          {pedido.usuario?.correo || "Email no disponible"}
                         </Typography>
                       </TableCell>
 
