@@ -1,0 +1,66 @@
+/* ===== TABS PERSONALIZADAS ===== */
+.custom-tabs {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  font-size: 17px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: color .25s ease;
+}
+
+.tab-btn:hover {
+  color: #111;
+}
+
+.tab-btn.active {
+  color: #B91C1C;
+}
+
+/* Línea animada */
+.tab-underline {
+  position: absolute;
+  bottom: -2px;
+  width: 50%;
+  height: 3px;
+  background: #B91C1C;
+  transition: left .3s ease;
+  border-radius: 50px;
+}
+
+/* ===== ANIMACIÓN DEL FORMULARIO ===== */
+.form-slide {
+  min-height: 260px;
+  transition: all .3s ease;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(15px);
+}
+
+.form-slide.slide-in {
+  opacity: 1;
+  transform: translateY(0px);
+}
+
+.form-slide.slide-out {
+  opacity: 0;
+  transform: translateY(15px);
+}
+
+/* Ajuste general */
+.alert {
+  padding: 10px;
+  font-size: 14px;
+}

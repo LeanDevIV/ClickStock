@@ -34,7 +34,13 @@ import { toast } from "react-hot-toast";
 import clientaxios from "../../utils/clientAxios.js";
 import "../../css/editarPedidosModal.css";
 
-const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado,setPedidos }) => {
+const EditarPedidosModal = ({
+  show,
+  onHide,
+  pedido,
+  onPedidoEditado,
+  setPedidos,
+}) => {
   const [formData, setFormData] = useState({
     direccionEnvio: "",
     estado: "pendiente",
@@ -126,27 +132,31 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado,setPedidos }
 
     return "";
   };
- const manejarEliminarPedido = async (pedido) => {
-  if (!window.confirm("¿Seguro que deseas eliminar este pedido?")) return;
-  try {
-    for (const item of pedido.productos) {
-      const productoId = item.producto?._id || item.producto;
-      const cantidad = item.cantidad;
-      const { data: producto } = await clientaxios.get(`/productos/${productoId}`);
-      const nuevoStock = producto.stock + cantidad;
-      await clientaxios.put(`/productos/${productoId}`, { stock: nuevoStock });
+  const manejarEliminarPedido = async (pedido) => {
+    if (!window.confirm("¿Seguro que deseas eliminar este pedido?")) return;
+    try {
+      for (const item of pedido.productos) {
+        const productoId = item.producto?._id || item.producto;
+        const cantidad = item.cantidad;
+        const { data: producto } = await clientaxios.get(
+          `/productos/${productoId}`
+        );
+        const nuevoStock = producto.stock + cantidad;
+        await clientaxios.put(`/productos/${productoId}`, {
+          stock: nuevoStock,
+        });
+      }
+
+      await clientaxios.delete(`/pedidos/${pedido._id}`);
+      setPedidos((prev) => prev.filter((p) => p._id !== pedido._id));
+
+      toast.success("Pedido eliminado correctamente y stock restaurado");
+      onHide();
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al eliminar pedido o actualizar stock");
     }
-
-    await clientaxios.delete(`/pedidos/${pedido._id}`);
-    setPedidos((prev) => prev.filter((p) => p._id !== pedido._id)); 
-
-    toast.success("Pedido eliminado correctamente y stock restaurado");
-    onHide(); 
-  } catch (error) {
-    console.error(error);
-    toast.error("Error al eliminar pedido o actualizar stock");
-  }
-};
+  };
   const manejarCambioDireccion = (e) => {
     const nuevaDireccion = e.target.value;
     setFormData({ ...formData, direccionEnvio: nuevaDireccion });
@@ -168,7 +178,7 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado,setPedidos }
       pedido?.productos?.find(
         (item) => (item.producto?._id || item.producto) === productoId
       )?.cantidad || 0;
-  
+
     const productosActualizados = [...formData.productos];
     productosActualizados[index] = {
       ...productosActualizados[index],
@@ -350,10 +360,10 @@ const EditarPedidosModal = ({ show, onHide, pedido, onPedidoEditado,setPedidos }
                   variant="h6"
                   className="valor-dato valor-dato-cliente"
                 >
-                  {pedido.usuario?.nombreUsuario || "Cliente no especificado"}
+                  {pedido.usuario?.nombre || "Cliente no especificado"}
                 </Typography>
                 <Typography variant="body2" className="texto-email">
-                  {pedido.usuario?.emailUsuario || "Email no disponible"}
+                  {pedido.usuario?.correo || "Email no disponible"}
                 </Typography>
               </Box>
             </Grid>

@@ -20,9 +20,9 @@ const AdminUsuarios = () => {
   const [showModal, setShowModal] = useState(false);
   const [editando, setEditando] = useState(false);
   const [usuarioActual, setUsuarioActual] = useState({
-    nombreUsuario: "",
-    emailUsuario: "",
-    rolUsuario: "usuario",
+    nombre: "",
+    correo: "",
+    rol: "usuario",
     contrasenia: "",
   });
 
@@ -71,9 +71,9 @@ const AdminUsuarios = () => {
     setShowModal(false);
     setEditando(false);
     setUsuarioActual({
-      nombreUsuario: "",
-      emailUsuario: "",
-      rolUsuario: "usuario",
+      nombre: "",
+      correo: "",
+      rol: "usuario",
       contrasenia: "",
     });
   };
@@ -113,20 +113,25 @@ const AdminUsuarios = () => {
       await obtenerUsuarios();
     } catch (error) {
       console.error("Error:", error);
-      const message = error.response?.data?.message || "Hubo un problema al procesar la solicitud";
+      const message =
+        error.response?.data?.message ||
+        "Hubo un problema al procesar la solicitud";
       Swal.fire("Error", message, "error");
     }
   };
 
   const cambiarRol = async (usuario) => {
-    const nuevoRol = usuario.rolUsuario === "admin" ? "usuario" : "admin";
+    const nuevoRol = usuario.rol === "admin" ? "usuario" : "admin";
     try {
-      const { data } = await clientAxios.put(`/usuarios/${usuario._id}/rol`, { rolUsuario: nuevoRol });
+      const { data } = await clientAxios.put(`/usuarios/${usuario._id}/rol`, {
+        rol: nuevoRol,
+      });
       Swal.fire("¡Listo!", data.message || "Rol actualizado", "success");
       await obtenerUsuarios();
     } catch (error) {
       console.error("Error al cambiar rol:", error);
-      const message = error.response?.data?.message || "No se pudo cambiar el rol";
+      const message =
+        error.response?.data?.message || "No se pudo cambiar el rol";
       Swal.fire("Error", message, "error");
     }
   };
@@ -151,7 +156,9 @@ const AdminUsuarios = () => {
 
       <Modal show={showModal} onHide={handleCloseModal} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>{editando ? "Editar Usuario" : "Crear Nuevo Usuario"}</Modal.Title>
+          <Modal.Title>
+            {editando ? "Editar Usuario" : "Crear Nuevo Usuario"}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
@@ -159,8 +166,8 @@ const AdminUsuarios = () => {
               <Form.Label>Nombre de Usuario</Form.Label>
               <Form.Control
                 type="text"
-                name="nombreUsuario"
-                value={usuarioActual.nombreUsuario}
+                name="nombre"
+                value={usuarioActual.nombre}
                 onChange={handleInputChange}
                 required
               />
@@ -170,8 +177,8 @@ const AdminUsuarios = () => {
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
-                name="emailUsuario"
-                value={usuarioActual.emailUsuario}
+                name="correo"
+                value={usuarioActual.correo}
                 onChange={handleInputChange}
                 required
               />
@@ -179,14 +186,20 @@ const AdminUsuarios = () => {
 
             <Form.Group className="mb-3">
               <Form.Label>Rol</Form.Label>
-              <Form.Select name="rolUsuario" value={usuarioActual.rolUsuario} onChange={handleInputChange}>
+              <Form.Select
+                name="rol"
+                value={usuarioActual.rol}
+                onChange={handleInputChange}
+              >
                 <option value="usuario">usuario</option>
                 <option value="admin">admin</option>
               </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Contraseña {editando ? "(dejar en blanco para mantener)" : ""}</Form.Label>
+              <Form.Label>
+                Contraseña {editando ? "(dejar en blanco para mantener)" : ""}
+              </Form.Label>
               <Form.Control
                 type="password"
                 name="contrasenia"
@@ -198,7 +211,11 @@ const AdminUsuarios = () => {
             </Form.Group>
 
             <div className="text-end">
-              <Button variant="secondary" onClick={handleCloseModal} className="me-2">
+              <Button
+                variant="secondary"
+                onClick={handleCloseModal}
+                className="me-2"
+              >
                 Cancelar
               </Button>
               <Button variant="primary" type="submit">
@@ -232,9 +249,9 @@ const AdminUsuarios = () => {
             <tbody>
               {usuarios.map((usuario) => (
                 <tr key={usuario._id}>
-                  <td>{usuario.nombreUsuario}</td>
-                  <td>{usuario.emailUsuario}</td>
-                  <td>{usuario.rolUsuario}</td>
+                  <td>{usuario.nombre}</td>
+                  <td>{usuario.correo}</td>
+                  <td>{usuario.rol}</td>
                   <td className="text-center">
                     <ButtonGroup>
                       <Button
@@ -246,12 +263,18 @@ const AdminUsuarios = () => {
                         <PencilSquare /> Editar
                       </Button>
                       <Button
-                        variant={usuario.rolUsuario === "admin" ? "secondary" : "info"}
+                        variant={usuario.rol === "admin" ? "secondary" : "info"}
                         size="sm"
                         onClick={() => cambiarRol(usuario)}
-                        title={usuario.rolUsuario === "admin" ? "Hacer usuario" : "Hacer admin"}
+                        title={
+                          usuario.rol === "admin"
+                            ? "Hacer usuario"
+                            : "Hacer admin"
+                        }
                       >
-                        {usuario.rolUsuario === "admin" ? "Quitar admin" : "Hacer admin"}
+                        {usuario.rol === "admin"
+                          ? "Quitar admin"
+                          : "Hacer admin"}
                       </Button>
                       <Button
                         variant="danger"

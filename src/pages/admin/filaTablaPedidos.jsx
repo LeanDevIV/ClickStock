@@ -52,10 +52,10 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
       <TableCell className="celda-cliente">
         <Box>
           <Typography className="texto-cliente" variant="body2">
-            {pedido.usuario?.nombreUsuario || "Cliente"}
+            {pedido.usuario?.nombre || "Cliente"}
           </Typography>
           <Typography className="texto-email" variant="caption">
-            {pedido.usuario?.emailUsuario || "N/A"}
+            {pedido.usuario?.correo || "N/A"}
           </Typography>
         </Box>
       </TableCell>
@@ -101,7 +101,7 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
         </Box>
       </TableCell>
       <TableCell className="celda-total">
-        <Typography  variant="body2" color="black !important " fontWeight="bold">
+        <Typography variant="body2" color="black !important " fontWeight="bold">
           {formatCurrency(pedido.total)}
         </Typography>
       </TableCell>

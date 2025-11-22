@@ -1,9 +1,18 @@
 import React, { useState } from "react";
-import { Avatar, IconButton, Menu, MenuItem, Tooltip, Divider } from "@mui/material";
+import {
+  Avatar,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Divider,
+} from "@mui/material";
 import { Link } from "react-router-dom";
+import EditProfileModal from "./EditProfileModal";
 
 export const UserMenu = ({ user, modoOscuro, handleLogout }) => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
   const open = Boolean(anchorEl);
 
   // Para abrir/cerrar el menú
@@ -14,9 +23,14 @@ export const UserMenu = ({ user, modoOscuro, handleLogout }) => {
     setAnchorEl(null);
   };
 
-  const nombre = user?.nombreUsuario || user?.nombre || user?.username || "?";
+  const handleOpenProfile = () => {
+    setShowEditModal(true);
+    handleMenuClose();
+  };
+
+  const nombre = user?.nombre || user?.nombre || user?.username || "?";
   const letra = nombre[0]?.toUpperCase();
-  const avatarSrc = user?.imagen || null;
+  const avatarSrc = user?.fotoPerfil || user?.imagen || null;
 
   return (
     <>
@@ -54,11 +68,9 @@ export const UserMenu = ({ user, modoOscuro, handleLogout }) => {
           },
         }}
       >
-        <MenuItem component={Link} to="/perfil">
-          Mi Perfil
-        </MenuItem>
+        <MenuItem onClick={handleOpenProfile}>Mi Perfil</MenuItem>
 
-        {user?.rolUsuario !== "admin" && (
+        {user?.rol !== "admin" && (
           <MenuItem component={Link} to="/admin">
             Panel Admin
           </MenuItem>
@@ -69,6 +81,11 @@ export const UserMenu = ({ user, modoOscuro, handleLogout }) => {
           Cerrar sesión
         </MenuItem>
       </Menu>
+
+      <EditProfileModal
+        open={showEditModal}
+        onClose={() => setShowEditModal(false)}
+      />
     </>
   );
 };

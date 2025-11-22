@@ -17,12 +17,12 @@ import {
   Brightness4,
   Search as SearchIcon,
   AdminPanelSettings,
-  ShoppingCart, 
+  ShoppingCart,
 } from "@mui/icons-material";
 import { useStore } from "../hooks/useStore";
 import { useScrollDirection } from "../hooks/useScrollDirection";
 import { UserMenu } from "./MenuUsuario";
-import RegistroLogin from "../pages/RegistroLogin";
+import AuthModal from "./AuthModal"; // ⬅️ Nuevo modal unificado
 import "./Header.css";
 // === :lupa: Estilos del buscador ===
 const SearchContainer = styled("div")(({ theme }) => ({
@@ -108,9 +108,11 @@ export const Header = ({ modoOscuro, toggleModo }) => {
               <Nav.Link as={Link} to="/" className="mx-2 fw-medium">
                 Inicio
               </Nav.Link>
+
               <Nav.Link as={Link} to="/productos" className="mx-2 fw-medium">
                 Productos
               </Nav.Link>
+
               <Nav.Link as={Link} to="/contacto" className="mx-2 fw-medium">
                 Contacto
               </Nav.Link>
@@ -123,7 +125,6 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                         component={Link}
                         to="/admin/dashboard"
                         color="error"
-                        className="text-danger"
                       >
                         <AdminPanelSettings />
                       </Button>
@@ -137,6 +138,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   <SearchIconWrapper>
                     <SearchIcon />
                   </SearchIconWrapper>
+
                   <StyledInputBase
                     placeholder="Buscar..."
                     inputProps={{ "aria-label": "buscar" }}
@@ -154,8 +156,8 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                     "&:hover": {
                       backgroundColor: modoOscuro
                         ? "rgba(255, 255, 255, 0.1)"
-                        : "rgba(0, 0, 0, 0.1)"
-                    }
+                        : "rgba(0, 0, 0, 0.1)",
+                    },
                   }}
                 >
                   <Badge
@@ -163,11 +165,11 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                     color="error"
                     sx={{
                       "& .MuiBadge-badge": {
-                        fontSize: '0.7rem',
-                        fontWeight: 'bold',
-                        minWidth: '18px',
-                        height: '18px',
-                      }
+                        fontSize: "0.7rem",
+                        fontWeight: "bold",
+                        minWidth: "18px",
+                        height: "18px",
+                      },
                     }}
                   >
                     <ShoppingCart />
@@ -176,9 +178,10 @@ export const Header = ({ modoOscuro, toggleModo }) => {
               </Tooltip>
               {/* :luna_creciente:/:soleado: Modo oscuro */}
               <div className="d-flex align-items-center ms-3">
-                <IconButton color="inherit" onClick={toggleModo}>
+                <IconButton onClick={toggleModo}>
                   {modoOscuro ? <Brightness7 /> : <Brightness4 />}
                 </IconButton>
+
                 <Switch
                   checked={modoOscuro}
                   onChange={toggleModo}
@@ -193,11 +196,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   handleLogout={handleLogout}
                 />
               ) : (
-                <Button
-                  color="inherit"
-                  className="ms-2 px-4"
-                  onClick={handleOpenAuth}
-                >
+                <Button onClick={handleOpenAuth} className="ms-2 px-4">
                   Iniciar sesión
                 </Button>
               )}
@@ -205,7 +204,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <RegistroLogin show={showAuthModal} onHide={handleCloseAuth} />
+      <AuthModal show={showAuthModal} onHide={handleCloseAuth} />
     </>
   );
 };

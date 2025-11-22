@@ -376,7 +376,7 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
                         value={usuario._id}
                         sx={{ color: theme.palette.text.primary }}
                       >
-                        {usuario.nombreUsuario} - {usuario.emailUsuario}
+                        {usuario.nombre} - {usuario.correo}
                       </MenuItem>
                     ))}
                   </Select>
