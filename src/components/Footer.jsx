@@ -113,7 +113,7 @@ const Footer = () => {
           justifyContent="center" // Centra las columnas horizontalmente
         >
           {/* Columna 1: Nuestras redes */}
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Typography
               variant="h6"
               gutterBottom
@@ -187,7 +187,7 @@ const Footer = () => {
           </Grid>
 
           {/* Columna 2: Acerca de nosotros */}
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Typography
               variant="h6"
               gutterBottom
@@ -257,7 +257,7 @@ const Footer = () => {
           </Grid>
 
           {/* Columna 3: Enlaces/Links de las páginas */}
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Typography
               variant="h6"
               gutterBottom

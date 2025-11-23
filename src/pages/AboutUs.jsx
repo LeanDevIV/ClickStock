@@ -98,7 +98,7 @@ export default function AboutUs() {
 
         <Grid container spacing={3} justifyContent="center">
           {integrantes.map((integrante, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={2.4} key={index}>
+            <Grid xs={12} sm={6} md={4} lg={2.4} key={index}>
               <Grow in={true} timeout={500 + index * 200}>
                 <Card
                   sx={{
