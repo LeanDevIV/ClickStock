@@ -36,7 +36,8 @@ export const GenericRow = ({
   const getCategoriaNombre = (categoriaId) => {
     if (!categoriaId) return "N/A";
     const cat = categorias.find(
-      (categoria) => categoria._id === categoriaId || categoria.id === categoriaId
+      (categoria) =>
+        categoria._id === categoriaId || categoria.id === categoriaId
     );
     return cat?.nombre || categoriaId;
   };
@@ -118,14 +119,23 @@ export const GenericRow = ({
       case "createdAt":
       case "fecha":
       case "fechaCreacion":
+      case "fechaInicio":
+      case "fechaFin":
         if (!value) return "-";
-        return new Date(value).toLocaleDateString("es-AR", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+        try {
+          const date = new Date(value);
+          if (isNaN(date.getTime())) return "-";
+          return date.toLocaleDateString("es-AR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } catch (error) {
+          console.error(`Error formatting date for field ${field}:`, error);
+          return "-";
+        }
 
       case "deletedBy":
         if (!value) return "-";
@@ -133,7 +143,9 @@ export const GenericRow = ({
 
       case "usuario":
         if (!value) return "-";
-        return typeof value === "object" ? value.nombreUsuario || value.name : value;
+        return typeof value === "object"
+          ? value.nombreUsuario || value.name
+          : value;
 
       case "productId":
         if (!value) return "-";
@@ -141,7 +153,9 @@ export const GenericRow = ({
 
       case "user":
         if (!value) return "-";
-        return typeof value === "object" ? value.nombreUsuario || value.name : value;
+        return typeof value === "object"
+          ? value.nombreUsuario || value.name
+          : value;
 
       case "rating":
         return (
@@ -149,6 +163,15 @@ export const GenericRow = ({
             label={`${value} ⭐`}
             size="small"
             color={value >= 4 ? "success" : "warning"}
+          />
+        );
+
+      case "activa":
+        return (
+          <Chip
+            label={value ? "Sí" : "No"}
+            size="small"
+            color={value ? "success" : "default"}
           />
         );
 

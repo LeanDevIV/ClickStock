@@ -4,6 +4,7 @@ export const MENU_ITEMS = [
   { titulo: "Pedidos", section: "Pedidos" },
   { titulo: "Soporte", section: "Soporte" },
   { titulo: "Reseñas", section: "Reseñas" },
+  // { titulo: "Promociones", section: "Promociones" }, // TODO: Debugging error de renderizado
 ];
 export const TABLE_CONFIG = {
   Productos: {
@@ -42,7 +43,7 @@ export const TABLE_CONFIG = {
   },
   Pedidos: {
     endpoint: "/pedidos",
-    restoreEndpoint: "/pedidos/:id/restaurar",
+    restoreEndpoint: "/pedidos/restore/:id",
     updateEndpoint: "/pedidos/:id",
     softDeleteEndpoint: "/pedidos/:id",
     editableFields: ["direccion", "estado"],
@@ -59,6 +60,7 @@ export const TABLE_CONFIG = {
     endpoint: "/contacto",
     restoreEndpoint: null,
     updateEndpoint: "/contacto/:id",
+    deleteEndpoint: "/contacto/:id",
     softDeleteEndpoint: null,
     editableFields: ["estado"],
     displayFields: ["nombre", "email", "asunto", "mensaje", "estado", "fecha"],
@@ -76,6 +78,29 @@ export const TABLE_CONFIG = {
       "comment",
       "createdAt",
       "isDeleted",
+    ],
+  },
+  Promociones: {
+    endpoint: "/promociones",
+    restoreEndpoint: null,
+    updateEndpoint: "/promociones/:id",
+    deleteEndpoint: "/promociones/:id",
+    softDeleteEndpoint: null,
+    editableFields: [
+      "titulo",
+      "descripcion",
+      "descuento",
+      "fechaInicio",
+      "fechaFin",
+      "activa",
+    ],
+    displayFields: [
+      "titulo",
+      "descuento",
+      "fechaInicio",
+      "fechaFin",
+      "activa",
+      "createdAt",
     ],
   },
 };
@@ -96,9 +121,18 @@ export const FIELD_TYPES = {
   asunto: "text",
   mensaje: "multiline",
   categoria: "select",
+  titulo: "text",
+  descuento: "number",
+  fechaInicio: "date",
+  fechaFin: "date",
+  activa: "select",
 };
 export const SELECT_OPTIONS = {
   disponible: [
+    { value: true, label: "Sí" },
+    { value: false, label: "No" },
+  ],
+  activa: [
     { value: true, label: "Sí" },
     { value: false, label: "No" },
   ],

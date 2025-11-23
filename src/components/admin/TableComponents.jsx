@@ -96,7 +96,11 @@ export const TableRowActions = ({
         {isEditing ? (
           <>
             <Tooltip title="Guardar cambios">
-              <IconButton onClick={() => onSave(id)} color="success" size="small">
+              <IconButton
+                onClick={() => onSave(id)}
+                color="success"
+                size="small"
+              >
                 <CheckIcon />
               </IconButton>
             </Tooltip>
@@ -150,7 +154,9 @@ export const TableRowActions = ({
       {/* Diálogo de confirmación */}
       <Dialog open={openConfirm} onClose={handleCancelDelete}>
         <DialogTitle>
-          {deleteType === "soft" ? "Eliminar producto" : "Eliminar permanentemente"}
+          {deleteType === "soft"
+            ? "Eliminar producto"
+            : "Eliminar permanentemente"}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -200,10 +206,11 @@ export const EditableCell = ({
     (typeof fieldConfig === "object" && fieldConfig.type === "select");
 
   if (isSelect) {
+    const options = SELECT_OPTIONS[field] || [];
     return (
       <FormControl size="small" fullWidth>
-        <Select value={value} onChange={(e) => onChange(e.target.value)}>
-          {SELECT_OPTIONS[field]?.map((option) => (
+        <Select value={value || ""} onChange={(e) => onChange(e.target.value)}>
+          {options.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -213,8 +220,28 @@ export const EditableCell = ({
     );
   }
 
+  // --- DATE ---
+  const isDate = fieldConfig === "date";
+  if (isDate) {
+    // Convertir el valor a formato YYYY-MM-DD para el input type="date"
+    const dateValue = value ? new Date(value).toISOString().split("T")[0] : "";
+    return (
+      <TextField
+        value={dateValue}
+        onChange={(e) => onChange(e.target.value)}
+        type="date"
+        size="small"
+        fullWidth
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+    );
+  }
+
   // --- MULTILINE ---
-  if (fieldConfig === "multiline" || isMultiline) {
+  const isMultilineField = fieldConfig === "multiline";
+  if (isMultilineField || isMultiline) {
     return (
       <TextField
         value={value || ""}
@@ -245,17 +272,11 @@ export const EditableCell = ({
   );
 };
 
-export const StatusChip = ({
-  value,
-  type = "estado",
-  isEditing,
-  onChange,
-  
-}) => {
+export const StatusChip = ({ value, type = "estado", isEditing, onChange }) => {
   if (isEditing) {
     return (
       <FormControl size="small" fullWidth>
-        <Select value={value} onChange={(e) => onChange( e.target.value)}>
+        <Select value={value} onChange={(e) => onChange(e.target.value)}>
           {SELECT_OPTIONS[type]?.[
             type === "Pedidos"
               ? "Pedidos"
