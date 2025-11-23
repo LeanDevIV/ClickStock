@@ -9,6 +9,7 @@ import {
   LocalOffer as PromocionesIcon,
 } from "@mui/icons-material";
 import { MENU_ITEMS, THEME } from "../../config/adminConfig";
+import Bsod from "../Bsod";
 
 const iconMap = {
   Productos: ProductosIcon,
@@ -33,8 +34,8 @@ export const AdminSidebar = ({ selectedSection, onSelectSection }) => {
         gap: 1,
         p: 2,
         borderRight: `2px solid ${primary}`,
-        minWidth: 160,
-        width: 160,
+        minWidth: 200,
+        width: 200,
         justifyContent: "flex-start",
         alignItems: "stretch",
         backgroundColor: muiTheme.palette.background.paper,
@@ -81,6 +82,7 @@ export const AdminSidebar = ({ selectedSection, onSelectSection }) => {
           </Button>
         );
       })}
+      <Bsod variant="outlined" size="medium" style={{ margin: "10px" }} />
     </Box>
   );
 };

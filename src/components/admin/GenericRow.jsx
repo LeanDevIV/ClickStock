@@ -8,6 +8,7 @@ import {
   StatusChip,
 } from "./TableComponents";
 import { TABLE_CONFIG, CHIP_COLORS } from "../../config/adminConfig";
+import { useStore } from "../../hooks/useStore";
 
 /**
  * Fila genérica reutilizable para todas las tablas
@@ -53,6 +54,32 @@ export const GenericRow = ({
           onChange={(newValue) => onFieldChange(field, newValue)}
           displayValue={displayValue}
         />
+      );
+    }
+
+    // Mostrar indicador de usuario actual en la tabla de Usuarios
+    if (section === "Usuarios" && field === "nombre") {
+      const currentUser = useStore.getState().user;
+      const isCurrentUser =
+        currentUser &&
+        (currentUser._id === item._id || currentUser.id === item._id);
+
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>{value}</span>
+          {isCurrentUser && (
+            <Chip
+              label="Tú"
+              size="small"
+              sx={{
+                backgroundColor: "#D4AF37",
+                color: "#000",
+                fontWeight: "bold",
+                fontSize: "11px",
+              }}
+            />
+          )}
+        </div>
       );
     }
 

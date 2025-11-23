@@ -35,7 +35,7 @@ export const TABLE_CONFIG = {
   },
   Usuarios: {
     endpoint: "/usuarios",
-    restoreEndpoint: "/usuarios/:id/restaurar",
+    restoreEndpoint: "/usuarios/restore/:id",
     updateEndpoint: "/usuarios/:id",
     softDeleteEndpoint: "/usuarios/:id",
     editableFields: ["nombre", "rol"],
@@ -67,10 +67,9 @@ export const TABLE_CONFIG = {
   },
   Reseñas: {
     endpoint: "/reviews",
-    restoreEndpoint: "/reviews/:id/restaurar",
-    updateEndpoint: "/reviews/:id",
+    restoreEndpoint: "/reviews/restore/:id",
     softDeleteEndpoint: "/reviews/:id",
-    editableFields: ["rating", "comment"],
+    editableFields: [],
     displayFields: [
       "productId",
       "user",
@@ -105,6 +104,16 @@ export const TABLE_CONFIG = {
       "deletedBy",
       "deletedAt",
     ],
+    validate: (data) => {
+      if (data.fechaInicio && data.fechaFin) {
+        const inicio = new Date(data.fechaInicio);
+        const fin = new Date(data.fechaFin);
+        if (fin < inicio) {
+          return "La fecha de fin no puede ser anterior a la fecha de inicio";
+        }
+      }
+      return null;
+    },
   },
 };
 export const FIELD_TYPES = {
@@ -153,8 +162,8 @@ export const SELECT_OPTIONS = {
     ],
     Soporte: [
       { value: "pendiente", label: "Pendiente" },
-      { value: "leído", label: "Leído" },
       { value: "respondido", label: "Respondido" },
+      { value: "descartado", label: "Descartado" },
     ],
   },
   categoria: [],
@@ -169,6 +178,7 @@ export const CHIP_COLORS = {
     pendiente: "warning",
     leído: "info",
     respondido: "success",
+    descartado: "error",
   },
   rol: {
     admin: "error",

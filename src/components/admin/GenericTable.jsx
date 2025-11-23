@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { THEME, TABLE_CONFIG } from "../../config/adminConfig";
-import { Box, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -29,7 +29,7 @@ export const GenericTable = ({
   onRefresh,
   categorias = [],
 }) => {
-  const muiTheme = useTheme();
+  // const muiTheme = useTheme();
   const [showDeleted, setShowDeleted] = useState(true);
   const config = TABLE_CONFIG[section];
 
@@ -60,7 +60,7 @@ export const GenericTable = ({
       total: "Total",
       estado: "Estado",
       fechaCreacion: "Fecha",
-      createdAt: "Fecha",
+      createdAt: "Creada",
       usuario: "Usuario",
       rolUsuario: "Rol",
       rol: "Rol",

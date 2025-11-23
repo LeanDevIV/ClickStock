@@ -8,14 +8,9 @@ import {
   Select,
   MenuItem,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
   FormControlLabel,
   Switch,
+  Button,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -25,6 +20,7 @@ import {
   Delete as DeleteIcon,
   DeleteForever as DeleteForeverIcon,
 } from "@mui/icons-material";
+import Swal from "sweetalert2";
 import {
   FIELD_TYPES,
   SELECT_OPTIONS,
@@ -43,29 +39,32 @@ export const TableRowActions = ({
   onSoftDelete,
   onHardDelete,
 }) => {
-  const [openConfirm, setOpenConfirm] = React.useState(false);
-  const [deleteType, setDeleteType] = React.useState(null); // 'soft' o 'hard'
-
   const showRestoreButton = isDeleted !== undefined;
 
-  const handleDeleteClick = (type) => {
-    setDeleteType(type);
-    setOpenConfirm(true);
-  };
+  const handleDeleteClick = async (type) => {
+    const result = await Swal.fire({
+      title:
+        type === "soft" ? "¿Eliminar elemento?" : "¿Eliminar permanentemente?",
+      text:
+        type === "soft"
+          ? "Podrás restaurarlo después"
+          : "Esta acción no se puede deshacer",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: type === "soft" ? "#ff9800" : "#d32f2f",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText:
+        type === "soft" ? "Sí, eliminar" : "Sí, eliminar permanentemente",
+      cancelButtonText: "Cancelar",
+    });
 
-  const handleConfirmDelete = () => {
-    if (deleteType === "soft") {
-      onSoftDelete?.(id);
-    } else if (deleteType === "hard") {
-      onHardDelete?.(id);
+    if (result.isConfirmed) {
+      if (type === "soft") {
+        onSoftDelete?.(id);
+      } else if (type === "hard") {
+        onHardDelete?.(id);
+      }
     }
-    setOpenConfirm(false);
-    setDeleteType(null);
-  };
-
-  const handleCancelDelete = () => {
-    setOpenConfirm(false);
-    setDeleteType(null);
   };
 
   return (
@@ -150,34 +149,6 @@ export const TableRowActions = ({
           </>
         )}
       </Box>
-
-      {/* Diálogo de confirmación */}
-      <Dialog open={openConfirm} onClose={handleCancelDelete}>
-        <DialogTitle>
-          {deleteType === "soft"
-            ? "Eliminar producto"
-            : "Eliminar permanentemente"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            {deleteType === "soft"
-              ? "¿Estás seguro de que deseas eliminar este producto? Podrás restaurarlo después."
-              : "¿Estás seguro de que deseas eliminar permanentemente este producto? Esta acción no se puede deshacer."}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelDelete} color="primary">
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleConfirmDelete}
-            color={deleteType === "hard" ? "error" : "warning"}
-            variant="contained"
-          >
-            Confirmar
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };

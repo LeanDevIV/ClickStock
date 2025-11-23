@@ -1,6 +1,8 @@
 import { useState, useCallback } from "react";
 import clientAxios from "../utils/clientAxios";
 import { TABLE_CONFIG } from "../config/adminConfig";
+import Swal from "sweetalert2";
+import { useStore } from "./useStore";
 
 export const useTableData = (section, options = {}) => {
   const [data, setData] = useState([]);
@@ -55,11 +57,32 @@ export const useTableData = (section, options = {}) => {
   const handleSave = useCallback(
     async (id) => {
       try {
+        // Validar antes de enviar
+        if (config.validate) {
+          const validationError = config.validate(editedData);
+          if (validationError) {
+            Swal.fire({
+              icon: "error",
+              title: "Error de validación",
+              text: validationError,
+              confirmButtonColor: "#D4AF37",
+            });
+            return;
+          }
+        }
+
         const endpoint = config.updateEndpoint.replace(":id", id);
         await clientAxios.put(endpoint, editedData);
 
         setData((prev) =>
-          prev.map((item) => (item._id === id ? editedData : item))
+          prev.map((item) => {
+            if (item._id === id) {
+              // Combinar el estado actual del item (que puede haber sido restaurado)
+              // con los cambios editados
+              return { ...item, ...editedData };
+            }
+            return item;
+          })
         );
 
         setEditingId(null);
@@ -69,7 +92,7 @@ export const useTableData = (section, options = {}) => {
         console.error("Error saving data:", err);
       }
     },
-    [editedData, config.updateEndpoint]
+    [editedData, config]
   );
 
   // Restaurar elemento eliminado
@@ -80,14 +103,39 @@ export const useTableData = (section, options = {}) => {
         return;
       }
 
+      // Mostrar confirmación antes de restaurar
+      const result = await Swal.fire({
+        title: "¿Restaurar elemento?",
+        text: "El elemento volverá a estar activo",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#D4AF37",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, restaurar",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
       try {
         const endpoint = config.restoreEndpoint.replace(":id", id);
-        const { data: productoRestaurado } = await clientAxios.patch(endpoint);
+        const { data: responseData } = await clientAxios.patch(endpoint);
+
+        // Intentar encontrar el objeto restaurado en la respuesta
+        const restoredItem =
+          responseData.producto ||
+          responseData.usuario ||
+          responseData.promocion ||
+          responseData.review ||
+          responseData.contacto ||
+          responseData;
 
         setData((prev) =>
           prev.map((item) =>
             item._id === id
-              ? productoRestaurado.producto || {
+              ? restoredItem || {
                   ...item,
                   isDeleted: false,
                   ...(section === "Productos"
@@ -98,6 +146,14 @@ export const useTableData = (section, options = {}) => {
           )
         );
 
+        Swal.fire({
+          title: "¡Restaurado!",
+          text: "El elemento ha sido restaurado correctamente",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+          iconColor: "#D4AF37",
+        });
       } catch (err) {
         setError("Error al restaurar: " + err.message);
         console.error("Error restoring:", err);
@@ -109,12 +165,46 @@ export const useTableData = (section, options = {}) => {
   // Soft Delete (marcar como eliminado)
   const handleSoftDelete = useCallback(
     async (id) => {
+      // Prevenir que el admin se elimine a sí mismo
+      if (section === "Usuarios") {
+        const currentUser = useStore.getState().user;
+        console.log("Current user ID:", currentUser?._id, "Target ID:", id);
+        if (currentUser && (currentUser._id === id || currentUser.id === id)) {
+          Swal.fire({
+            icon: "question",
+            title: "¿En serio?",
+            html: `
+    <div style="text-align: center;">
+      <p>Estás a punto de realizar un <strong>auto-borrado</strong>.</p>
+      <p style="color: #666; font-style: italic;">
+        "La auto-preservación es la primera ley de la naturaleza."
+      </p>
+    </div>
+  `,
+            focusConfirm: false,
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Vale, me quedo',
+            confirmButtonColor: "#4CAF50",
+            showClass: {
+              popup: "animate__animated animate__fadeInDown",
+            },
+            hideClass: {
+              popup: "animate__animated animate__fadeOutUp",
+            },
+            footer:
+              '<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">¿Necesitas ayuda con tu cuenta?</a>',
+          });
+          return;
+        }
+      }
+
       try {
         const endpoint =
           config.softDeleteEndpoint?.replace(":id", id) ||
           config.updateEndpoint.replace(":id", id);
         // Usar DELETE para soft delete (el backend captura el usuario desde el token)
-        const { data: productoActualizado } = await clientAxios.put(endpoint);
+        const { data: productoActualizado } = await clientAxios.delete(
+          endpoint
+        );
 
         // Usar la respuesta del servidor que incluye deletedBy y deletedAt
         setData((prev) =>
@@ -139,6 +229,26 @@ export const useTableData = (section, options = {}) => {
   // Hard Delete (eliminar permanentemente)
   const handleHardDelete = useCallback(
     async (id) => {
+      // Prevenir que el admin se elimine a sí mismo
+      if (section === "Usuarios") {
+        const currentUser = useStore.getState().user;
+        console.log(
+          "Hard delete - Current user ID:",
+          currentUser?._id,
+          "Target ID:",
+          id
+        );
+        if (currentUser && (currentUser._id === id || currentUser.id === id)) {
+          Swal.fire({
+            icon: "error",
+            title: "Acción no permitida",
+            text: "No puedes eliminar tu propia cuenta",
+            confirmButtonColor: "#D4AF37",
+          });
+          return;
+        }
+      }
+
       try {
         // Usar deleteEndpoint configurado en TABLE_CONFIG
         const endpoint = config.deleteEndpoint?.replace(":id", id);
@@ -150,13 +260,12 @@ export const useTableData = (section, options = {}) => {
         await clientAxios.delete(endpoint);
 
         setData((prev) => prev.filter((item) => item._id !== id));
-
       } catch (err) {
         setError("Error al eliminar permanentemente: " + err.message);
         console.error("Error hard deleting:", err);
       }
     },
-    [config.deleteEndpoint]
+    [config.deleteEndpoint, section]
   );
 
   return {
