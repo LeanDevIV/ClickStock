@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar, Nav, Container } from "react-bootstrap";
+import { Offcanvas } from "react-bootstrap";
+
 import {
   Box,
   Button,
@@ -65,6 +67,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 // === :cerebro: Componente principal ===
 export const Header = ({ modoOscuro, toggleModo }) => {
+  const [showCarrito, setShowCarrito] = useState(false);
+  const handleOpenPreview = () => setShowCarrito(true);
+  const handleClosePreview = () => setShowCarrito(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
@@ -72,6 +77,8 @@ export const Header = ({ modoOscuro, toggleModo }) => {
   const user = useStore((state) => state.user);
   const logout = useStore((state) => state.logout);
   const totalArticulos = useStore((state) => state.cart.totalArticulos);
+  const carrito = useStore((state) => state.cart);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (search.trim() !== "") {
@@ -147,7 +154,37 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   />
                 </SearchContainer>
               </Box>
-              <Tooltip title="Ver carrito">
+              <Tooltip title="Ver carrito rápido">
+                <IconButton
+                  color="inherit"
+                  onClick={handleOpenPreview}
+                  className="ms-2"
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: modoOscuro
+                        ? "rgba(255, 255, 255, 0.1)"
+                        : "rgba(0, 0, 0, 0.1)",
+                    },
+                  }}
+                >
+                  <Badge
+                    badgeContent={totalArticulos}
+                    color="error"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        fontSize: "0.7rem",
+                        fontWeight: "bold",
+                        minWidth: "18px",
+                        height: "18px",
+                      },
+                    }}
+                  >
+                    <ShoppingCart />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+
+              {/* <Tooltip title="Ver carrito">
                 <IconButton
                   color="inherit"
                   onClick={handleGoToCart}
@@ -175,7 +212,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                     <ShoppingCart />
                   </Badge>
                 </IconButton>
-              </Tooltip>
+              </Tooltip> */}
               {/* :luna_creciente:/:soleado: Modo oscuro */}
               <div className="d-flex align-items-center ms-3">
                 <IconButton onClick={toggleModo}>
@@ -204,6 +241,41 @@ export const Header = ({ modoOscuro, toggleModo }) => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+      <Offcanvas
+        show={showCarrito}
+        onHide={handleClosePreview}
+        placement="end" // 👈 aparece a la derecha
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Tu carrito</Offcanvas.Title>
+        </Offcanvas.Header>
+
+        <Offcanvas.Body>
+          {/* Mostrar últimos 5 productos */}
+          {carrito?.productos?.slice(-5).map((p) => (
+            <div key={p._id} className="d-flex justify-content-between mb-3">
+              <span>{p.producto?.nombre}</span>
+              <span>x{p.cantidad}</span>
+            </div>
+          ))}
+
+          <hr />
+
+          <h5>Total: ${carrito?.total || 0}</h5>
+
+          <Button
+            variant="primary"
+            className="mt-3 w-100"
+            onClick={() => {
+              handleClosePreview();
+              handleGoToCart(); // 👈 va a la página de carrito
+            }}
+          >
+            Ir al carrito
+          </Button>
+        </Offcanvas.Body>
+      </Offcanvas>
+
       <AuthModal show={showAuthModal} onHide={handleCloseAuth} />
     </>
   );
