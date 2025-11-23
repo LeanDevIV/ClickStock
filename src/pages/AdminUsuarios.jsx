@@ -3,16 +3,30 @@ import clientAxios from "../utils/clientAxios";
 import Swal from "sweetalert2";
 import {
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   Button,
   Container,
-  Row,
-  Col,
-  Spinner,
+  Box,
+  Typography,
+  CircularProgress,
   ButtonGroup,
-  Modal,
-  Form,
-} from "react-bootstrap";
-import { PencilSquare, TrashFill, PlusCircle } from "react-bootstrap-icons";
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+} from "@mui/material";
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  AddCircle as AddCircleIcon,
+} from "@mui/icons-material";
 
 const AdminUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -98,14 +112,11 @@ const AdminUsuarios = () => {
     e.preventDefault();
     try {
       if (editando) {
-        // Si se está editando, si se modificó rol se puede usar endpoint /:id/rol
         const payload = { ...usuarioActual };
-        // No enviar contrasenia vacía en edición
         if (!payload.contrasenia) delete payload.contrasenia;
         await clientAxios.put(`/usuarios/${usuarioActual._id}`, payload);
         Swal.fire("¡Éxito!", "Usuario actualizado correctamente", "success");
       } else {
-        // Para creación usa el endpoint de registro
         await clientAxios.post(`/usuarios/registro`, usuarioActual);
         Swal.fire("¡Éxito!", "Usuario creado correctamente", "success");
       }
@@ -137,134 +148,149 @@ const AdminUsuarios = () => {
   };
 
   return (
-    <Container className="my-4">
-      <Row className="align-items-center mb-4">
-        <Col>
-          <h2 className="fw-bold text-primary mb-0">Gestión de Usuarios</h2>
-          <small className="text-muted">Administra usuarios y roles</small>
-        </Col>
-        <Col className="text-end">
-          <Button
-            variant="success"
-            className="d-flex align-items-center gap-2"
-            onClick={() => handleShowModal()}
+    <Container sx={{ my: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h4"
+            component="h2"
+            color="primary"
+            fontWeight="bold"
           >
-            <PlusCircle /> Agregar Usuario
+            Gestión de Usuarios
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Administra usuarios y roles
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          color="success"
+          startIcon={<AddCircleIcon />}
+          onClick={() => handleShowModal()}
+        >
+          Agregar Usuario
+        </Button>
+      </Box>
+
+      <Dialog
+        open={showModal}
+        onClose={handleCloseModal}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {editando ? "Editar Usuario" : "Crear Nuevo Usuario"}
+        </DialogTitle>
+        <DialogContent>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Nombre de Usuario"
+              name="nombre"
+              value={usuarioActual.nombre}
+              onChange={handleInputChange}
+              required
+              margin="normal"
+            />
+
+            <TextField
+              fullWidth
+              label="Email"
+              name="correo"
+              type="email"
+              value={usuarioActual.correo}
+              onChange={handleInputChange}
+              required
+              margin="normal"
+            />
+
+            <TextField
+              fullWidth
+              select
+              label="Rol"
+              name="rol"
+              value={usuarioActual.rol}
+              onChange={handleInputChange}
+              margin="normal"
+            >
+              <MenuItem value="usuario">usuario</MenuItem>
+              <MenuItem value="admin">admin</MenuItem>
+            </TextField>
+
+            <TextField
+              fullWidth
+              label={`Contraseña ${
+                editando ? "(dejar en blanco para mantener)" : ""
+              }`}
+              name="contrasenia"
+              type="password"
+              value={usuarioActual.contrasenia}
+              onChange={handleInputChange}
+              required={!editando}
+              margin="normal"
+              inputProps={{ minLength: 6 }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal} color="inherit">
+            Cancelar
           </Button>
-        </Col>
-      </Row>
-
-      <Modal show={showModal} onHide={handleCloseModal} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {editando ? "Editar Usuario" : "Crear Nuevo Usuario"}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Nombre de Usuario</Form.Label>
-              <Form.Control
-                type="text"
-                name="nombre"
-                value={usuarioActual.nombre}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="correo"
-                value={usuarioActual.correo}
-                onChange={handleInputChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Rol</Form.Label>
-              <Form.Select
-                name="rol"
-                value={usuarioActual.rol}
-                onChange={handleInputChange}
-              >
-                <option value="usuario">usuario</option>
-                <option value="admin">admin</option>
-              </Form.Select>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>
-                Contraseña {editando ? "(dejar en blanco para mantener)" : ""}
-              </Form.Label>
-              <Form.Control
-                type="password"
-                name="contrasenia"
-                value={usuarioActual.contrasenia}
-                onChange={handleInputChange}
-                minLength={6}
-                {...(editando ? {} : { required: true })}
-              />
-            </Form.Group>
-
-            <div className="text-end">
-              <Button
-                variant="secondary"
-                onClick={handleCloseModal}
-                className="me-2"
-              >
-                Cancelar
-              </Button>
-              <Button variant="primary" type="submit">
-                {editando ? "Guardar Cambios" : "Crear Usuario"}
-              </Button>
-            </div>
-          </Form>
-        </Modal.Body>
-      </Modal>
+          <Button onClick={handleSubmit} variant="contained" color="primary">
+            {editando ? "Guardar Cambios" : "Crear Usuario"}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {cargando ? (
-        <div className="text-center py-5">
-          <Spinner animation="border" variant="primary" />
-          <p className="mt-3 text-muted">Cargando usuarios...</p>
-        </div>
+        <Box sx={{ textAlign: "center", py: 5 }}>
+          <CircularProgress />
+          <Typography sx={{ mt: 3 }} color="text.secondary">
+            Cargando usuarios...
+          </Typography>
+        </Box>
       ) : usuarios.length === 0 ? (
-        <div className="text-center py-5 text-muted">
-          <p>No hay usuarios cargados aún.</p>
-        </div>
+        <Box sx={{ textAlign: "center", py: 5 }}>
+          <Typography color="text.secondary">
+            No hay usuarios cargados aún.
+          </Typography>
+        </Box>
       ) : (
-        <div className="table-responsive">
-          <Table bordered hover striped className="align-middle shadow-sm">
-            <thead className="table-primary">
-              <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Rol</th>
-                <th className="text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
+        <TableContainer component={Paper} elevation={3}>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ bgcolor: "primary.light" }}>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Rol</TableCell>
+                <TableCell align="center">Acciones</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {usuarios.map((usuario) => (
-                <tr key={usuario._id}>
-                  <td>{usuario.nombre}</td>
-                  <td>{usuario.correo}</td>
-                  <td>{usuario.rol}</td>
-                  <td className="text-center">
-                    <ButtonGroup>
+                <TableRow key={usuario._id} hover>
+                  <TableCell>{usuario.nombre}</TableCell>
+                  <TableCell>{usuario.correo}</TableCell>
+                  <TableCell>{usuario.rol}</TableCell>
+                  <TableCell align="center">
+                    <ButtonGroup variant="contained" size="small">
                       <Button
-                        variant="warning"
-                        size="sm"
-                        className="d-flex align-items-center gap-1"
+                        color="warning"
+                        startIcon={<EditIcon />}
                         onClick={() => handleShowModal(usuario)}
                       >
-                        <PencilSquare /> Editar
+                        Editar
                       </Button>
                       <Button
-                        variant={usuario.rol === "admin" ? "secondary" : "info"}
-                        size="sm"
+                        color={usuario.rol === "admin" ? "inherit" : "info"}
                         onClick={() => cambiarRol(usuario)}
                         title={
                           usuario.rol === "admin"
@@ -277,20 +303,19 @@ const AdminUsuarios = () => {
                           : "Hacer admin"}
                       </Button>
                       <Button
-                        variant="danger"
-                        size="sm"
-                        className="d-flex align-items-center gap-1"
+                        color="error"
+                        startIcon={<DeleteIcon />}
                         onClick={() => eliminarUsuario(usuario._id)}
                       >
-                        <TrashFill /> Eliminar
+                        Eliminar
                       </Button>
                     </ButtonGroup>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
+            </TableBody>
           </Table>
-        </div>
+        </TableContainer>
       )}
     </Container>
   );

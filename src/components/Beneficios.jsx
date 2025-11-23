@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-} from "@mui/material";
+import { Box, Container, Card, Typography } from "@mui/material";
 import {
   LocalShipping,
   VerifiedUser,
@@ -25,17 +18,24 @@ const neonBorder = keyframes`
   }
 `;
 
-// Styled Card con efecto neón
+// Styled Card (Contenedor Principal)
 const NeonCard = styled(Card)(({ theme }) => ({
-  height: "100%",
-  textAlign: "center",
+  height: "100%", // Se estira para llenar la celda del Grid
+  minHeight: "200px",
+  width: "100%",
   position: "relative",
   overflow: "visible",
-  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+  backgroundColor: "transparent",
+  borderRadius: "16px",
+  transition: "transform 0.3s ease",
+  boxShadow: "none",
+
   "&:hover": {
     transform: "translateY(-8px)",
-    boxShadow: theme.shadows[6],
+    cursor: "pointer",
   },
+
+  // Capa del Borde Gradiente (Detrás)
   "&::before": {
     content: '""',
     position: "absolute",
@@ -43,7 +43,7 @@ const NeonCard = styled(Card)(({ theme }) => ({
     left: -2,
     right: -2,
     bottom: -2,
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: "18px",
     background: `linear-gradient(
       90deg,
       transparent 0%,
@@ -55,9 +55,26 @@ const NeonCard = styled(Card)(({ theme }) => ({
     )`,
     backgroundSize: "200% 100%",
     animation: `${neonBorder} 4s linear infinite`,
-    zIndex: -1,
+    zIndex: 0,
     opacity: 0.8,
   },
+}));
+
+// Capa de Superficie (Frente - Tapa el centro del gradiente)
+const CardSurface = styled(Box)(({ theme }) => ({
+  position: "relative",
+  zIndex: 1,
+  height: "100%",
+  width: "100%",
+  // Color sólido explícito según modo
+  backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#ffffff",
+  borderRadius: "16px",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: theme.spacing(2),
+  boxShadow: theme.shadows[4],
 }));
 
 const BeneficiosHome = () => {
@@ -85,46 +102,59 @@ const BeneficiosHome = () => {
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 5, mb: 5 }}>
-      <Box sx={{ textAlign: "center", mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 6, mb: 6 }}>
+      <Box sx={{ textAlign: "center", mb: 5 }}>
         <Typography variant="h4" component="h2" gutterBottom fontWeight="bold">
           Beneficios de comprar con Nosotros
         </Typography>
       </Box>
 
-      <Grid container spacing={2} justifyContent="center">
+      {/* CSS Grid Nativo para anchos idénticos garantizados */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "repeat(2, 1fr)", // 2 columnas exactas en móvil
+            md: "repeat(4, 1fr)", // 4 columnas exactas en desktop
+          },
+          gap: 3, // Espaciado uniforme
+          width: "100%",
+          alignItems: "stretch", // Altura uniforme
+        }}
+      >
         {beneficios.map((beneficio, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <NeonCard>
-              <CardContent
-                sx={{ py: 2, px: 2, position: "relative", zIndex: 1 }}
+          <NeonCard key={index}>
+            <CardSurface>
+              <Box
+                sx={{
+                  color: "primary.main",
+                  mb: 1.5,
+                  display: "flex",
+                  justifyContent: "center",
+                }}
               >
-                <Box
-                  sx={{
-                    color: "primary.main",
-                    mb: 1.5,
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  {beneficio.icon}
-                </Box>
-                <Typography
-                  variant="subtitle1"
-                  component="h6"
-                  gutterBottom
-                  fontWeight="bold"
-                >
-                  {beneficio.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {beneficio.description}
-                </Typography>
-              </CardContent>
-            </NeonCard>
-          </Grid>
+                {beneficio.icon}
+              </Box>
+              <Typography
+                variant="subtitle1"
+                component="h3"
+                gutterBottom
+                fontWeight="bold"
+                sx={{ mb: 0.5, lineHeight: 1.2 }}
+              >
+                {beneficio.title}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ lineHeight: 1.4, display: "block" }}
+              >
+                {beneficio.description}
+              </Typography>
+            </CardSurface>
+          </NeonCard>
         ))}
-      </Grid>
+      </Box>
     </Container>
   );
 };

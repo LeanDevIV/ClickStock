@@ -1,13 +1,24 @@
 import React from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "./AboutUs.css";
+import {
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  IconButton,
+  Box,
+  Grow,
+  useTheme,
+} from "@mui/material";
+import { GitHub, LinkedIn } from "@mui/icons-material";
 
 const integrantes = [
   {
     nombre: "Luciano Mayorga",
     rol: "Desarrollador Frontend",
-    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRq2Td0CIbPGuZvYgLyx0up0jcQ1VH3Vm5yMg&s",
+    imagen:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRq2Td0CIbPGuZvYgLyx0up0jcQ1VH3Vm5yMg&s",
     github: "https://github.com/lucianomayorga",
     linkedin: "#",
   },
@@ -35,61 +46,163 @@ const integrantes = [
   {
     nombre: "Alvaro Roldan",
     rol: "Tester",
-    imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SNQ9XsPt9cv4aHIR6z2XXTBHZ9Wn091bkQ&s",
+    imagen:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6SNQ9XsPt9cv4aHIR6z2XXTBHZ9Wn091bkQ&s",
     github: "#",
     linkedin: "#",
   },
 ];
 
 export default function AboutUs() {
-  return (
-    <div className="container-fluid py-5 text-center about-section">
-      <h1 className="mb-4 fw-bold">Quiénes Somos</h1>
-      <p className="mb-5 text-muted mx-auto" style={{ maxWidth: "700px" }}>
-        Somos un equipo de desarrolladores apasionados por la tecnología y el
-        trabajo en equipo. Este proyecto forma parte de nuestro trabajo final
-        del curso de desarrollo Fullstack, donde buscamos crear una aplicación
-        web moderna y funcional.
-        Y por sobre todo, APROBAR😁
-      </p>
+  const theme = useTheme();
+  const modoOscuro = theme.palette.mode === "dark";
 
-      <div className="row justify-content-center g-4">
-        {integrantes.map((i, index) => (
-          <div key={index} className="col-12 col-sm-6 col-lg-3">
-            <div className="card integrante-card border-0 shadow-lg h-100">
-              <div className="img-container mt-4">
-                <img
-                  src={i.imagen}
-                  alt={i.nombre}
-                  className="rounded-circle integrante-img"
-                />
-              </div>
-              <div className="card-body">
-                <h5 className="card-title fw-semibold">{i.nombre}</h5>
-                <p className="card-text text-muted">{i.rol}</p>
-                <div className="social-icons">
-                  <a
-                    href={i.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-dark mx-2"
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        bgcolor: "background.default",
+        py: 8,
+        textAlign: "center",
+        minHeight: "80vh",
+      }}
+    >
+      <Container maxWidth="lg">
+        <Typography
+          variant="h3"
+          component="h1"
+          gutterBottom
+          fontWeight="bold"
+          sx={{
+            mb: 2,
+            color: "text.primary",
+          }}
+        >
+          Quiénes Somos
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            mb: 6,
+            maxWidth: "700px",
+            mx: "auto",
+            color: "#D4AF37",
+            fontSize: "1.1rem",
+          }}
+        >
+          Somos un equipo de desarrolladores apasionados por la tecnología y el
+          trabajo en equipo. Este proyecto forma parte de nuestro trabajo final
+          del curso de desarrollo Fullstack, donde buscamos crear una aplicación
+          web moderna y funcional. Y por sobre todo, APROBAR😁
+        </Typography>
+
+        <Grid container spacing={3} justifyContent="center">
+          {integrantes.map((integrante, index) => (
+            <Grid item xs={12} sm={6} md={4} lg={2.4} key={index}>
+              <Grow in={true} timeout={500 + index * 200}>
+                <Card
+                  sx={{
+                    height: "100%",
+                    minHeight: "320px",
+                    bgcolor: modoOscuro ? "#2C2C2C" : "#FFFFFF",
+                    borderRadius: 4,
+                    transition: "transform 0.4s ease, box-shadow 0.4s ease",
+                    display: "flex",
+                    flexDirection: "column",
+                    "&:hover": {
+                      transform: "translateY(-8px)",
+                      boxShadow: modoOscuro
+                        ? "0 8px 20px rgba(212, 175, 55, 0.3)"
+                        : "0 8px 20px rgba(0, 0, 0, 0.15)",
+                    },
+                  }}
+                >
+                  <CardContent
+                    sx={{
+                      textAlign: "center",
+                      py: 4,
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                    }}
                   >
-                    <i className="bi bi-github fs-4"></i>
-                  </a>
-                  <a
-                    href={i.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary mx-2"
-                  >
-                    <i className="bi bi-linkedin fs-4"></i>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+                    <Box>
+                      <Avatar
+                        src={integrante.imagen}
+                        alt={integrante.nombre}
+                        sx={{
+                          width: 120,
+                          height: 120,
+                          mx: "auto",
+                          mb: 2,
+                          border: "3px solid #D4AF37",
+                          transition: "transform 0.4s ease",
+                          "&:hover": {
+                            transform: "scale(1.05) rotate(-2deg)",
+                          },
+                        }}
+                      />
+                      <Typography
+                        variant="h6"
+                        component="h5"
+                        fontWeight="600"
+                        gutterBottom
+                        sx={{ color: "text.primary" }}
+                      >
+                        {integrante.nombre}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          mb: 2,
+                          color: "#D4AF37",
+                        }}
+                      >
+                        {integrante.rol}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", gap: 1 }}
+                    >
+                      <IconButton
+                        href={integrante.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{
+                          color: modoOscuro ? "#FFFFFF" : "#000000",
+                          transition: "transform 0.4s ease, color 0.3s ease",
+                          "&:hover": {
+                            transform: "scale(1.2)",
+                            color: "#D4AF37",
+                          },
+                        }}
+                      >
+                        <GitHub fontSize="large" />
+                      </IconButton>
+                      <IconButton
+                        href={integrante.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{
+                          color: "#0077B5",
+                          transition: "transform 0.4s ease, color 0.3s ease",
+                          "&:hover": {
+                            transform: "scale(1.2)",
+                            color: "#D4AF37",
+                          },
+                        }}
+                      >
+                        <LinkedIn fontSize="large" />
+                      </IconButton>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grow>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </Box>
   );
 }

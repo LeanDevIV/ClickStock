@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { Form, Button } from "react-bootstrap";
-import { PersonFill, EnvelopeFill, KeyFill } from "react-bootstrap-icons";
+import { TextField, Button, Alert, Box, InputAdornment } from "@mui/material";
+import {
+  Person as PersonIcon,
+  Email as EmailIcon,
+  Lock as LockIcon,
+  Phone as PhoneIcon,
+} from "@mui/icons-material";
 import { useStore } from "../hooks/useStore";
 import { registroService } from "../services/RegistroService";
 
-function RegistroLogin({ show, onHide }) {
-  const [modo, setModo] = useState("login");
+function RegistroLogin() {
   const [mensaje, setMensaje] = useState("");
-
-  React.useEffect(() => {
-    if (show) setModo("login");
-  }, [show]);
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -87,110 +87,128 @@ function RegistroLogin({ show, onHide }) {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      {mensaje && <div className="alert alert-info">{mensaje}</div>}
-      <Form.Group className="mb-3">
-        <Form.Label>Nombre</Form.Label>
-        <div className="input-group">
-          <span className="input-group-text">
-            <PersonFill />
-          </span>
-          <Form.Control
-            type="text"
-            name="nombre"
-            value={formData.nombre}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </Form.Group>
+    <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+      {mensaje && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {mensaje}
+        </Alert>
+      )}
 
-      <Form.Group className="mb-3">
-        <Form.Label>Apellido</Form.Label>
-        <div className="input-group">
-          <span className="input-group-text">
-            <PersonFill />
-          </span>
-          <Form.Control
-            type="text"
-            name="apellido"
-            value={formData.apellido}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </Form.Group>
+      <TextField
+        fullWidth
+        label="Nombre"
+        name="nombre"
+        value={formData.nombre}
+        onChange={handleChange}
+        required
+        margin="normal"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <PersonIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-      <Form.Group className="mb-3">
-        <Form.Label>Teléfono</Form.Label>
-        <div className="input-group">
-          <span className="input-group-text">
-            <PersonFill />
-          </span>
-          <Form.Control
-            type="text"
-            name="telefono"
-            value={formData.telefono}
-            onChange={handleChange}
-          />
-        </div>
-      </Form.Group>
+      <TextField
+        fullWidth
+        label="Apellido"
+        name="apellido"
+        value={formData.apellido}
+        onChange={handleChange}
+        required
+        margin="normal"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <PersonIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-      <Form.Group className="mb-3">
-        <Form.Label>Correo electrónico</Form.Label>
-        <div className="input-group">
-          <span className="input-group-text">
-            <EnvelopeFill />
-          </span>
-          <Form.Control
-            type="email"
-            name="correo"
-            value={formData.correo}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </Form.Group>
+      <TextField
+        fullWidth
+        label="Teléfono"
+        name="telefono"
+        value={formData.telefono}
+        onChange={handleChange}
+        margin="normal"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <PhoneIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-      <Form.Group className="mb-3">
-        <Form.Label>Contraseña</Form.Label>
-        <div className="input-group">
-          <span className="input-group-text">
-            <KeyFill />
-          </span>
-          <Form.Control
-            type="password"
-            name="contrasenia"
-            value={formData.contrasenia}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </Form.Group>
+      <TextField
+        fullWidth
+        label="Correo electrónico"
+        name="correo"
+        type="email"
+        value={formData.correo}
+        onChange={handleChange}
+        required
+        margin="normal"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <EmailIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-      <Form.Group className="mb-3">
-        <Form.Label>Confirmar contraseña</Form.Label>
-        <div className="input-group">
-          <span className="input-group-text">
-            <KeyFill />
-          </span>
-          <Form.Control
-            type="password"
-            name="confirmarContrasenia"
-            value={formData.confirmarContrasenia}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </Form.Group>
+      <TextField
+        fullWidth
+        label="Contraseña"
+        name="contrasenia"
+        type="password"
+        value={formData.contrasenia}
+        onChange={handleChange}
+        required
+        margin="normal"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <LockIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-      <div className="d-grid gap-2">
-        <Button variant="primary" type="submit" disabled={cargando}>
-          {cargando ? "Procesando..." : "Registrarse"}
-        </Button>
-      </div>
-    </Form>
+      <TextField
+        fullWidth
+        label="Confirmar contraseña"
+        name="confirmarContrasenia"
+        type="password"
+        value={formData.confirmarContrasenia}
+        onChange={handleChange}
+        required
+        margin="normal"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <LockIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      <Button
+        fullWidth
+        variant="contained"
+        type="submit"
+        disabled={cargando}
+        sx={{ mt: 2 }}
+      >
+        {cargando ? "Procesando..." : "Registrarse"}
+      </Button>
+    </Box>
   );
 }
 
-export default RegistroForm;
+export default RegistroLogin;
