@@ -28,12 +28,7 @@ import {
 } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
 import useCart from "../hooks/useCart";
-import { initMercadoPago } from "@mercadopago/sdk-react";
-import axios from "axios";
-
-initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY, {
-  locale: 'es-AR'
-});
+import { useMercadoPago } from "../hooks/useMercadoPago";
 
 const CartItemSkeleton = () => {
   const theme = useTheme();
@@ -149,9 +144,9 @@ const CarritoPage = () => {
     actualizarCantidad,
     limpiarCarrito,
   } = useCart();
+  const { loading: loadingPayment, crearPreferencia } = useMercadoPago();
   const navigate = useNavigate();
 
-  const [loadingPayment, setLoadingPayment] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const handleIncrementar = async (producto) => {
@@ -181,65 +176,36 @@ const CarritoPage = () => {
   const handleProcederPago = async () => {
     if (articulos.length === 0) return;
 
-    try {
-      setLoadingPayment(true);
-      setSnackbarOpen(true);
+    const authStorage = localStorage.getItem('auth-storage');
+    
+    if (!authStorage) {
+      alert("Debes iniciar sesión para realizar el pago");
+      navigate("/login");
+      return;
+    }
 
-      const authStorage = localStorage.getItem('auth-storage');
-      
-      if (!authStorage) {
-        alert("Debes iniciar sesión para realizar el pago");
-        setLoadingPayment(false);
-        setSnackbarOpen(false);
-        navigate("/login");
-        return;
-      }
+    const authData = JSON.parse(authStorage);
+    const userData = authData.state.user;
 
-      const authData = JSON.parse(authStorage);
-      const userData = authData.state.user;
+    if (!userData?.correo) {
+      alert("Debes iniciar sesión para realizar el pago");
+      navigate("/login");
+      return;
+    }
 
-      if (!userData || !userData.correo) {
-        alert("Debes iniciar sesión para realizar el pago");
-        setLoadingPayment(false);
-        setSnackbarOpen(false);
-        navigate("/login");
-        return;
-      }
+    const productos = articulos.map(producto => ({
+      idProducto: producto.idProducto,
+      nombre: producto.nombre,
+      precio: producto.precio,
+      cantidad: producto.cantidad,
+      imagen: producto.imagen
+    }));
 
-      const productos = articulos.map(producto => ({
-        idProducto: producto.idProducto,
-        nombre: producto.nombre,
-        precio: producto.precio,
-        cantidad: producto.cantidad,
-        imagen: producto.imagen
-      }));
-
-      const response = await axios.post(
-        "http://localhost:5000/api/pagos/crear_preferencia", 
-        {
-          productos: productos,
-          usuario: {
-            emailUsuario: userData.correo
-          }
-        }
-      );
-
-      if (response.data.id) {
-        const mpUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${response.data.id}`;
-        window.open(mpUrl, '_blank');
-      }
-      
-    } catch (error) {
-      if (error.response) {
-        alert(`Error: ${error.response.data.message || "No se pudo generar el pago"}`);
-      } else if (error.request) {
-        alert("Error de conexión. Verifica que el servidor esté funcionando.");
-      } else {
-        alert("Error inesperado. Intenta nuevamente.");
-      }
-    } finally {
-      setLoadingPayment(false);
-      setSnackbarOpen(false);
+    setSnackbarOpen(true);
+    const result = await crearPreferencia(productos, userData.correo);
+    
+    if (!result.success) {
+      alert(result.error);
     }
   };
 
