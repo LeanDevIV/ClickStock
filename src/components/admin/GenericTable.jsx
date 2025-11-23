@@ -51,6 +51,7 @@ export const GenericTable = ({
       descripcion: "Descripción",
       emailUsuario: "Email",
       email: "Email",
+      correo: "Correo",
       precio: "Precio",
       categoria: "Categoría",
       stock: "Stock",
@@ -62,6 +63,7 @@ export const GenericTable = ({
       createdAt: "Fecha",
       usuario: "Usuario",
       rolUsuario: "Rol",
+      rol: "Rol",
       isDeleted: "Eliminado",
       deletedBy: "Eliminado por",
       deletedAt: "Fecha de eliminación",
@@ -72,6 +74,12 @@ export const GenericTable = ({
       user: "Usuario",
       rating: "Calificación",
       comment: "Comentario",
+      // Promociones
+      titulo: "Título",
+      descuento: "Descuento",
+      fechaInicio: "Fecha Inicio",
+      fechaFin: "Fecha Fin",
+      activa: "Activa",
     };
 
     return {
@@ -98,9 +106,9 @@ export const GenericTable = ({
       )}
 
       {/* Tabla con scroll horizontal solo si es necesario */}
-      <TableContainer 
+      <TableContainer
         component={Paper}
-        sx={{ 
+        sx={{
           width: "100%",
           overflowX: "auto",
           WebkitOverflowScrolling: "touch",
@@ -148,8 +156,14 @@ export const GenericTable = ({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={tableHeader.length} align="center" sx={{ py: 3 }}>
-                  <span style={{ color: THEME.primaryColor, fontStyle: "italic" }}>
+                <TableCell
+                  colSpan={tableHeader.length}
+                  align="center"
+                  sx={{ py: 3 }}
+                >
+                  <span
+                    style={{ color: THEME.primaryColor, fontStyle: "italic" }}
+                  >
                     {showDeleted
                       ? "No hay registros disponibles"
                       : "No hay registros activos"}

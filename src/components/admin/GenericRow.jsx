@@ -176,6 +176,10 @@ export const GenericRow = ({
         );
 
       default:
+        // Manejo de arrays (ej: productos en Promociones)
+        if (Array.isArray(value)) {
+          return value.length > 0 ? `${value.length} items` : "-";
+        }
         return value || "-";
     }
   };

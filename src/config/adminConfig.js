@@ -4,7 +4,7 @@ export const MENU_ITEMS = [
   { titulo: "Pedidos", section: "Pedidos" },
   { titulo: "Soporte", section: "Soporte" },
   { titulo: "Reseñas", section: "Reseñas" },
-  // { titulo: "Promociones", section: "Promociones" }, // TODO: Debugging error de renderizado
+  { titulo: "Promociones", section: "Promociones" },
 ];
 export const TABLE_CONFIG = {
   Productos: {
@@ -82,10 +82,10 @@ export const TABLE_CONFIG = {
   },
   Promociones: {
     endpoint: "/promociones",
-    restoreEndpoint: null,
+    restoreEndpoint: "/promociones/restore/:id",
     updateEndpoint: "/promociones/:id",
-    deleteEndpoint: "/promociones/:id",
-    softDeleteEndpoint: null,
+    deleteEndpoint: "/promociones/permanent/:id",
+    softDeleteEndpoint: "/promociones/soft/:id",
     editableFields: [
       "titulo",
       "descripcion",
@@ -101,6 +101,9 @@ export const TABLE_CONFIG = {
       "fechaFin",
       "activa",
       "createdAt",
+      "isDeleted",
+      "deletedBy",
+      "deletedAt",
     ],
   },
 };
