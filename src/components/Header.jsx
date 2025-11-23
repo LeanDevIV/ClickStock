@@ -183,36 +183,6 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   </Badge>
                 </IconButton>
               </Tooltip>
-
-              {/* <Tooltip title="Ver carrito">
-                <IconButton
-                  color="inherit"
-                  onClick={handleGoToCart}
-                  className="ms-2"
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: modoOscuro
-                        ? "rgba(255, 255, 255, 0.1)"
-                        : "rgba(0, 0, 0, 0.1)",
-                    },
-                  }}
-                >
-                  <Badge
-                    badgeContent={totalArticulos}
-                    color="error"
-                    sx={{
-                      "& .MuiBadge-badge": {
-                        fontSize: "0.7rem",
-                        fontWeight: "bold",
-                        minWidth: "18px",
-                        height: "18px",
-                      },
-                    }}
-                  >
-                    <ShoppingCart />
-                  </Badge>
-                </IconButton>
-              </Tooltip> */}
               {/* :luna_creciente:/:soleado: Modo oscuro */}
               <div className="d-flex align-items-center ms-3">
                 <IconButton onClick={toggleModo}>
