@@ -5,6 +5,8 @@
   display: flex;
   align-items: center;
   padding: 40px 0;
+  background-attachment: fixed;
+
 }
 
 .contact-overlay {
@@ -131,5 +133,33 @@
 
   .contact-form-box {
     padding: 18px;
+  }
+}
+/* Contenedor del mapa */
+.map-container {
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* iFrame responsive */
+.map-container iframe {
+  width: 100%;
+  height: 200px;
+  border: 0;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .map-container iframe {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container iframe {
+    height: 200px;
   }
 }
