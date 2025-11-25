@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useTableData } from "../../hooks/useTableData";
 import { TABLE_CONFIG, THEME, SELECT_OPTIONS } from "../../config/adminConfig";
 import { useCategoriesStore } from "../../hooks/useCategoriesStore";
-import { Box, Pagination, Typography } from "@mui/material";
+import { Box, Pagination, Typography, Button } from "@mui/material";
 import { AdminSidebar } from "../../components/admin/AdminSidebar";
 import { GenericTable } from "../../components/admin/GenericTable";
 
@@ -69,7 +69,16 @@ export const AdminDashboard = () => {
       return <p>Cargando datos...</p>;
     }
     if (error) {
-      return <p>{error}</p>;
+      return (
+        <Box sx={{ p: 3, textAlign: "center" }}>
+          <Typography color="error" sx={{ mb: 2 }}>
+            {error}
+          </Typography>
+          <Button variant="contained" onClick={fetchData} sx={{ mt: 1 }}>
+            Reintentar
+          </Button>
+        </Box>
+      );
     }
 
     const commonProps = {
@@ -77,7 +86,11 @@ export const AdminDashboard = () => {
       data: paginatedData,
       editingId,
       editedData,
-      onEdit: onEdit,
+      onEdit:
+        TABLE_CONFIG[selectedSection].editableFields &&
+        TABLE_CONFIG[selectedSection].editableFields.length > 0
+          ? onEdit
+          : undefined,
       onSave: handleSave,
       onCancel: handleCancel,
       onFieldChange: handleFieldChange,
@@ -97,14 +110,39 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", width: "100%" }}>
-      <Box component="main" sx={{ flexGrow: 1, p: 2, width: "100%", overflow: "hidden" }}>
-        <Typography variant="h4" sx={{ mb: 2, fontWeight: "bold", fontSize: { xs: "1.5rem", sm: "2rem" } }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        width: "100%",
+      }}
+    >
+      <Box
+        component="main"
+        sx={{ flexGrow: 1, p: 2, width: "100%", overflow: "hidden" }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            mb: 2,
+            fontWeight: "bold",
+            fontSize: { xs: "1.5rem", sm: "2rem" },
+          }}
+        >
           {selectedSection}
         </Typography>
 
         {/* Contenedor Sidebar + Tabla en flex */}
-        <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start", width: "100%", overflow: "hidden" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            alignItems: "flex-start",
+            width: "100%",
+            overflow: "hidden",
+          }}
+        >
           {/* Sidebar */}
           <AdminSidebar
             selectedSection={selectedSection}

@@ -9,7 +9,7 @@ El proyecto está desarrollado con tecnologías modernas de frontend y busca ofr
 
 - **React.js** – Framework principal del frontend  
 - **Vite** – Entorno de desarrollo ultrarrápido  
-- **React Bootstrap** – Componentes visuales y responsive design  
+- **Material-UI (MUI)** – Componentes visuales y responsive design  
 - **Zustand** – Manejo de estado global  
 - **Axios** – Comunicación con el backend mediante API REST  
 - **React Router DOM** – Navegación entre vistas  

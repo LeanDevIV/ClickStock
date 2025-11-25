@@ -8,6 +8,7 @@ import {
   StatusChip,
 } from "./TableComponents";
 import { TABLE_CONFIG, CHIP_COLORS } from "../../config/adminConfig";
+import { useStore } from "../../hooks/useStore";
 
 /**
  * Fila genérica reutilizable para todas las tablas
@@ -36,7 +37,8 @@ export const GenericRow = ({
   const getCategoriaNombre = (categoriaId) => {
     if (!categoriaId) return "N/A";
     const cat = categorias.find(
-      (categoria) => categoria._id === categoriaId || categoria.id === categoriaId
+      (categoria) =>
+        categoria._id === categoriaId || categoria.id === categoriaId
     );
     return cat?.nombre || categoriaId;
   };
@@ -52,6 +54,32 @@ export const GenericRow = ({
           onChange={(newValue) => onFieldChange(field, newValue)}
           displayValue={displayValue}
         />
+      );
+    }
+
+    // Mostrar indicador de usuario actual en la tabla de Usuarios
+    if (section === "Usuarios" && field === "nombre") {
+      const currentUser = useStore.getState().user;
+      const isCurrentUser =
+        currentUser &&
+        (currentUser._id === item._id || currentUser.id === item._id);
+
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>{value}</span>
+          {isCurrentUser && (
+            <Chip
+              label="Tú"
+              size="small"
+              sx={{
+                backgroundColor: "#D4AF37",
+                color: "#000",
+                fontWeight: "bold",
+                fontSize: "11px",
+              }}
+            />
+          )}
+        </div>
       );
     }
 
@@ -118,14 +146,23 @@ export const GenericRow = ({
       case "createdAt":
       case "fecha":
       case "fechaCreacion":
+      case "fechaInicio":
+      case "fechaFin":
         if (!value) return "-";
-        return new Date(value).toLocaleDateString("es-AR", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+        try {
+          const date = new Date(value);
+          if (isNaN(date.getTime())) return "-";
+          return date.toLocaleDateString("es-AR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } catch (error) {
+          console.error(`Error formatting date for field ${field}:`, error);
+          return "-";
+        }
 
       case "deletedBy":
         if (!value) return "-";
@@ -133,7 +170,9 @@ export const GenericRow = ({
 
       case "usuario":
         if (!value) return "-";
-        return typeof value === "object" ? value.nombreUsuario || value.name : value;
+        return typeof value === "object"
+          ? value.nombreUsuario || value.name
+          : value;
 
       case "productId":
         if (!value) return "-";
@@ -141,7 +180,9 @@ export const GenericRow = ({
 
       case "user":
         if (!value) return "-";
-        return typeof value === "object" ? value.nombreUsuario || value.name : value;
+        return typeof value === "object"
+          ? value.nombreUsuario || value.name
+          : value;
 
       case "rating":
         return (
@@ -152,7 +193,20 @@ export const GenericRow = ({
           />
         );
 
+      case "activa":
+        return (
+          <Chip
+            label={value ? "Sí" : "No"}
+            size="small"
+            color={value ? "success" : "default"}
+          />
+        );
+
       default:
+        // Manejo de arrays (ej: productos en Promociones)
+        if (Array.isArray(value)) {
+          return value.length > 0 ? `${value.length} items` : "-";
+        }
         return value || "-";
     }
   };

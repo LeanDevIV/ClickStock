@@ -1,30 +1,36 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Navbar, Nav, Container } from "react-bootstrap";
 import {
+  AppBar,
+  Toolbar,
+  Container,
   Box,
   Button,
-  ButtonGroup,
   IconButton,
   InputBase,
-  Switch,
-  Tooltip,
   Badge,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
 } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import {
-  Brightness7,
-  Brightness4,
   Search as SearchIcon,
-  AdminPanelSettings,
   ShoppingCart,
+  Menu as MenuIcon,
+  Person,
+  Brightness4,
+  Brightness7,
 } from "@mui/icons-material";
 import { useStore } from "../hooks/useStore";
 import { useScrollDirection } from "../hooks/useScrollDirection";
 import { UserMenu } from "./MenuUsuario";
-import AuthModal from "./AuthModal"; // ⬅️ Nuevo modal unificado
+import AuthModal from "./AuthModal";
 import "./Header.css";
-// === :lupa: Estilos del buscador ===
+
+// Search Styles
 const SearchContainer = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -32,13 +38,15 @@ const SearchContainer = styled("div")(({ theme }) => ({
   "&:hover": {
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
+  marginRight: theme.spacing(2),
   marginLeft: 0,
   width: "100%",
   [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(1),
+    marginLeft: theme.spacing(3),
     width: "auto",
   },
 }));
+
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
   height: "100%",
@@ -48,147 +56,207 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
 }));
+
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
-  width: "100%",
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
-    [theme.breakpoints.up("sm")]: {
-      width: "12ch",
-      "&:focus": {
-        width: "20ch",
-      },
+    width: "100%",
+    [theme.breakpoints.up("md")]: {
+      width: "20ch",
     },
   },
 }));
-// === :cerebro: Componente principal ===
+
 export const Header = ({ modoOscuro, toggleModo }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [search, setSearch] = useState("");
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const navigate = useNavigate();
   const showNavbar = useScrollDirection(10);
   const user = useStore((state) => state.user);
   const logout = useStore((state) => state.logout);
   const totalArticulos = useStore((state) => state.cart.totalArticulos);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (search.trim() !== "") {
       navigate(`/buscar?query=${search}`);
       setSearch("");
+      setMobileOpen(false);
     }
   };
+
   const handleOpenAuth = () => setShowAuthModal(true);
   const handleCloseAuth = () => setShowAuthModal(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleGoToCart = () => {
+    navigate("/carrito");
+    setMobileOpen(false);
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/");
   };
-  const handleGoToCart = () => {
-    navigate("/carrito");
-  };
+
+  const navLinks = [
+    { title: "Inicio", path: "/" },
+    { title: "Productos", path: "/productos" },
+    { title: "Nosotros", path: "/nosotros" },
+    { title: "Contacto", path: "/contacto" },
+  ];
+
+  const drawer = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
+      <Box sx={{ my: 2 }}>
+        <Link
+          to="/"
+          style={{
+            textDecoration: "none",
+            color: "inherit",
+            fontWeight: "bold",
+            fontSize: "1.2rem",
+          }}
+        >
+          ClickStock
+        </Link>
+      </Box>
+      <List>
+        {navLinks.map((item) => (
+          <ListItem key={item.title} disablePadding>
+            <ListItemButton
+              component={Link}
+              to={item.path}
+              sx={{ textAlign: "center" }}
+            >
+              <ListItemText primary={item.title} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+
   return (
     <>
-      <Navbar
-        bg={modoOscuro ? "dark" : "light"}
-        variant={modoOscuro ? "dark" : "light"}
-        expand="lg"
-        className={`shadow-sm py-3 sticky-top navbar-transition ${
+      <AppBar
+        position="sticky"
+        color="default"
+        elevation={1}
+        className={`navbar-transition ${
           showNavbar ? "navbar-visible" : "navbar-hidden"
         }`}
+        sx={{
+          bgcolor: modoOscuro ? "background.paper" : "background.default",
+          color: "text.primary",
+        }}
       >
-        <Container>
-          <Navbar.Brand as={Link} to="/" className="fw-bold fs-4 text-primary">
-            Click<span className="text-dark">Stock</span>
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbar-nav" />
-          <Navbar.Collapse id="navbar-nav">
-            <Nav className="ms-auto align-items-center">
-              <Nav.Link as={Link} to="/" className="mx-2 fw-medium">
-                Inicio
-              </Nav.Link>
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            {/* Logo Desktop */}
+            <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
+              <Link
+                to="/"
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  fontWeight: "bold",
+                  fontSize: "1.5rem",
+                }}
+              >
+                ClickStock
+              </Link>
+            </Box>
 
-              <Nav.Link as={Link} to="/productos" className="mx-2 fw-medium">
-                Productos
-              </Nav.Link>
+            {/* Mobile Menu Button */}
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+              <IconButton
+                size="large"
+                aria-label="menu"
+                onClick={handleDrawerToggle}
+                color="inherit"
+              >
+                <MenuIcon />
+              </IconButton>
+            </Box>
 
-              <Nav.Link as={Link} to="/contacto" className="mx-2 fw-medium">
-                Contacto
-              </Nav.Link>
-              {/* Enlaces de admin */}
-              {user?.rolUsuario === "admin" && (
-                <div className="mx-2">
-                  <ButtonGroup variant="text" className="text-danger">
-                    <Tooltip title="Admin">
-                      <Button
-                        component={Link}
-                        to="/admin/dashboard"
-                        color="error"
-                      >
-                        <AdminPanelSettings />
-                      </Button>
-                    </Tooltip>
-                  </ButtonGroup>
-                </div>
-              )}
-              {/* :lupa: Buscador */}
-              <Box component="form" onSubmit={handleSubmit}>
+            {/* Logo Mobile */}
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+              <Link
+                to="/"
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  fontWeight: "bold",
+                  fontSize: "1.2rem",
+                }}
+              >
+                ClickStock
+              </Link>
+            </Box>
+
+            {/* Desktop Nav Links */}
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: { xs: "none", md: "flex" },
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
+              {navLinks.map((page) => (
+                <Button
+                  key={page.title}
+                  component={Link}
+                  to={page.path}
+                  sx={{ my: 2, color: "inherit", display: "block" }}
+                >
+                  {page.title}
+                </Button>
+              ))}
+            </Box>
+
+            {/* Search, Cart, Dark Mode, User */}
+            <Box
+              sx={{
+                flexGrow: 0,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <form onSubmit={handleSubmit}>
                 <SearchContainer>
                   <SearchIconWrapper>
                     <SearchIcon />
                   </SearchIconWrapper>
-
                   <StyledInputBase
                     placeholder="Buscar..."
-                    inputProps={{ "aria-label": "buscar" }}
+                    inputProps={{ "aria-label": "search" }}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
                 </SearchContainer>
-              </Box>
-              <Tooltip title="Ver carrito">
-                <IconButton
-                  color="inherit"
-                  onClick={handleGoToCart}
-                  className="ms-2"
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: modoOscuro
-                        ? "rgba(255, 255, 255, 0.1)"
-                        : "rgba(0, 0, 0, 0.1)",
-                    },
-                  }}
-                >
-                  <Badge
-                    badgeContent={totalArticulos}
-                    color="error"
-                    sx={{
-                      "& .MuiBadge-badge": {
-                        fontSize: "0.7rem",
-                        fontWeight: "bold",
-                        minWidth: "18px",
-                        height: "18px",
-                      },
-                    }}
-                  >
-                    <ShoppingCart />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-              {/* :luna_creciente:/:soleado: Modo oscuro */}
-              <div className="d-flex align-items-center ms-3">
-                <IconButton onClick={toggleModo}>
-                  {modoOscuro ? <Brightness7 /> : <Brightness4 />}
-                </IconButton>
+              </form>
 
-                <Switch
-                  checked={modoOscuro}
-                  onChange={toggleModo}
-                  color="default"
-                />
-              </div>
-              {/* :silueta_de_busto: Usuario / Login */}
+              <IconButton onClick={handleGoToCart} color="inherit">
+                <Badge badgeContent={totalArticulos} color="error">
+                  <ShoppingCart />
+                </Badge>
+              </IconButton>
+
+              <IconButton onClick={toggleModo} color="inherit">
+                {modoOscuro ? <Brightness7 /> : <Brightness4 />}
+              </IconButton>
+
               {user ? (
                 <UserMenu
                   user={user}
@@ -196,15 +264,44 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   handleLogout={handleLogout}
                 />
               ) : (
-                <Button onClick={handleOpenAuth} className="ms-2 px-4">
-                  Iniciar sesión
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  onClick={handleOpenAuth}
+                  startIcon={<Person />}
+                  size="small"
+                >
+                  Ingresar
                 </Button>
               )}
-            </Nav>
-          </Navbar.Collapse>
+            </Box>
+          </Toolbar>
         </Container>
-      </Navbar>
-      <AuthModal show={showAuthModal} onHide={handleCloseAuth} />
+      </AppBar>
+
+      {/* Mobile Drawer */}
+      <nav>
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
+          sx={{
+            display: { xs: "block", md: "none" },
+            "& .MuiDrawer-paper": { boxSizing: "border-box", width: 240 },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </nav>
+
+      <AuthModal
+        show={showAuthModal}
+        handleClose={handleCloseAuth}
+        setMensaje={() => {}}
+      />
     </>
   );
 };

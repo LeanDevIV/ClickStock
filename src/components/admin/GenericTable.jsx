@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { THEME, TABLE_CONFIG } from "../../config/adminConfig";
-import { Box, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 import TableContainer from "@mui/material/TableContainer";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -29,7 +29,7 @@ export const GenericTable = ({
   onRefresh,
   categorias = [],
 }) => {
-  const muiTheme = useTheme();
+  // const muiTheme = useTheme();
   const [showDeleted, setShowDeleted] = useState(true);
   const config = TABLE_CONFIG[section];
 
@@ -51,6 +51,7 @@ export const GenericTable = ({
       descripcion: "Descripción",
       emailUsuario: "Email",
       email: "Email",
+      correo: "Correo",
       precio: "Precio",
       categoria: "Categoría",
       stock: "Stock",
@@ -59,9 +60,10 @@ export const GenericTable = ({
       total: "Total",
       estado: "Estado",
       fechaCreacion: "Fecha",
-      createdAt: "Fecha",
+      createdAt: "Creada",
       usuario: "Usuario",
       rolUsuario: "Rol",
+      rol: "Rol",
       isDeleted: "Eliminado",
       deletedBy: "Eliminado por",
       deletedAt: "Fecha de eliminación",
@@ -72,6 +74,12 @@ export const GenericTable = ({
       user: "Usuario",
       rating: "Calificación",
       comment: "Comentario",
+      // Promociones
+      titulo: "Título",
+      descuento: "Descuento",
+      fechaInicio: "Fecha Inicio",
+      fechaFin: "Fecha Fin",
+      activa: "Activa",
     };
 
     return {
@@ -98,9 +106,9 @@ export const GenericTable = ({
       )}
 
       {/* Tabla con scroll horizontal solo si es necesario */}
-      <TableContainer 
+      <TableContainer
         component={Paper}
-        sx={{ 
+        sx={{
           width: "100%",
           overflowX: "auto",
           WebkitOverflowScrolling: "touch",
@@ -148,8 +156,14 @@ export const GenericTable = ({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={tableHeader.length} align="center" sx={{ py: 3 }}>
-                  <span style={{ color: THEME.primaryColor, fontStyle: "italic" }}>
+                <TableCell
+                  colSpan={tableHeader.length}
+                  align="center"
+                  sx={{ py: 3 }}
+                >
+                  <span
+                    style={{ color: THEME.primaryColor, fontStyle: "italic" }}
+                  >
                     {showDeleted
                       ? "No hay registros disponibles"
                       : "No hay registros activos"}
