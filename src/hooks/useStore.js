@@ -1,6 +1,17 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+// Limpieza automática al cargar el store
+if (typeof window !== 'undefined') {
+  try {
+    if (localStorage.getItem('ecommerce-storage')) {
+      localStorage.removeItem('ecommerce-storage');
+    }
+  } catch (error) {
+    // Silencioso
+  }
+}
+
 export const useStore = create(
   persist(
     (set) => ({
@@ -46,10 +57,8 @@ export const useStore = create(
             "Error al hidratar el estado desde localStorage:",
             error
           );
-          // En caso de error, el estado se inicializará con los valores por defecto
         }
       },
-      // Manejo de errores de serialización
       serialize: (state) => {
         try {
           return JSON.stringify(state);

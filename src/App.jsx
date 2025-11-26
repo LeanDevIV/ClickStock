@@ -53,7 +53,7 @@ function App() {
         }}
       />
       {/* Background animado - posición absoluta */}
-      <div
+      {/* <div
         style={{
           position: "absolute",
           top: 0,
@@ -79,7 +79,7 @@ function App() {
           autoResumeDelay={3000}
           autoRampDuration={0.6}
         />
-      </div>
+      </div> */}
       {/* <WelcomeScreen /> */}
       <AppRoutes modoOscuro={modoOscuro} toggleModo={toggleModo} />
       <FloatingChat />

@@ -7,7 +7,7 @@ function Home() {
   return (
     <div style={{ width: "100%", minHeight: "100vh", position: "relative" }}>
       {/* Background animado - posición absoluta */}
-      <div
+      {/* <div
         style={{
           position: "absolute",
           top: 0,
@@ -34,7 +34,7 @@ function Home() {
           autoResumeDelay={3000}
           autoRampDuration={0.6}
         />
-      </div>
+      </div> */}
 
       {/* Contenido principal - posición relativa para estar encima */}
       <div style={{ position: "relative", zIndex: 1 }}>
