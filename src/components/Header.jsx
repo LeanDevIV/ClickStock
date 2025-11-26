@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import CarritoPreview from "./CarritoPreview";
+
+
 import {
   AppBar,
   Toolbar,
@@ -71,6 +74,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export const Header = ({ modoOscuro, toggleModo }) => {
+  const [showCarrito, setShowCarrito] = useState(false);
+  const handleOpenPreview = () => setShowCarrito(true);
+  const handleClosePreview = () => setShowCarrito(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -80,6 +86,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
   const user = useStore((state) => state.user);
   const logout = useStore((state) => state.logout);
   const totalArticulos = useStore((state) => state.cart.totalArticulos);
+  const carrito = useStore((state) => state.cart);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -247,7 +254,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                 </SearchContainer>
               </form>
 
-              <IconButton onClick={handleGoToCart} color="inherit">
+              <IconButton onClick={handleOpenPreview} color="inherit">
                 <Badge badgeContent={totalArticulos} color="error">
                   <ShoppingCart />
                 </Badge>
@@ -302,6 +309,8 @@ export const Header = ({ modoOscuro, toggleModo }) => {
         handleClose={handleCloseAuth}
         setMensaje={() => {}}
       />
+      <CarritoPreview show={showCarrito} handleClose={handleClosePreview} />
+
     </>
   );
 };
