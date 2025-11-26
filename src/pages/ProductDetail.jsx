@@ -232,20 +232,31 @@ const ProductDetail = () => {
             <Stack spacing={3}>
               {/* Título y precio */}
               <Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'flex-start', 
+                  gap: 1, 
+                  mb: 1,
+                  flexDirection: { xs: 'column', sm: 'row' }
+                }}>
                   <Typography
                     variant="h4"
                     component="h1"
                     fontWeight="bold"
                     color="text.primary"
-                    sx={{ lineHeight: 1.2 }}
+                    sx={{ lineHeight: 1.2, flex: 1 }}
                   >
                     {product.nombre}
                   </Typography>
-                  <BotonCompartir
-                    idProducto={product._id}
-                    nombreProducto={product.nombre}
-                  />
+                  <Box sx={{ 
+                    alignSelf: { xs: 'flex-start', sm: 'center' },
+                    mt: { xs: 1, sm: 0 }
+                  }}>
+                    <BotonCompartir
+                      idProducto={product._id}
+                      nombreProducto={product.nombre}
+                    />
+                  </Box>
                 </Box>
 
                 <Typography
