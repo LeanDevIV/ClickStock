@@ -116,6 +116,8 @@ export const AdminDashboard = () => {
         flexDirection: "column",
         minHeight: "100vh",
         width: "100%",
+        bgcolor: "rgba(0,0,0,0.7)",
+        backdropFilter: "blur(4px)",
       }}
     >
       <Box
