@@ -16,6 +16,10 @@ function App() {
     return getItem("modoOscuro", false); // Retorna boolean directamente
   });
 
+  const [backgroundEnabled, setBackgroundEnabled] = useState(() => {
+    return getItem("backgroundEnabled", true); // Default true
+  });
+
   const theme = useMemo(() => getCustomTheme(modoOscuro), [modoOscuro]);
 
   const toggleModo = () => {
@@ -23,6 +27,14 @@ function App() {
       const nuevoModo = !prev;
       setItem("modoOscuro", nuevoModo); // Guarda boolean directamente
       return nuevoModo;
+    });
+  };
+
+  const toggleBackground = () => {
+    setBackgroundEnabled((prev) => {
+      const newState = !prev;
+      setItem("backgroundEnabled", newState);
+      return newState;
     });
   };
 
@@ -52,36 +64,43 @@ function App() {
           },
         }}
       />
-      {/* Background animado - posición absoluta */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          zIndex: 0,
-        }}
-      >
-        <LiquidEther
-          mouseForce={20}
-          cursorSize={100}
-          isViscous={false}
-          viscous={30}
-          iterationsViscous={32}
-          iterationsPoisson={32}
-          resolution={0.5}
-          isBounce={false}
-          autoDemo={true}
-          autoSpeed={0.5}
-          autoIntensity={2.2}
-          takeoverDuration={0.25}
-          autoResumeDelay={3000}
-          autoRampDuration={0.6}
-        />
-      </div>
+      {/* Background animado - posición absoluta (Solo en Modo Oscuro) */}
+      {backgroundEnabled && modoOscuro && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 0,
+          }}
+        >
+          <LiquidEther
+            mouseForce={20}
+            cursorSize={100}
+            isViscous={false}
+            viscous={30}
+            iterationsViscous={32}
+            iterationsPoisson={32}
+            resolution={0.5}
+            isBounce={false}
+            autoDemo={true}
+            autoSpeed={0.5}
+            autoIntensity={2.2}
+            takeoverDuration={0.25}
+            autoResumeDelay={3000}
+            autoRampDuration={0.6}
+          />
+        </div>
+      )}
       <WelcomeScreen />
-      <AppRoutes modoOscuro={modoOscuro} toggleModo={toggleModo} />
+      <AppRoutes
+        modoOscuro={modoOscuro}
+        toggleModo={toggleModo}
+        backgroundEnabled={backgroundEnabled}
+        toggleBackground={toggleBackground}
+      />
       <FloatingChat />
       <Footer />
     </ThemeProvider>

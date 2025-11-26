@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -23,7 +23,10 @@ import {
   Person,
   Brightness4,
   Brightness7,
+  BlurOn,
+  BlurOff,
 } from "@mui/icons-material";
+import { Tooltip } from "@mui/material";
 import { useStore } from "../hooks/useStore";
 import { useScrollDirection } from "../hooks/useScrollDirection";
 import { UserMenu } from "./MenuUsuario";
@@ -70,7 +73,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export const Header = ({ modoOscuro, toggleModo }) => {
+export const Header = ({
+  modoOscuro,
+  toggleModo,
+  backgroundEnabled,
+  toggleBackground,
+}) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -155,6 +163,9 @@ export const Header = ({ modoOscuro, toggleModo }) => {
     </Box>
   );
 
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <>
       <AppBar
@@ -165,7 +176,7 @@ export const Header = ({ modoOscuro, toggleModo }) => {
           showNavbar ? "navbar-visible" : "navbar-hidden"
         } ${isScrolled ? "glass-navbar" : "transparent-navbar"}`}
         sx={{
-          color: "text.primary",
+          color: isHome && !isScrolled ? "#FFFFFF" : "text.primary",
           transition: "all 0.3s ease",
           bgcolor: isScrolled
             ? modoOscuro
@@ -267,6 +278,14 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   <ShoppingCart />
                 </Badge>
               </IconButton>
+
+              <Tooltip
+                title={backgroundEnabled ? "Desactivar Fondo" : "Activar Fondo"}
+              >
+                <IconButton onClick={toggleBackground} color="inherit">
+                  {backgroundEnabled ? <BlurOn /> : <BlurOff />}
+                </IconButton>
+              </Tooltip>
 
               <IconButton onClick={toggleModo} color="inherit">
                 {modoOscuro ? <Brightness7 /> : <Brightness4 />}
