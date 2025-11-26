@@ -26,24 +26,38 @@ import {
   Tooltip,
 } from "@mui/material";
 
-function Products() {
+function Products({ productos: productosExternos }) {
   const [productos, setProductos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { esFavorito, toggleFavorito, loading: loadingFavoritos } = useFavoritos();
-  const { añadirAlCarrito, quitarDelCarrito, cargando: cargandoCarrito, articulos } = useCart();
+  const [loading, setLoading] = useState(!productosExternos);
+  const {
+    esFavorito,
+    toggleFavorito,
+    loading: loadingFavoritos,
+  } = useFavoritos();
+  const {
+    añadirAlCarrito,
+    quitarDelCarrito,
+    cargando: cargandoCarrito,
+    articulos,
+  } = useCart();
   const navigate = useNavigate();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   // Función para verificar si el producto está en el carrito
   const estaEnCarrito = (productoId) => {
-    return articulos.some(item => item.idProducto === productoId);
+    return articulos.some((item) => item.idProducto === productoId);
   };
 
   useEffect(() => {
-    obtenerProductos();
-  }, []);
+    if (productosExternos) {
+      setProductos(productosExternos);
+      setLoading(false);
+    } else {
+      obtenerProductos();
+    }
+  }, [productosExternos]);
 
   async function obtenerProductos() {
     try {
@@ -91,25 +105,25 @@ function Products() {
         borderRadius: 3,
         boxShadow: 2,
         overflow: "hidden",
-        bgcolor: 'background.paper',
+        bgcolor: "background.paper",
       }}
     >
-      <Skeleton 
-        variant="rectangular" 
-        width="100%" 
-        height={200} 
-        sx={{ bgcolor: 'grey.800' }}
+      <Skeleton
+        variant="rectangular"
+        width="100%"
+        height={200}
+        sx={{ bgcolor: "grey.800" }}
       />
-      
+
       <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
         <Skeleton variant="text" height={32} sx={{ mb: 1 }} />
         <Skeleton variant="text" height={20} width="60%" sx={{ mb: 1 }} />
         <Skeleton variant="text" height={28} width="40%" sx={{ mb: 2 }} />
-        
-        <Box sx={{ mt: 'auto' }}>
-          <Skeleton 
-            variant="rectangular" 
-            height={40} 
+
+        <Box sx={{ mt: "auto" }}>
+          <Skeleton
+            variant="rectangular"
+            height={40}
             sx={{ borderRadius: 2 }}
           />
         </Box>
@@ -119,25 +133,25 @@ function Products() {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography 
-          variant="h3" 
+      <Box sx={{ textAlign: "center", mb: 6 }}>
+        <Typography
+          variant="h3"
           component="h1"
           fontWeight="bold"
           gutterBottom
           sx={{
             background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            color: 'transparent',
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            color: "transparent",
           }}
         >
           Nuestros Productos
         </Typography>
-        <Typography 
-          variant="h6" 
+        <Typography
+          variant="h6"
           color="text.secondary"
-          sx={{ maxWidth: 600, mx: 'auto' }}
+          sx={{ maxWidth: 600, mx: "auto" }}
         >
           Descubre nuestra selección exclusiva de productos de alta calidad
         </Typography>
@@ -164,7 +178,7 @@ function Products() {
           {productos.length > 0 ? (
             productos.map((producto) => {
               const enCarrito = estaEnCarrito(producto._id);
-              
+
               return (
                 <Grid
                   item
@@ -217,15 +231,16 @@ function Products() {
                           left: 12,
                           fontWeight: "bold",
                           zIndex: 2,
-                          backdropFilter: 'blur(10px)',
-                          backgroundColor: theme.palette.mode === 'dark' 
-                            ? 'rgba(0,0,0,0.7)' 
-                            : 'rgba(255,255,255,0.9)',
+                          backdropFilter: "blur(10px)",
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? "rgba(0,0,0,0.7)"
+                              : "rgba(255,255,255,0.9)",
                         }}
                       />
                     )}
 
-                    <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+                    <Box sx={{ position: "relative", overflow: "hidden" }}>
                       <CardMedia
                         component="img"
                         image={
@@ -250,18 +265,22 @@ function Products() {
                         position: "absolute",
                         top: 12,
                         right: 12,
-                        color: esFavorito(producto._id) ? theme.palette.error.main : "grey.400",
-                        backgroundColor: theme.palette.mode === 'dark' 
-                          ? 'rgba(0,0,0,0.7)' 
-                          : 'rgba(255,255,255,0.9)',
-                        backdropFilter: 'blur(10px)',
+                        color: esFavorito(producto._id)
+                          ? theme.palette.error.main
+                          : "grey.400",
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? "rgba(0,0,0,0.7)"
+                            : "rgba(255,255,255,0.9)",
+                        backdropFilter: "blur(10px)",
                         opacity: 0,
                         transform: "translateY(-10px)",
                         transition: "all 0.3s ease",
-                        "&:hover": { 
-                          backgroundColor: theme.palette.mode === 'dark' 
-                            ? 'rgba(0,0,0,0.9)' 
-                            : 'white',
+                        "&:hover": {
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? "rgba(0,0,0,0.9)"
+                              : "white",
                           transform: "scale(1.1)",
                         },
                       }}
@@ -273,7 +292,11 @@ function Products() {
                       )}
                     </IconButton>
 
-                    <Tooltip title={enCarrito ? "Quitar del carrito" : "Agregar al carrito"}>
+                    <Tooltip
+                      title={
+                        enCarrito ? "Quitar del carrito" : "Agregar al carrito"
+                      }
+                    >
                       <IconButton
                         className="carrito-btn"
                         onClick={() => handleToggleCarrito(producto)}
@@ -282,18 +305,22 @@ function Products() {
                           position: "absolute",
                           top: 12,
                           right: 54,
-                          color: enCarrito ? theme.palette.success.main : theme.palette.primary.main,
-                          backgroundColor: theme.palette.mode === 'dark' 
-                            ? 'rgba(0,0,0,0.7)' 
-                            : 'rgba(255,255,255,0.9)',
-                          backdropFilter: 'blur(10px)',
+                          color: enCarrito
+                            ? theme.palette.success.main
+                            : theme.palette.primary.main,
+                          backgroundColor:
+                            theme.palette.mode === "dark"
+                              ? "rgba(0,0,0,0.7)"
+                              : "rgba(255,255,255,0.9)",
+                          backdropFilter: "blur(10px)",
                           opacity: 0,
                           transform: "translateY(-10px)",
                           transition: "all 0.3s ease",
-                          "&:hover": { 
-                            backgroundColor: theme.palette.mode === 'dark' 
-                              ? 'rgba(0,0,0,0.9)' 
-                              : 'white',
+                          "&:hover": {
+                            backgroundColor:
+                              theme.palette.mode === "dark"
+                                ? "rgba(0,0,0,0.9)"
+                                : "white",
                             transform: "scale(1.1)",
                           },
                         }}
@@ -322,24 +349,24 @@ function Products() {
                           sx={{
                             fontWeight: 600,
                             mb: 1,
-                            display: '-webkit-box',
+                            display: "-webkit-box",
                             WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            minHeight: '48px',
-                            color: 'text.primary',
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            minHeight: "48px",
+                            color: "text.primary",
                           }}
                         >
                           {producto.nombre}
                         </Typography>
 
-                        <Typography 
-                          variant="h5" 
+                        <Typography
+                          variant="h5"
                           component="p"
-                          sx={{ 
+                          sx={{
                             fontWeight: "bold",
-                            color: 'primary.main',
-                            textAlign: 'center',
+                            color: "primary.main",
+                            textAlign: "center",
                             mb: 2,
                           }}
                         >
@@ -351,24 +378,25 @@ function Products() {
                             label={producto.categoria}
                             size="small"
                             variant="outlined"
-                            sx={{ 
-                              fontSize: '0.7rem', 
+                            sx={{
+                              fontSize: "0.7rem",
                               mb: 1.5,
-                              width: '100%',
-                              borderColor: 'primary.main',
-                              color: 'primary.main',
+                              width: "100%",
+                              borderColor: "primary.main",
+                              color: "primary.main",
                             }}
                           />
                         )}
 
-                        <Box sx={{ mt: 'auto', pt: 1 }}>
+                        <Box sx={{ mt: "auto", pt: 1 }}>
                           <Typography
                             variant="body2"
                             color="text.secondary"
-                            sx={{ 
-                              fontSize: '0.875rem',
-                              textAlign: 'center',
-                              fontWeight: producto.stock < 10 ? 'bold' : 'normal'
+                            sx={{
+                              fontSize: "0.875rem",
+                              textAlign: "center",
+                              fontWeight:
+                                producto.stock < 10 ? "bold" : "normal",
                             }}
                           >
                             Disponible:{" "}
@@ -392,11 +420,11 @@ function Products() {
                             <Typography
                               variant="caption"
                               sx={{
-                                display: 'block',
-                                textAlign: 'center',
+                                display: "block",
+                                textAlign: "center",
                                 mt: 0.5,
                                 color: theme.palette.warning.main,
-                                fontWeight: 'bold',
+                                fontWeight: "bold",
                               }}
                             >
                               Últimas unidades
@@ -413,19 +441,21 @@ function Products() {
                           py: 1.2,
                           textTransform: "none",
                           fontWeight: "bold",
-                          fontSize: '1rem',
+                          fontSize: "1rem",
                           background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                           color: theme.palette.primary.contrastText,
                           boxShadow: `0 4px 15px ${theme.palette.primary.main}30`,
-                          '&:hover': {
-                            transform: 'translateY(-2px)',
+                          "&:hover": {
+                            transform: "translateY(-2px)",
                             boxShadow: `0 6px 20px ${theme.palette.primary.main}50`,
                             background: `linear-gradient(45deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
                           },
-                          transition: 'all 0.3s ease',
+                          transition: "all 0.3s ease",
                           mt: 2,
                         }}
-                        onClick={() => navigate(`/producto/detalle/${producto._id}`)}
+                        onClick={() =>
+                          navigate(`/producto/detalle/${producto._id}`)
+                        }
                       >
                         Ver Detalles
                       </Button>
@@ -435,7 +465,7 @@ function Products() {
               );
             })
           ) : (
-            <Box sx={{ textAlign: 'center', py: 8, width: '100%' }}>
+            <Box sx={{ textAlign: "center", py: 8, width: "100%" }}>
               <Typography variant="h5" color="text.secondary" gutterBottom>
                 No hay productos disponibles
               </Typography>
