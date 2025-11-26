@@ -12,19 +12,30 @@ import TablaPedidos from "../pages/admin/tablaPedidos";
 import ScrollToTop from "../components/ScrollToTop.jsx";
 import ProductList from "../pages/ProductList"; // ✅ Importamos la página de productos
 import PromocionesForm from "../pages/PromocionesForm.jsx";
-import TestCompartir from "../components/testPrueba.jsx"
+import TestCompartir from "../components/testPrueba.jsx";
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
 import CarritoPage from "../pages/CarritoPage.jsx";
+import SearchResults from "../pages/SearchResults.jsx";
 
-function IndexRoutes({ modoOscuro, toggleModo }) {
+function IndexRoutes({
+  modoOscuro,
+  toggleModo,
+  backgroundEnabled,
+  toggleBackground,
+}) {
   return (
     <>
-      <ScrollToTop />    
+      <ScrollToTop />
       <Routes>
         {/* Layout público */}
         <Route
           element={
-            <MainLayout modoOscuro={modoOscuro} toggleModo={toggleModo} />
+            <MainLayout
+              modoOscuro={modoOscuro}
+              toggleModo={toggleModo}
+              backgroundEnabled={backgroundEnabled}
+              toggleBackground={toggleBackground}
+            />
           }
         >
           <Route path="/test-compartir" element={<TestCompartir />} />
@@ -33,6 +44,7 @@ function IndexRoutes({ modoOscuro, toggleModo }) {
           <Route path="/Acerca" element={<AboutUs />} />
           <Route path="/Contacto" element={<Contact />} />
           <Route path="/productos" element={<ProductList />} />
+          <Route path="/buscar" element={<SearchResults />} />
           <Route path="/promocion" element={<PromocionesForm />} />
           {/* ✅ Página de productos */}
           <Route path="/producto/detalle/:id" element={<ProductDetail />} />
