@@ -2,11 +2,13 @@ import { useState, useEffect, useMemo } from "react";
 import { useTableData } from "../../hooks/useTableData";
 import { TABLE_CONFIG, THEME, SELECT_OPTIONS } from "../../config/adminConfig";
 import { useCategoriesStore } from "../../hooks/useCategoriesStore";
-import { Box, Pagination, Typography, Button } from "@mui/material";
+import { Box, Pagination, Typography, Button, useTheme } from "@mui/material";
 import { AdminSidebar } from "../../components/admin/AdminSidebar";
 import { GenericTable } from "../../components/admin/GenericTable";
 
 export const AdminDashboard = () => {
+  const theme = useTheme();
+  const modoOscuro = theme.palette.mode === "dark";
   const [selectedSection, setSelectedSection] = useState("Productos");
 
   const [page, setPage] = useState(1);
@@ -116,8 +118,8 @@ export const AdminDashboard = () => {
         flexDirection: "column",
         minHeight: "100vh",
         width: "100%",
-        bgcolor: "rgba(0,0,0,0.7)",
-        backdropFilter: "blur(4px)",
+        bgcolor: modoOscuro ? "rgba(0,0,0,0.7)" : "background.default",
+        backdropFilter: modoOscuro ? "blur(4px)" : "none",
       }}
     >
       <Box
