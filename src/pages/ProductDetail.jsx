@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import BotonCompartir from '../components/BotonCompartir.jsx';
 import {
   Container,
   Box,
@@ -249,6 +250,10 @@ const ProductDetail = () => {
                 >
                   ${product.precio?.toLocaleString()}
                 </Typography>
+                    <BotonCompartir 
+        idProducto="test-123"
+        nombreProducto="Producto de Prueba"
+      />
               </Box>
 
               {/* Descripción */}
