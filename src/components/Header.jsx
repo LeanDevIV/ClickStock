@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -110,9 +110,19 @@ export const Header = ({ modoOscuro, toggleModo }) => {
   const navLinks = [
     { title: "Inicio", path: "/" },
     { title: "Productos", path: "/productos" },
-    { title: "Nosotros", path: "/nosotros" },
+    { title: "Nosotros", path: "/acerca" },
     { title: "Contacto", path: "/contacto" },
   ];
+
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
@@ -148,15 +158,20 @@ export const Header = ({ modoOscuro, toggleModo }) => {
   return (
     <>
       <AppBar
-        position="sticky"
-        color="default"
-        elevation={1}
+        position="fixed" // Changed to fixed for better glass effect overlay
+        color="transparent" // Transparent base
+        elevation={isScrolled ? 4 : 0}
         className={`navbar-transition ${
           showNavbar ? "navbar-visible" : "navbar-hidden"
-        }`}
+        } ${isScrolled ? "glass-navbar" : "transparent-navbar"}`}
         sx={{
-          bgcolor: modoOscuro ? "background.paper" : "background.default",
           color: "text.primary",
+          transition: "all 0.3s ease",
+          bgcolor: isScrolled
+            ? modoOscuro
+              ? "rgba(18, 18, 18, 0.7)"
+              : "rgba(255, 255, 255, 0.7)"
+            : "transparent",
         }}
       >
         <Container maxWidth="xl">
