@@ -7,8 +7,11 @@ import {
   Box,
   Tabs,
   Tab,
+  Button,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub } from "react-icons/fa";
 import RegistroForm from "./RegistroForm";
 import LoginForm from "./LoginForm";
 import "./AuthModal.css";
@@ -90,6 +93,51 @@ function AuthModal({ show, handleClose }) {
           ) : (
             <RegistroForm setMensaje={setMensaje} onSuccess={handleSuccess} />
           )}
+        </Box>
+
+        <Box sx={{ mt: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+            <Box sx={{ flex: 1, height: "1px", bgcolor: "divider" }} />
+            <Box sx={{ px: 2, color: "text.secondary", typography: "body2" }}>
+              O continuar con
+            </Box>
+            <Box sx={{ flex: 1, height: "1px", bgcolor: "divider" }} />
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<FcGoogle size={20} />}
+              onClick={() => console.log("Login con Google")}
+              sx={{
+                borderColor: "divider",
+                color: "text.primary",
+                "&:hover": {
+                  borderColor: "text.primary",
+                  bgcolor: "action.hover",
+                },
+              }}
+            >
+              Google
+            </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<FaGithub size={20} />}
+              onClick={() => console.log("Login con GitHub")}
+              sx={{
+                borderColor: "divider",
+                color: "text.primary",
+                "&:hover": {
+                  borderColor: "text.primary",
+                  bgcolor: "action.hover",
+                },
+              }}
+            >
+              GitHub
+            </Button>
+          </Box>
         </Box>
       </DialogContent>
     </Dialog>
