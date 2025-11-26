@@ -39,7 +39,7 @@ function LoginForm({ setMensaje, onSuccess }) {
         fullWidth
         label="Correo electrónico"
         type="email"
-        margin="normal"
+        margin="dense"
         {...register("correo", {
           required: "El correo es requerido",
           pattern: {
@@ -49,12 +49,16 @@ function LoginForm({ setMensaje, onSuccess }) {
         })}
         error={!!errors.correo}
         helperText={errors.correo?.message}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Email />
-            </InputAdornment>
-          ),
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            color: "#fff",
+            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.23)" },
+            "&:hover fieldset": { borderColor: "#fff" },
+            "&.Mui-focused fieldset": { borderColor: "#d32f2f" },
+          },
+          "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
+          "& .MuiInputLabel-root.Mui-focused": { color: "#d32f2f" },
+          "& .MuiInputAdornment-root": { color: "rgba(255, 255, 255, 0.7)" },
         }}
       />
 
@@ -62,7 +66,7 @@ function LoginForm({ setMensaje, onSuccess }) {
         fullWidth
         label="Contraseña"
         type="password"
-        margin="normal"
+        margin="dense"
         {...register("contrasenia", { required: "La contraseña es requerida" })}
         error={!!errors.contrasenia}
         helperText={errors.contrasenia?.message}
@@ -73,15 +77,30 @@ function LoginForm({ setMensaje, onSuccess }) {
             </InputAdornment>
           ),
         }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            color: "#fff",
+            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.23)" },
+            "&:hover fieldset": { borderColor: "#fff" },
+            "&.Mui-focused fieldset": { borderColor: "#d32f2f" },
+          },
+          "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
+          "& .MuiInputLabel-root.Mui-focused": { color: "#d32f2f" },
+          "& .MuiInputAdornment-root": { color: "rgba(255, 255, 255, 0.7)" },
+        }}
       />
 
       <Button
         fullWidth
         variant="contained"
-        color="primary"
         type="submit"
         disabled={cargando}
-        sx={{ mt: 2, py: 1 }}
+        sx={{
+          mt: 2,
+          py: 1,
+          bgcolor: "#d32f2f", // Red button
+          "&:hover": { bgcolor: "#b71c1c" },
+        }}
       >
         {cargando ? "Verificando..." : "Ingresar"}
       </Button>

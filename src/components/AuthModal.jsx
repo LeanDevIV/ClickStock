@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   IconButton,
   Box,
@@ -19,6 +18,19 @@ import "./AuthModal.css";
 function AuthModal({ show, handleClose }) {
   const [modo, setModo] = useState(0); // 0 = login, 1 = registro
   const [mensaje, setMensaje] = useState("");
+  const [height, setHeight] = useState("auto");
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(contentRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const handleTabChange = (event, newValue) => {
     setModo(newValue);
@@ -36,40 +48,64 @@ function AuthModal({ show, handleClose }) {
     <Dialog
       open={!!show}
       onClose={handleClose}
-      maxWidth="sm"
+      maxWidth="xs"
       fullWidth
+      sx={{
+        "& .MuiDialog-container": {
+          alignItems: "flex-start",
+          pt: 10,
+        },
+      }}
       PaperProps={{
         sx: {
           borderRadius: 2,
+          maxHeight: "90vh",
+          bgcolor: "#1e1e1e", // Dark background
+          color: "#ffffff", // White text
+          border: "1px solid #333",
         },
       }}
     >
-      <DialogTitle
-        sx={{
-          m: 0,
-          p: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        Mi Cuenta
+      <DialogContent sx={{ p: 3, position: "relative" }}>
+        {/* Close button in body */}
         <IconButton
           aria-label="close"
           onClick={handleClose}
+          size="small"
           sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
             color: (theme) => theme.palette.grey[500],
+            zIndex: 1,
+            "&:hover": { color: "#ffffff" },
           }}
         >
           <CloseIcon />
         </IconButton>
-      </DialogTitle>
 
-      <DialogContent dividers>
-        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
-          <Tabs value={modo} onChange={handleTabChange} centered>
-            <Tab label="Iniciar Sesión" />
-            <Tab label="Registrarse" />
+        {/* Tabs */}
+        <Box
+          sx={{ borderBottom: 1, borderColor: "rgba(255,255,255,0.1)", mb: 2 }}
+        >
+          <Tabs
+            value={modo}
+            onChange={handleTabChange}
+            centered
+            variant="fullWidth"
+            sx={{
+              minHeight: 40,
+              "& .MuiTab-root": {
+                color: "rgba(255,255,255,0.7)",
+                "&.Mui-selected": { color: "#d32f2f" }, // Red selected text
+              },
+              "& .MuiTabs-indicator": {
+                backgroundColor: "#d32f2f", // Red indicator
+              },
+            }}
+          >
+            <Tab label="Iniciar Sesión" sx={{ py: 1, minHeight: 40 }} />
+            <Tab label="Registrarse" sx={{ py: 1, minHeight: 40 }} />
           </Tabs>
         </Box>
 
@@ -77,45 +113,96 @@ function AuthModal({ show, handleClose }) {
           <Box
             sx={{
               mb: 2,
-              p: 2,
-              bgcolor: "success.light",
+              p: 1,
+              bgcolor: "rgba(46, 125, 50, 0.2)", // Darker success bg
+              color: "#66bb6a", // Light green text
               borderRadius: 1,
               textAlign: "center",
+              fontSize: "0.875rem",
             }}
           >
             {mensaje}
           </Box>
         )}
 
-        <Box>
-          {modo === 0 ? (
-            <LoginForm setMensaje={setMensaje} onSuccess={handleSuccess} />
-          ) : (
-            <RegistroForm setMensaje={setMensaje} onSuccess={handleSuccess} />
-          )}
+        {/* Content with smooth height transition */}
+        <Box
+          sx={{
+            height: height,
+            transition: "height 0.4s ease-in-out",
+            overflow: "hidden",
+          }}
+        >
+          <Box ref={contentRef}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "flex-start",
+                transition:
+                  "opacity 0.4s ease-in-out, transform 0.4s ease-in-out",
+                opacity: 1,
+                transform: "translateY(0)",
+                "@keyframes fadeIn": {
+                  from: {
+                    opacity: 0,
+                    transform: "translateY(10px)",
+                  },
+                  to: {
+                    opacity: 1,
+                    transform: "translateY(0)",
+                  },
+                },
+                animation: "fadeIn 0.4s ease-in-out",
+                p: 0.5,
+              }}
+              key={modo}
+            >
+              {modo === 0 ? (
+                <LoginForm setMensaje={setMensaje} onSuccess={handleSuccess} />
+              ) : (
+                <RegistroForm
+                  setMensaje={setMensaje}
+                  onSuccess={handleSuccess}
+                />
+              )}
+            </Box>
+          </Box>
         </Box>
 
-        <Box sx={{ mt: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-            <Box sx={{ flex: 1, height: "1px", bgcolor: "divider" }} />
-            <Box sx={{ px: 2, color: "text.secondary", typography: "body2" }}>
+        <Box sx={{ mt: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 1.5 }}>
+            <Box
+              sx={{ flex: 1, height: "1px", bgcolor: "rgba(255,255,255,0.1)" }}
+            />
+            <Box
+              sx={{
+                px: 2,
+                color: "rgba(255,255,255,0.5)",
+                typography: "caption",
+              }}
+            >
               O continuar con
             </Box>
-            <Box sx={{ flex: 1, height: "1px", bgcolor: "divider" }} />
+            <Box
+              sx={{ flex: 1, height: "1px", bgcolor: "rgba(255,255,255,0.1)" }}
+            />
           </Box>
 
-          <Box sx={{ display: "flex", gap: 2, flexDirection: "column" }}>
+          <Box sx={{ display: "flex", gap: 1.5 }}>
             <Button
               fullWidth
               variant="outlined"
               startIcon={<FcGoogle size={20} />}
               onClick={() => console.log("Login con Google")}
+              size="small"
               sx={{
-                borderColor: "divider",
-                color: "text.primary",
+                borderColor: "rgba(255,255,255,0.2)",
+                color: "#ffffff",
+                py: 0.8,
                 "&:hover": {
-                  borderColor: "text.primary",
-                  bgcolor: "action.hover",
+                  borderColor: "#ffffff",
+                  bgcolor: "rgba(255,255,255,0.05)",
                 },
               }}
             >
@@ -126,12 +213,14 @@ function AuthModal({ show, handleClose }) {
               variant="outlined"
               startIcon={<FaGithub size={20} />}
               onClick={() => console.log("Login con GitHub")}
+              size="small"
               sx={{
-                borderColor: "divider",
-                color: "text.primary",
+                borderColor: "rgba(255,255,255,0.2)",
+                color: "#ffffff",
+                py: 0.8,
                 "&:hover": {
-                  borderColor: "text.primary",
-                  bgcolor: "action.hover",
+                  borderColor: "#ffffff",
+                  bgcolor: "rgba(255,255,255,0.05)",
                 },
               }}
             >
