@@ -9,7 +9,7 @@ import { globalStyles } from "./styles/globalStyles";
 import FloatingChat from "./components/Chatbot.jsx";
 import { getItem, setItem } from "./utils/localStorageHelper";
 import LiquidEther from "./styles/liquid-ether/LiquidEther.jsx";
-//import WelcomeScreen from "./components/WelcomeScreen";
+import WelcomeScreen from "./components/WelcomeScreen";
 
 function App() {
   const [modoOscuro, setModoOscuro] = useState(() => {
@@ -80,7 +80,7 @@ function App() {
           autoRampDuration={0.6}
         />
       </div>
-      {/* <WelcomeScreen /> */}
+      <WelcomeScreen />
       <AppRoutes modoOscuro={modoOscuro} toggleModo={toggleModo} />
       <FloatingChat />
       <Footer />
