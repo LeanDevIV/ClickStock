@@ -17,27 +17,17 @@ const Contacto = () => {
 
   const onSubmit = async (data) => {
     try {
-      await axios.post("http://localhost:5000/api/contacto", {
-        ...data,
-        estado: "pendiente",
-      });
+      const res = await axios.post(
+        "http://localhost:5000/api/contacto/enviar-correo",
+        data
+      );
 
-      Swal.fire({
-        title: "Enviado con éxito",
-        text: "Tu mensaje fue enviado correctamente",
-        icon: "success",
-        confirmButtonText: "Aceptar",
-      });
-
-      reset();
+      if (res.data.ok) {
+        Swal.fire("Éxito", "Tu mensaje ha sido enviado", "success");
+        reset();
+      }
     } catch (error) {
-      console.error(error);
-      Swal.fire({
-        title: "Error",
-        text: "Error al enviar el mensaje ❌",
-        icon: "error",
-        confirmButtonText: "Aceptar",
-      });
+      Swal.fire("Error", "Hubo un problema al enviar el mensaje", "error");
     }
   };
 

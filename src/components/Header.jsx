@@ -1,8 +1,6 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import CarritoPreview from "./CarritoPreview";
-
-
 import {
   AppBar,
   Toolbar,
@@ -26,7 +24,10 @@ import {
   Person,
   Brightness4,
   Brightness7,
+  BlurOn,
+  BlurOff,
 } from "@mui/icons-material";
+import { Tooltip } from "@mui/material";
 import { useStore } from "../hooks/useStore";
 import { useScrollDirection } from "../hooks/useScrollDirection";
 import { UserMenu } from "./MenuUsuario";
@@ -73,7 +74,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export const Header = ({ modoOscuro, toggleModo }) => {
+export const Header = ({ modoOscuro, toggleModo, backgroundEnabled,
+  toggleBackground, }) => {
   const [showCarrito, setShowCarrito] = useState(false);
   const handleOpenPreview = () => setShowCarrito(true);
   const handleClosePreview = () => setShowCarrito(false);
@@ -117,9 +119,19 @@ export const Header = ({ modoOscuro, toggleModo }) => {
   const navLinks = [
     { title: "Inicio", path: "/" },
     { title: "Productos", path: "/productos" },
-    { title: "Nosotros", path: "/nosotros" },
+    { title: "Nosotros", path: "/acerca" },
     { title: "Contacto", path: "/contacto" },
   ];
+
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
@@ -152,18 +164,26 @@ export const Header = ({ modoOscuro, toggleModo }) => {
     </Box>
   );
 
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <>
       <AppBar
-        position="sticky"
-        color="default"
-        elevation={1}
+        position="fixed" // Changed to fixed for better glass effect overlay
+        color="transparent" // Transparent base
+        elevation={isScrolled ? 4 : 0}
         className={`navbar-transition ${
           showNavbar ? "navbar-visible" : "navbar-hidden"
-        }`}
+        } ${isScrolled ? "glass-navbar" : "transparent-navbar"}`}
         sx={{
-          bgcolor: modoOscuro ? "background.paper" : "background.default",
-          color: "text.primary",
+          color: isHome && !isScrolled ? "#FFFFFF" : "text.primary",
+          transition: "all 0.3s ease",
+          bgcolor: isScrolled
+            ? modoOscuro
+              ? "rgba(18, 18, 18, 0.7)"
+              : "rgba(255, 255, 255, 0.7)"
+            : "transparent",
         }}
       >
         <Container maxWidth="xl">
@@ -259,6 +279,14 @@ export const Header = ({ modoOscuro, toggleModo }) => {
                   <ShoppingCart />
                 </Badge>
               </IconButton>
+
+              <Tooltip
+                title={backgroundEnabled ? "Desactivar Fondo" : "Activar Fondo"}
+              >
+                <IconButton onClick={toggleBackground} color="inherit">
+                  {backgroundEnabled ? <BlurOn /> : <BlurOff />}
+                </IconButton>
+              </Tooltip>
 
               <IconButton onClick={toggleModo} color="inherit">
                 {modoOscuro ? <Brightness7 /> : <Brightness4 />}

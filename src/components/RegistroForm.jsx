@@ -46,7 +46,8 @@ function RegistroForm({ setMensaje, onSuccess }) {
       <TextField
         fullWidth
         label="Nombre"
-        margin="normal"
+        margin="dense"
+        size="small"
         {...register("nombre", { required: "El nombre es requerido" })}
         error={!!errors.nombre}
         helperText={errors.nombre?.message}
@@ -57,12 +58,23 @@ function RegistroForm({ setMensaje, onSuccess }) {
             </InputAdornment>
           ),
         }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            color: "#fff",
+            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.23)" },
+            "&:hover fieldset": { borderColor: "#fff" },
+            "&.Mui-focused fieldset": { borderColor: "#d32f2f" },
+          },
+          "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
+          "& .MuiInputLabel-root.Mui-focused": { color: "#d32f2f" },
+          "& .MuiInputAdornment-root": { color: "rgba(255, 255, 255, 0.7)" },
+        }}
       />
-
       <TextField
         fullWidth
         label="Apellido"
-        margin="normal"
+        margin="dense"
+        size="small"
         {...register("apellido", { required: "El apellido es requerido" })}
         error={!!errors.apellido}
         helperText={errors.apellido?.message}
@@ -73,12 +85,23 @@ function RegistroForm({ setMensaje, onSuccess }) {
             </InputAdornment>
           ),
         }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            color: "#fff",
+            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.23)" },
+            "&:hover fieldset": { borderColor: "#fff" },
+            "&.Mui-focused fieldset": { borderColor: "#d32f2f" },
+          },
+          "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
+          "& .MuiInputLabel-root.Mui-focused": { color: "#d32f2f" },
+          "& .MuiInputAdornment-root": { color: "rgba(255, 255, 255, 0.7)" },
+        }}
       />
-
       <TextField
         fullWidth
         label="Teléfono"
-        margin="normal"
+        margin="dense"
+        size="small"
         {...register("telefono")}
         error={!!errors.telefono}
         helperText={errors.telefono?.message}
@@ -89,13 +112,24 @@ function RegistroForm({ setMensaje, onSuccess }) {
             </InputAdornment>
           ),
         }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            color: "#fff",
+            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.23)" },
+            "&:hover fieldset": { borderColor: "#fff" },
+            "&.Mui-focused fieldset": { borderColor: "#d32f2f" },
+          },
+          "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
+          "& .MuiInputLabel-root.Mui-focused": { color: "#d32f2f" },
+          "& .MuiInputAdornment-root": { color: "rgba(255, 255, 255, 0.7)" },
+        }}
       />
-
       <TextField
         fullWidth
         label="Correo electrónico"
         type="email"
-        margin="normal"
+        margin="dense"
+        size="small"
         {...register("correo", {
           required: "El correo es requerido",
           pattern: {
@@ -112,14 +146,27 @@ function RegistroForm({ setMensaje, onSuccess }) {
             </InputAdornment>
           ),
         }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            color: "#fff",
+            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.23)" },
+            "&:hover fieldset": { borderColor: "#fff" },
+            "&.Mui-focused fieldset": { borderColor: "#d32f2f" },
+          },
+          "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
+          "& .MuiInputLabel-root.Mui-focused": { color: "#d32f2f" },
+          "& .MuiInputAdornment-root": { color: "rgba(255, 255, 255, 0.7)" },
+        }}
       />
-
       <TextField
         fullWidth
         label="Contraseña"
         type="password"
-        margin="normal"
-        {...register("contrasenia", { required: "La contraseña es requerida" })}
+        margin="dense"
+        size="small"
+        {...register("contrasenia", {
+          required: "La contraseña es requerida",
+        })}
         error={!!errors.contrasenia}
         helperText={errors.contrasenia?.message}
         InputProps={{
@@ -129,13 +176,24 @@ function RegistroForm({ setMensaje, onSuccess }) {
             </InputAdornment>
           ),
         }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            color: "#fff",
+            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.23)" },
+            "&:hover fieldset": { borderColor: "#fff" },
+            "&.Mui-focused fieldset": { borderColor: "#d32f2f" },
+          },
+          "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
+          "& .MuiInputLabel-root.Mui-focused": { color: "#d32f2f" },
+          "& .MuiInputAdornment-root": { color: "rgba(255, 255, 255, 0.7)" },
+        }}
       />
-
       <TextField
         fullWidth
         label="Confirmar contraseña"
         type="password"
-        margin="normal"
+        margin="dense"
+        size="small"
         {...register("confirmarContrasenia", {
           required: "Confirma tu contraseña",
           validate: (val) => {
@@ -153,15 +211,29 @@ function RegistroForm({ setMensaje, onSuccess }) {
             </InputAdornment>
           ),
         }}
+        sx={{
+          "& .MuiOutlinedInput-root": {
+            color: "#fff",
+            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.23)" },
+            "&:hover fieldset": { borderColor: "#fff" },
+            "&.Mui-focused fieldset": { borderColor: "#d32f2f" },
+          },
+          "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
+          "& .MuiInputLabel-root.Mui-focused": { color: "#d32f2f" },
+          "& .MuiInputAdornment-root": { color: "rgba(255, 255, 255, 0.7)" },
+        }}
       />
-
       <Button
         fullWidth
         variant="contained"
-        color="primary"
         type="submit"
         disabled={cargando}
-        sx={{ mt: 2, py: 1 }}
+        sx={{
+          mt: 2,
+          py: 1,
+          bgcolor: "#d32f2f",
+          "&:hover": { bgcolor: "#b71c1c" },
+        }}
       >
         {cargando ? "Procesando..." : "Registrarse"}
       </Button>
