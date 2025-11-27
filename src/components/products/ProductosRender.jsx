@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import clientAxios from "../utils/clientAxios";
+import clientAxios from "../../utils/clientAxios";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
-import { useFavoritos } from "../hooks/useFavoritos";
-import { useCart } from "../hooks/useCart";
+import { useFavoritos } from "../../hooks/useFavoritos";
+import { useCart } from "../../hooks/useCart";
 import {
   Card,
   CardContent,
@@ -375,7 +375,11 @@ function Products({ productos: productosExternos }) {
 
                         {producto.categoria && (
                           <Chip
-                            label={producto.categoria}
+                            label={
+                              typeof producto.categoria === "object"
+                                ? producto.categoria.nombre
+                                : producto.categoria
+                            }
                             size="small"
                             variant="outlined"
                             sx={{
