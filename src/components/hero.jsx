@@ -1,33 +1,60 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
 import { AutoScroll } from "@splidejs/splide-extension-auto-scroll";
 import "@splidejs/splide/dist/css/splide.min.css";
 import "../css/hero.css";
 
 const HeroHomePage = () => {
-  const [progress, setProgress] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const images = [
-    "https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=1200&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1682687220067-dced9a881b56?w=1200&h=500&fit=crop",
-    "https://img.freepik.com/free-vector/stylish-glowing-digital-red-lines-banner_1017-23964.jpg?semt=ais_hybrid&w=740&q=80",
-    "https://png.pngtree.com/thumb_back/fh260/background/20230217/pngtree-blue-wavy-banner-background-blank-image_1608934.jpg",
-    "https://img.freepik.com/vector-gratis/fondo-abstracto-azul-medio-tono-espacio-texto_1017-41428.jpg?semt=ais_hybrid&w=740&q=80",
+  const navigate = useNavigate();
+
+  const slides = [
+    {
+      image: "https://i.imgur.com/WQCfEbH.jpeg",
+      link: "/productos",
+    },
+    {
+      image: "https://i.imgur.com/27tgbdE.jpeg",
+      link: "/productos",
+    },
+    {
+      image: "https://i.imgur.com/Db3z0Pj.jpeg",
+      title: "Control Total",
+      description: "Gestiona cada aspecto de tu inventario con precisión.",
+      buttonText: "Empezar Ahora",
+      link: "/productos",
+    },
+    {
+      image: "https://i.imgur.com/ZBRU7yI.jpeg",
+      title: "Seguridad Garantizada",
+      description: "Tus datos protegidos con los más altos estándares.",
+      buttonText: "Más Información",
+      link: "/Acerca",
+    },
+    {
+      image: "https://i.imgur.com/7aPraif.jpeg",
+      title: "Soporte 24/7",
+      description: "Estamos aquí para ayudarte en cada paso del camino.",
+      buttonText: "Contactar",
+      link: "/Contacto",
+    },
   ];
 
   const splideOptions = {
     type: "loop",
     perPage: 1,
     autoplay: true,
-    interval: 2000, 
+    interval: 4000,
     pauseOnHover: false,
     resetProgress: false,
     arrows: true,
-    pagination: false,
-    speed: 480, 
+    pagination: true, // Enable default pagination dots for cleaner look
+    speed: 800,
     dragAngleThreshold: 30,
     autoScroll: {
-      speed: 1.5, 
+      speed: 1.5,
+      pauseOnHover: false,
     },
   };
 
@@ -39,20 +66,29 @@ const HeroHomePage = () => {
           extensions={{ AutoScroll }}
           onMoved={(splide, index) => {
             setCurrentSlide(index);
-            setProgress(0);
           }}
         >
-          {images.map((image, index) => (
+          {slides.map((slide, index) => (
             <SplideSlide key={index}>
-              <div className="slide-content">
+              <div
+                className="slide-content"
+                onClick={() => navigate(slide.link)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    navigate(slide.link);
+                  }
+                }}
+              >
                 <img
-                  src={image}
+                  src={slide.image}
                   alt={`Slide ${index + 1}`}
                   className="slide-image"
                 />
                 <div className="slide-overlay">
-                  <h3>Slide {index + 1}</h3>
-                  <p>Descripción de la imagen {index + 1}</p>
+                  <h3>{slide.title}</h3>
+                  <p>{slide.description}</p>
                 </div>
               </div>
             </SplideSlide>
@@ -62,19 +98,9 @@ const HeroHomePage = () => {
           <div
             className="progress-bar"
             style={{
-              width: `${((currentSlide + 1) / images.length) * 100}%`,
+              width: `${((currentSlide + 1) / slides.length) * 100}%`,
             }}
           ></div>
-        </div>
-        <div className="progress-indicators">
-          {images.map((_, index) => (
-            <div
-              key={index}
-              className={`progress-dot ${
-                index === currentSlide ? "active" : ""
-              } ${index < currentSlide ? "completed" : ""}`}
-            ></div>
-          ))}
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "./WelcomeScreen.css";
 import TargetCursor from "../styles/target-cursor/TargetCursor";
 import Dither from "../styles/dither/Dither";
 import { Button } from "@mui/material";
@@ -36,37 +35,63 @@ const WelcomeScreen = () => {
   return (
     <div
       style={{
-        position: "absolute",
+        position: "fixed",
         top: 0,
         left: 0,
-        width: "100%",
-        height: "100%",
-        zIndex: 2,
+        width: "100vw",
+        height: "100vh",
+        zIndex: 9998,
         opacity: isVisible ? 1 : 0,
         transition: "opacity 0.8s ease-in-out",
         pointerEvents: isVisible ? "auto" : "none",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      <Dither
-        zIndex={1}
-        waveColor={[1, 1, 1]}
-        disableAnimation={false}
-        enableMouseInteraction={true}
-        mouseRadius={0.3}
-        colorNum={4}
-        waveAmplitude={0.3}
-        waveFrequency={3}
-        waveSpeed={0.05}
-      />
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 0,
+        }}
+      >
+        <Dither
+          zIndex={1}
+          disableAnimation={false}
+          enableMouseInteraction={true}
+          mouseRadius={0.3}
+          colorNum={4}
+          waveAmplitude={0.3}
+          waveFrequency={3}
+          waveSpeed={0.05}
+        />
+      </div>
       <TargetCursor
         zIndex={2}
-        hideDefaultCursor={true}
         parallaxOn={true}
         spinDuration={2}
         hoverDuration={0.2}
       />
 
-      <Button zIndex={3} className=" cursor-target" onClick={handleContinue}>
+      <Button
+        variant="outlined"
+        sx={{
+          zIndex: 10,
+          position: "relative",
+          backgroundColor: "black",
+          color: "white",
+          "&:hover": {
+            backgroundColor: "white",
+            color: "black",
+          },
+        }}
+        className="cursor-target"
+        onClick={handleContinue}
+      >
         Ingresar al Sitio
       </Button>
     </div>
