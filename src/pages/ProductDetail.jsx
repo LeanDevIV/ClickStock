@@ -248,6 +248,7 @@ const ProductDetail = () => {
                   >
                     {product.nombre}
                   </Typography>
+                  
                   <Box sx={{ 
                     alignSelf: { xs: 'flex-start', sm: 'center' },
                     mt: { xs: 1, sm: 0 }

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { useCompartir } from "../hooks/useCompartir";
 import { QRCodeSVG } from "qrcode.react";
-import toast from 'react-hot-toast'; 
+import toast from "react-hot-toast";
 import {
   Box,
   IconButton,
@@ -41,7 +41,7 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
     const handleClickOutside = (event) => {
       if (
         mostrarOpciones &&
-        modalRef.current && 
+        modalRef.current &&
         !modalRef.current.contains(event.target) &&
         botonRef.current &&
         !botonRef.current.contains(event.target)
@@ -50,9 +50,9 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [mostrarOpciones, alternarOpciones]);
 
@@ -70,16 +70,14 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
     window.open(
       `mailto:?subject=${encodeURIComponent(
         nombreProducto
-      )}&body=${encodeURIComponent(
-        `Mira este producto: ${generarEnlace()}`
-      )}`
+      )}&body=${encodeURIComponent(`Mira este producto: ${generarEnlace()}`)}`
     );
     alternarOpciones();
   };
 
   const handleCopiarEnlace = () => {
     navigator.clipboard.writeText(generarEnlace());
-    toast.success('¡Enlace copiado al portapapeles!');
+    toast.success("¡Enlace copiado al portapapeles!");
     alternarOpciones();
   };
 
@@ -106,12 +104,12 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
         downloadLink.download = `qr-${nombreProducto}.png`;
         downloadLink.href = pngFile;
         downloadLink.click();
-        toast.success('QR descargado correctamente');
+        toast.success("QR descargado correctamente");
       };
 
       img.src = "data:image/svg+xml;base64," + btoa(svgData);
     } else {
-      toast.error('Error al generar el QR para descargar');
+      toast.error("Error al generar el QR para descargar");
     }
   };
 
@@ -139,7 +137,7 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
           <Typography variant="subtitle2" className="modal-title">
             Compartir en:
           </Typography>
-          
+
           <Box className="icon-container">
             <Tooltip title="WhatsApp" {...tooltipProps}>
               <IconButton
@@ -189,16 +187,30 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
         onClose={alternarQR}
         maxWidth="sm"
         fullWidth
+        TransitionComponent={Fade}
         transitionDuration={400}
       >
-        <DialogContent>
-          <Box className="qr-container">
-            <Tooltip title="Cerrar" {...tooltipProps}>
-              <IconButton onClick={alternarQR} className="close-button">
-                <Close />
-              </IconButton>
-            </Tooltip>
+        <DialogContent sx={{ position: "relative", p: 3 }}>
+          {/* Botón cerrar en la esquina superior derecha */}
+          <Tooltip title="Cerrar" {...tooltipProps}>
+            <IconButton
+              onClick={alternarQR}
+              sx={{
+                position: "absolute",
+                right: 16,
+                top: 16,
+                color: "grey.500",
+                zIndex: 1,
+                "&:hover": {
+                  bgcolor: "grey.100",
+                },
+              }}
+            >
+              <Close />
+            </IconButton>
+          </Tooltip>
 
+          <Box className="qr-container">
             <Typography variant="h5" gutterBottom>
               Escanea el código QR
             </Typography>
@@ -218,7 +230,7 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
             </Typography>
           </Box>
         </DialogContent>
-        
+
         <DialogActions className="dialog-actions">
           <Tooltip title="Descargar QR" {...tooltipProps}>
             <Button
