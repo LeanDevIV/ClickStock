@@ -12,7 +12,6 @@ import TablaPedidos from "../pages/admin/tablaPedidos";
 import ScrollToTop from "../components/ScrollToTop.jsx";
 import ProductList from "../pages/ProductList"; // ✅ Importamos la página de productos
 import PromocionesForm from "../pages/PromocionesForm.jsx";
-import TestCompartir from "../components/testPrueba.jsx";
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
 import CarritoPage from "../pages/CarritoPage.jsx";
 import SearchResults from "../pages/SearchResults.jsx";
@@ -38,7 +37,6 @@ function IndexRoutes({
             />
           }
         >
-          <Route path="/test-compartir" element={<TestCompartir />} />
           <Route path="/" element={<Home />} />
           <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/Acerca" element={<AboutUs />} />
