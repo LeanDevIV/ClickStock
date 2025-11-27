@@ -11,9 +11,7 @@ import TableBody from "@mui/material/TableBody";
 import { TableControls } from "./TableComponents";
 import { GenericRow } from "./GenericRow";
 //TODO: arreglar import
-//import { CreateItemModal } from "../admin/CreateItemModal";
-
-import { CreateItemModal } from "./CreateItemModal";
+import { CreateItemModal } from "../admin/CreateItemModal";
 
 /**
  * Tabla genérica reutilizable para todas las secciones del admin
@@ -31,12 +29,12 @@ export const GenericTable = ({
   onSoftDelete,
   onHardDelete,
   onRefresh,
-  //onCreate,
+  onCreate,
   categorias = [],
 }) => {
   // const muiTheme = useTheme();
   const [showDeleted, setShowDeleted] = useState(true);
-  //const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const config = TABLE_CONFIG[section];
 
   // Verificar si la sección soporta soft delete
@@ -112,13 +110,13 @@ export const GenericTable = ({
       />
 
       {/* Modal de Creación */}
-      {/* <CreateItemModal
+      <CreateItemModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreate={onCreate}
         section={section}
         config={config}
-      /> */}
+      />
 
       {/* Tabla con scroll horizontal solo si es necesario */}
       <TableContainer
