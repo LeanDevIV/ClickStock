@@ -23,7 +23,7 @@ import {
   Link,
   QrCode2,
 } from "@mui/icons-material";
-import "../css/botonCompartir.css";
+import "../css/BotonCompartir.css";
 
 const BotonCompartir = ({ idProducto, nombreProducto }) => {
   const {
