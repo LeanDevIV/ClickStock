@@ -11,11 +11,7 @@ import TableBody from "@mui/material/TableBody";
 import { TableControls } from "./TableComponents";
 import { GenericRow } from "./GenericRow";
 
-<<<<<<< HEAD:src/components/admin/GenericTable.jsx
 import { CreateItemModal } from "./CreateItemModal";
-=======
-import { CreateItemModal } from "../admin/CreateItemModal";
->>>>>>> 3f4f7a5 (Refactorizacion general de estructura de proyecto (movimiento de carpetas) #2):src/components/common/GenericTable.jsx
 
 /**
  * Tabla genérica reutilizable para todas las secciones del admin
@@ -33,12 +29,12 @@ export const GenericTable = ({
   onSoftDelete,
   onHardDelete,
   onRefresh,
-  onCreate, // Nueva prop
+  //onCreate,
   categorias = [],
 }) => {
   // const muiTheme = useTheme();
   const [showDeleted, setShowDeleted] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  //const [showCreateModal, setShowCreateModal] = useState(false);
   const config = TABLE_CONFIG[section];
 
   // Verificar si la sección soporta soft delete
@@ -109,18 +105,18 @@ export const GenericTable = ({
         showDeletedLabel="Mostrar eliminados"
         showDeletedInitial={true}
         onShowDeletedChange={setShowDeleted}
-        onAdd={() => setShowCreateModal(true)}
+        //onAdd={() => setShowCreateModal(true)}
         showDeletedSwitch={shouldShowDeleted}
       />
 
       {/* Modal de Creación */}
-      <CreateItemModal
+      {/* <CreateItemModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onCreate={onCreate}
         section={section}
         config={config}
-      />
+      /> */}
 
       {/* Tabla con scroll horizontal solo si es necesario */}
       <TableContainer
