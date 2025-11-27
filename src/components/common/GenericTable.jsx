@@ -10,6 +10,8 @@ import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import { TableControls } from "./TableComponents";
 import { GenericRow } from "./GenericRow";
+//TODO: arreglar import
+//import { CreateItemModal } from "../admin/CreateItemModal";
 
 import { CreateItemModal } from "./CreateItemModal";
 
