@@ -20,6 +20,7 @@ export const TABLE_CONFIG = {
       "categoria",
       "stock",
       "disponible",
+      "imagenes",
     ],
     displayFields: [
       "nombre",
@@ -37,6 +38,7 @@ export const TABLE_CONFIG = {
     endpoint: "/usuarios",
     restoreEndpoint: "/usuarios/restore/:id",
     updateEndpoint: "/usuarios/:id",
+    deleteEndpoint: "/usuarios/permanent/:id",
     softDeleteEndpoint: "/usuarios/:id",
     editableFields: ["nombre", "rol"],
     displayFields: ["nombre", "correo", "rol", "createdAt", "isDeleted"],
@@ -138,6 +140,7 @@ export const FIELD_TYPES = {
   fechaInicio: "date",
   fechaFin: "date",
   activa: "select",
+  imagenes: "file",
 };
 export const SELECT_OPTIONS = {
   disponible: [

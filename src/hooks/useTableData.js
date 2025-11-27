@@ -3,6 +3,7 @@ import clientAxios from "../utils/clientAxios";
 import { TABLE_CONFIG } from "../config/adminConfig";
 import Swal from "sweetalert2";
 import { useStore } from "./useStore";
+import { subirArchivo } from "../services/uploadService";
 
 export const useTableData = (section, options = {}) => {
   const [data, setData] = useState([]);
@@ -66,6 +67,8 @@ export const useTableData = (section, options = {}) => {
               title: "Error de validación",
               text: validationError,
               confirmButtonColor: "#D4AF37",
+              background: "#1e1e1e",
+              color: "#fff",
             });
             return;
           }
@@ -110,9 +113,11 @@ export const useTableData = (section, options = {}) => {
         icon: "question",
         showCancelButton: true,
         confirmButtonColor: "#D4AF37",
-        cancelButtonColor: "#6c757d",
+        cancelButtonColor: "#d33",
         confirmButtonText: "Sí, restaurar",
         cancelButtonText: "Cancelar",
+        background: "#1e1e1e",
+        color: "#fff",
       });
 
       if (!result.isConfirmed) {
@@ -153,6 +158,8 @@ export const useTableData = (section, options = {}) => {
           timer: 2000,
           showConfirmButton: false,
           iconColor: "#D4AF37",
+          background: "#1e1e1e",
+          color: "#fff",
         });
       } catch (err) {
         setError("Error al restaurar: " + err.message);
@@ -191,7 +198,9 @@ export const useTableData = (section, options = {}) => {
               popup: "animate__animated animate__fadeOutUp",
             },
             footer:
-              '<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">¿Necesitas ayuda con tu cuenta?</a>',
+              '<a target="_blank" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" style="color: #D4AF37;">¿Necesitas ayuda con tu cuenta?</a>',
+            background: "#1e1e1e",
+            color: "#fff",
           });
           return;
         }
@@ -219,7 +228,14 @@ export const useTableData = (section, options = {}) => {
           )
         );
       } catch (err) {
-        setError("Error al eliminar: " + err.message);
+        const message =
+          err.response?.data?.message || "Error al eliminar: " + err.message;
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: message,
+          confirmButtonColor: "#D4AF37",
+        });
         console.error("Error soft deleting:", err);
       }
     },
@@ -244,6 +260,8 @@ export const useTableData = (section, options = {}) => {
             title: "Acción no permitida",
             text: "No puedes eliminar tu propia cuenta",
             confirmButtonColor: "#D4AF37",
+            background: "#1e1e1e",
+            color: "#fff",
           });
           return;
         }
@@ -261,7 +279,17 @@ export const useTableData = (section, options = {}) => {
 
         setData((prev) => prev.filter((item) => item._id !== id));
       } catch (err) {
-        setError("Error al eliminar permanentemente: " + err.message);
+        const message =
+          err.response?.data?.message ||
+          "Error al eliminar permanentemente: " + err.message;
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: message,
+          confirmButtonColor: "#D4AF37",
+          background: "#1e1e1e",
+          color: "#fff",
+        });
         console.error("Error hard deleting:", err);
       }
     },
@@ -285,6 +313,72 @@ export const useTableData = (section, options = {}) => {
     handleRestore,
     handleSoftDelete,
     handleHardDelete,
+    handleCreate: async (newItem) => {
+      try {
+        let itemToCreate = { ...newItem };
+
+        // Verificar si hay archivos para subir
+        const fileFields = Object.keys(newItem).filter(
+          (key) => newItem[key] instanceof File
+        );
+
+        if (fileFields.length > 0) {
+          // Mostrar loading de subida
+          Swal.fire({
+            title: "Subiendo archivos...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+            background: "#1e1e1e",
+            color: "#fff",
+          });
+
+          for (const field of fileFields) {
+            const file = newItem[field];
+            // Subir archivo y obtener URL
+            // Asumimos que 'productos' es el directorio por defecto, o podríamos deducirlo de 'section'
+            const directorio = section.toLowerCase();
+            const url = await subirArchivo(file, directorio);
+
+            // Si el campo es 'imagenes', guardar como array
+            if (field === "imagenes") {
+              itemToCreate[field] = [url];
+            } else {
+              itemToCreate[field] = url;
+            }
+          }
+        }
+
+        const endpoint = config.endpoint; // Asumimos que el endpoint base acepta POST
+        const { data: createdItem } = await clientAxios.post(
+          endpoint,
+          itemToCreate
+        );
+
+        setData((prev) => [...prev, createdItem]);
+        Swal.fire({
+          icon: "success",
+          title: "¡Creado!",
+          text: "El elemento ha sido creado correctamente",
+          confirmButtonColor: "#D4AF37",
+          background: "#1e1e1e",
+          color: "#fff",
+        });
+      } catch (err) {
+        const message =
+          err.response?.data?.message || "Error al crear: " + err.message;
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: message,
+          confirmButtonColor: "#D4AF37",
+          background: "#1e1e1e",
+          color: "#fff",
+        });
+        console.error("Error creating item:", err);
+      }
+    },
     setEditingId,
   };
 };

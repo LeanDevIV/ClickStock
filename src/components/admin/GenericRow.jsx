@@ -207,6 +207,10 @@ export const GenericRow = ({
         if (Array.isArray(value)) {
           return value.length > 0 ? `${value.length} items` : "-";
         }
+        // Si es un objeto y no lo hemos manejado antes, evitar crash
+        if (value && typeof value === "object") {
+          return JSON.stringify(value); // O retornar "-" o value.nombre si existe
+        }
         return value || "-";
     }
   };
@@ -242,10 +246,14 @@ export const GenericRow = ({
 
         // Manejo especial para categoría
         if (header.key === "categoria") {
-          const categoriaId =
-            itemActual.categoria?._id ||
-            itemActual.categoria?.id ||
-            itemActual.categoria;
+          const rawCategoria = itemActual.categoria;
+          let categoriaId = rawCategoria;
+
+          // Si es un objeto, intentar extraer el ID
+          if (rawCategoria && typeof rawCategoria === "object") {
+            categoriaId = rawCategoria._id || rawCategoria.id;
+          }
+
           value = categoriaId;
           displayValue = getCategoriaNombre(categoriaId);
         }

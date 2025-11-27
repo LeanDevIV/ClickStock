@@ -35,6 +35,7 @@ export const AdminDashboard = () => {
     handleRestore,
     handleSoftDelete,
     handleHardDelete,
+    handleCreate,
   } = useTableData(selectedSection, adminOptions);
 
   // Cargar categorías al montar el componente
@@ -98,6 +99,7 @@ export const AdminDashboard = () => {
       onFieldChange: handleFieldChange,
       onRefresh: fetchData,
       categorias: categorias,
+      onCreate: handleCreate,
     };
 
     // Usar GenericTable para todas las secciones
