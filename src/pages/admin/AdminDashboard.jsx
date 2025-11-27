@@ -4,7 +4,7 @@ import { TABLE_CONFIG, THEME, SELECT_OPTIONS } from "../../config/adminConfig";
 import { useCategoriesStore } from "../../hooks/useCategoriesStore";
 import { Box, Pagination, Typography, Button, useTheme } from "@mui/material";
 import { AdminSidebar } from "../../components/admin/AdminSidebar";
-import { GenericTable } from "../../components/admin/GenericTable";
+import { GenericTable } from "../../components/common/GenericTable";
 
 export const AdminDashboard = () => {
   const theme = useTheme();
