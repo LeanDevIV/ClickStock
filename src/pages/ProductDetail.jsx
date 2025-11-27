@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import BotonCompartir from "../components/BotonCompartir.jsx";
 import {
   Container,
   Box,
@@ -231,16 +232,34 @@ const ProductDetail = () => {
             <Stack spacing={3}>
               {/* Título y precio */}
               <Box>
-                <Typography
-                  variant="h4"
-                  component="h1"
-                  fontWeight="bold"
-                  gutterBottom
-                  color="text.primary"
-                  sx={{ lineHeight: 1.2 }}
-                >
-                  {product.nombre}
-                </Typography>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'flex-start', 
+                  gap: 1, 
+                  mb: 1,
+                  flexDirection: { xs: 'column', sm: 'row' }
+                }}>
+                  <Typography
+                    variant="h4"
+                    component="h1"
+                    fontWeight="bold"
+                    color="text.primary"
+                    sx={{ lineHeight: 1.2, flex: 1 }}
+                  >
+                    {product.nombre}
+                  </Typography>
+                  
+                  <Box sx={{ 
+                    alignSelf: { xs: 'flex-start', sm: 'center' },
+                    mt: { xs: 1, sm: 0 }
+                  }}>
+                    <BotonCompartir
+                      idProducto={product._id}
+                      nombreProducto={product.nombre}
+                    />
+                  </Box>
+                </Box>
+
                 <Typography
                   variant="h3"
                   fontWeight="bold"

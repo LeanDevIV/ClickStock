@@ -1,208 +1,150 @@
-.contenedor-compartir {
+.boton-compartir-container {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 300px;
 }
 
-.boton-principal {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-width: 200px;
+.MuiTooltip-tooltip {
+  font-size: 0.75rem !important;
+  padding: 4px 8px !important;
 }
 
-.boton-principal:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.boton-principal:disabled {
-  background-color: #28a745;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.boton-principal.copiado {
-  background-color: #28a745;
-}
-
-.boton-opciones {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-}
-
-.boton-opciones:hover {
-  background-color: #545b62;
-}
-
-.mensaje-copiado {
-  position: absolute;
-  top: -50px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  white-space: nowrap;
-  z-index: 1000;
-  animation: fadeInOut 2s ease-in-out;
-}
-
-@keyframes fadeInOut {
-  0% { opacity: 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-.opciones-adicionales {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-}
-
-.opcion {
-  background-color: white;
-  border: 1px solid #dee2e6;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.opcion:hover {
-  background-color: #e9ecef;
-  border-color: #007bff;
-}
-
-.icono {
-  font-size: 18px;
-}
-.contenedor-botones-opciones {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-.boton-opciones {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-  flex: 1;
-}
-
-.boton-opciones:hover {
-  background-color: #545b62;
-}
-
-.contenedor-qr {
-    position: relative;
-  text-align: center;
-  padding: 20px;
-  border: 2px solid #e9ecef;
-  border-radius: 12px;
-  background-color: #f8f9fa;
-  margin-top: 15px;
-}
-.boton-cerrar {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #dc3545;
-  color: white;
-  border: none;
+.boton-compartir-icon {
+  border: 1px solid;
+  border-color: var(--primary-main);
+  padding: 12px;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  font-size: 18px;
+  background-color: var(--primary-main);
+  color: var(--primary-contrast);
+  transition: all 0.2s ease-in-out;
+}
+
+.boton-compartir-icon:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--primary-contrast);
+}
+
+.boton-compartir-modal {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  background-color: var(--bg-paper);
+  min-width: 200px;
+  z-index: 1300;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.boton-compartir-modal::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  background-color: var(--bg-paper);
+  transform: rotate(45deg);
+  border-left: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.modal-title {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 16px !important;
+  color: var(--text-primary);
+}
+
+.icon-container {
   display: flex;
-  align-items: center;
+  gap: 8px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
-.boton-cerrar:hover {
-  background: #c82333;
+.icon-button {
+  border: 1px solid;
+  padding: 12px;
+  border-radius: 50%;
+  background-color: transparent;
+  transition: all 0.2s ease-in-out;
 }
 
-.contenedor-qr h4 {
-  margin-bottom: 15px;
-  color: #333;
-  font-size: 18px;
+.icon-button.whatsapp {
+  border-color: #4caf50;
+  color: #4caf50;
 }
 
-.qr-code {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
-  padding: 10px;
-  background-color: white;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-}
-
-.texto-qr {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 15px;
-}
-
-.boton-descargar-qr {
-  background-color: #28a745;
+.icon-button.whatsapp:hover {
+  background-color: #4caf50;
   color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
+  border-color: #4caf50;
 }
 
-.boton-descargar-qr:hover {
-  background-color: #218838;
+.icon-button.email {
+  border-color: #e20000;
+  color: #e20000;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .contenedor-botones-opciones {
-    flex-direction: column;
-  }
-  
-  .qr-code {
-    transform: scale(0.9);
-  }
+.icon-button.email:hover {
+  background-color: #e20000;
+  color: white;
+}
+
+.icon-button.link {
+  border-color: #0288d1;
+  color: #0288d1;
+}
+
+.icon-button.link:hover {
+  background-color: #0288d1;
+  color: white;
+  border-color: #0288d1;
+}
+
+.icon-button.qr {
+  border-color: #7b1fa2;
+  color: #7b1fa2;
+}
+
+.icon-button.qr:hover {
+  background-color: #7b1fa2;
+  color: white;
+  border-color: #7b1fa2;
+}
+
+.qr-container {
+  text-align: center;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  color: var(--text-secondary);
+}
+
+.close-button:hover {
+  background-color: var(--hover-bg);
+}
+
+.qr-box {
+  padding: 16px;
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  display: inline-block;
+  margin: 16px 0;
+}
+
+.dialog-actions {
+  justify-content: center;
+  padding-bottom: 24px;
+}
+
+.download-button {
+  border-radius: 8px;
 }
