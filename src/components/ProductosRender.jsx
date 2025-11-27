@@ -375,7 +375,11 @@ function Products({ productos: productosExternos }) {
 
                         {producto.categoria && (
                           <Chip
-                            label={producto.categoria}
+                            label={
+                              typeof producto.categoria === "object"
+                                ? producto.categoria.nombre
+                                : producto.categoria
+                            }
                             size="small"
                             variant="outlined"
                             sx={{

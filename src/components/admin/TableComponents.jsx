@@ -19,6 +19,7 @@ import {
   Refresh as RefreshIcon,
   Delete as DeleteIcon,
   DeleteForever as DeleteForeverIcon,
+  AddCircle as AddCircleIcon,
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import {
@@ -286,6 +287,8 @@ export const TableControls = ({
   showDeletedInitial = true,
   onShowDeletedChange,
   isLoading = false,
+  onAdd,
+  showDeletedSwitch = true,
 }) => {
   const [showDeleted, setShowDeleted] = React.useState(showDeletedInitial);
 
@@ -321,24 +324,40 @@ export const TableControls = ({
         Actualizar
       </Button>
 
-      <FormControlLabel
-        control={
-          <Switch
-            checked={showDeleted}
-            onChange={handleToggleDeleted}
-            disabled={isLoading}
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: THEME.primaryColor,
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: THEME.primaryColor,
-              },
-            }}
-          />
-        }
-        label={showDeletedLabel}
-      />
+      <Button
+        variant="contained"
+        startIcon={<AddCircleIcon />}
+        onClick={onAdd}
+        sx={{
+          bgcolor: "success.main",
+          color: "white",
+          fontWeight: "bold",
+          "&:hover": { bgcolor: "success.dark" },
+        }}
+      >
+        Agregar
+      </Button>
+
+      {showDeletedSwitch && (
+        <FormControlLabel
+          control={
+            <Switch
+              checked={showDeleted}
+              onChange={handleToggleDeleted}
+              disabled={isLoading}
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": {
+                  color: THEME.primaryColor,
+                },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                  backgroundColor: THEME.primaryColor,
+                },
+              }}
+            />
+          }
+          label={showDeletedLabel}
+        />
+      )}
     </Box>
   );
 };
