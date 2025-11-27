@@ -1,17 +1,85 @@
 import React from "react";
 import {
   Container,
-  Grid,
-  Card,
-  CardContent,
   Typography,
   Avatar,
   IconButton,
   Box,
-  Grow,
+  Card,
   useTheme,
 } from "@mui/material";
 import { GitHub, LinkedIn } from "@mui/icons-material";
+import { styled, keyframes } from "@mui/material/styles";
+
+// Keyframe para el efecto de luz neón recorriendo los bordes
+const neonBorder = keyframes`
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+`;
+
+// Styled Card (Contenedor Principal)
+const NeonCard = styled(Card)(({ theme }) => ({
+  height: "100%", // Se estira para llenar la celda del Grid
+  minHeight: "320px",
+  width: "100%",
+  position: "relative",
+  overflow: "visible",
+  backgroundColor: "transparent",
+  borderRadius: "16px",
+  transition: "transform 0.3s ease",
+  boxShadow: "none",
+
+  "&:hover": {
+    transform: "translateY(-8px)",
+    transition: "transform 0.3s ease",
+    cursor: "pointer",
+  },
+
+  // Capa del Borde Gradiente (Detrás)
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: -2,
+    left: -2,
+    right: -2,
+    bottom: -2,
+    borderRadius: "18px",
+    background: `linear-gradient(
+      90deg,
+      transparent 0%,
+      ${theme.palette.primary.main} 20%,
+      ${theme.palette.error.main} 40%,
+      ${theme.palette.warning.main} 60%,
+      ${theme.palette.primary.main} 80%,
+      transparent 100%
+    )`,
+    backgroundSize: "200% 100%",
+    animation: `${neonBorder} 4s linear infinite`,
+    zIndex: 0,
+    opacity: 0.8,
+  },
+}));
+
+// Capa de Superficie (Frente - Tapa el centro del gradiente)
+const CardSurface = styled(Box)(({ theme }) => ({
+  position: "relative",
+  zIndex: 1,
+  height: "100%",
+  width: "100%",
+  // Color sólido explícito según modo
+  backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#ffffff",
+  borderRadius: "16px",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between", // Distribuye espacio entre avatar/info y redes
+  alignItems: "center",
+  padding: theme.spacing(4),
+  boxShadow: theme.shadows[4],
+}));
 
 const integrantes = [
   {
@@ -61,7 +129,8 @@ export default function AboutUs() {
     <Box
       sx={{
         width: "100%",
-        bgcolor: "background.default",
+        bgcolor: modoOscuro ? "rgba(0,0,0,0.7)" : "background.default",
+        backdropFilter: modoOscuro ? "blur(4px)" : "none",
         py: 8,
         textAlign: "center",
         minHeight: "80vh",
@@ -96,112 +165,97 @@ export default function AboutUs() {
           web moderna y funcional. Y por sobre todo, APROBAR😁
         </Typography>
 
-        <Grid container spacing={3} justifyContent="center">
+        {/* CSS Grid Nativo para anchos idénticos garantizados */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "repeat(1, 1fr)", // 1 columna en móvil
+              sm: "repeat(2, 1fr)", // 2 columnas en tablet
+              md: "repeat(3, 1fr)", // 3 columnas en desktop pequeño
+              lg: "repeat(5, 1fr)", // 5 columnas en pantallas grandes (para que entren todos en una fila si se quiere)
+            },
+            gap: 3, // Espaciado uniforme
+            width: "100%",
+            alignItems: "stretch", // Altura uniforme
+            justifyContent: "center",
+            mb: 6, // Margen inferior para separar del footer
+          }}
+        >
           {integrantes.map((integrante, index) => (
-            <Grid xs={12} sm={6} md={4} lg={2.4} key={index}>
-              <Grow in={true} timeout={500 + index * 200}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    minHeight: "320px",
-                    bgcolor: modoOscuro ? "#2C2C2C" : "#FFFFFF",
-                    borderRadius: 4,
-                    transition: "transform 0.4s ease, box-shadow 0.4s ease",
-                    display: "flex",
-                    flexDirection: "column",
-                    "&:hover": {
-                      transform: "translateY(-8px)",
-                      boxShadow: modoOscuro
-                        ? "0 8px 20px rgba(212, 175, 55, 0.3)"
-                        : "0 8px 20px rgba(0, 0, 0, 0.15)",
-                    },
-                  }}
-                >
-                  <CardContent
+            <NeonCard key={index}>
+              <CardSurface>
+                <Box sx={{ textAlign: "center" }}>
+                  <Avatar
+                    src={integrante.imagen}
+                    alt={integrante.nombre}
                     sx={{
-                      textAlign: "center",
-                      py: 4,
-                      flex: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
+                      width: 120,
+                      height: 120,
+                      mx: "auto",
+                      mb: 2,
+                      border: "3px solid #D4AF37",
+                      transition: "transform 0.4s ease",
+                      "&:hover": {
+                        transform: "scale(1.05) rotate(-2deg)",
+                      },
+                    }}
+                  />
+                  <Typography
+                    variant="h6"
+                    component="h5"
+                    fontWeight="600"
+                    gutterBottom
+                    sx={{ color: "text.primary" }}
+                  >
+                    {integrante.nombre}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      mb: 2,
+                      color: "#D4AF37",
                     }}
                   >
-                    <Box>
-                      <Avatar
-                        src={integrante.imagen}
-                        alt={integrante.nombre}
-                        sx={{
-                          width: 120,
-                          height: 120,
-                          mx: "auto",
-                          mb: 2,
-                          border: "3px solid #D4AF37",
-                          transition: "transform 0.4s ease",
-                          "&:hover": {
-                            transform: "scale(1.05) rotate(-2deg)",
-                          },
-                        }}
-                      />
-                      <Typography
-                        variant="h6"
-                        component="h5"
-                        fontWeight="600"
-                        gutterBottom
-                        sx={{ color: "text.primary" }}
-                      >
-                        {integrante.nombre}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          mb: 2,
-                          color: "#D4AF37",
-                        }}
-                      >
-                        {integrante.rol}
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{ display: "flex", justifyContent: "center", gap: 1 }}
-                    >
-                      <IconButton
-                        href={integrante.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        sx={{
-                          color: modoOscuro ? "#FFFFFF" : "#000000",
-                          transition: "transform 0.4s ease, color 0.3s ease",
-                          "&:hover": {
-                            transform: "scale(1.2)",
-                            color: "#D4AF37",
-                          },
-                        }}
-                      >
-                        <GitHub fontSize="large" />
-                      </IconButton>
-                      <IconButton
-                        href={integrante.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        sx={{
-                          color: "#0077B5",
-                          transition: "transform 0.4s ease, color 0.3s ease",
-                          "&:hover": {
-                            transform: "scale(1.2)",
-                            color: "#D4AF37",
-                          },
-                        }}
-                      >
-                        <LinkedIn fontSize="large" />
-                      </IconButton>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grow>
-            </Grid>
+                    {integrante.rol}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+                  <IconButton
+                    href={integrante.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      color: modoOscuro ? "#FFFFFF" : "#000000",
+                      transition: "transform 0.4s ease, color 0.3s ease",
+                      "&:hover": {
+                        transform: "scale(1.2)",
+                        color: "#D4AF37",
+                      },
+                    }}
+                  >
+                    <GitHub fontSize="large" />
+                  </IconButton>
+                  <IconButton
+                    href={integrante.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      color: "#0077B5",
+                      transition: "transform 0.4s ease, color 0.3s ease",
+                      "&:hover": {
+                        transform: "scale(1.2)",
+                        color: "#D4AF37",
+                      },
+                    }}
+                  >
+                    <LinkedIn fontSize="large" />
+                  </IconButton>
+                </Box>
+              </CardSurface>
+            </NeonCard>
           ))}
-        </Grid>
+        </Box>
       </Container>
     </Box>
   );
