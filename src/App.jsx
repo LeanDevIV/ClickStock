@@ -2,14 +2,13 @@ import { useState, useMemo } from "react";
 import AppRoutes from "./routes/Indexroutes.jsx";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { Toaster } from "react-hot-toast";
-import Footer from "./components/Footer.jsx";
-import ProductosRender from "./components/ProductosRender.jsx";
-import { getCustomTheme } from "./styles/customTheme";
-import { globalStyles } from "./styles/globalStyles";
-import FloatingChat from "./components/Chatbot.jsx";
+import Footer from "./components/layouts/Footer.jsx";
+import { getCustomTheme } from "./styles/theme/customTheme.jsx";
+import { globalStyles } from "./styles/theme/globalStyles.jsx";
+import FloatingChat from "./components/home/Chatbot.jsx";
 import { getItem, setItem } from "./utils/localStorageHelper";
 import LiquidEther from "./styles/liquid-ether/LiquidEther.jsx";
-import WelcomeScreen from "./components/WelcomeScreen";
+import WelcomeScreen from "./styles/welcome-screen/WelcomeScreen.jsx";
 
 function App() {
   const [modoOscuro, setModoOscuro] = useState(() => {
@@ -17,7 +16,7 @@ function App() {
   });
 
   const [backgroundEnabled, setBackgroundEnabled] = useState(() => {
-    return getItem("backgroundEnabled", true); // Default true
+    return getItem("backgroundEnabled", false); // Default false
   });
 
   const theme = useMemo(() => getCustomTheme(modoOscuro), [modoOscuro]);
