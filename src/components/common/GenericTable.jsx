@@ -11,7 +11,11 @@ import TableBody from "@mui/material/TableBody";
 import { TableControls } from "./TableComponents";
 import { GenericRow } from "./GenericRow";
 
+<<<<<<< HEAD:src/components/admin/GenericTable.jsx
 import { CreateItemModal } from "./CreateItemModal";
+=======
+import { CreateItemModal } from "../admin/CreateItemModal";
+>>>>>>> 3f4f7a5 (Refactorizacion general de estructura de proyecto (movimiento de carpetas) #2):src/components/common/GenericTable.jsx
 
 /**
  * Tabla genérica reutilizable para todas las secciones del admin
