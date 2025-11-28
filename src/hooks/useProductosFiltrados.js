@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import clientAxios from "../../utils/clientAxios";
+import clientAxios from "../utils/clientAxios";
 
 export const useProductosFiltrados = () => {
   const [productos, setProductos] = useState([]);
@@ -14,22 +14,25 @@ export const useProductosFiltrados = () => {
         setLoading(true);
         setError(null);
         
+        // ✅ USAR LOS PARÁMETROS CORRECTOS DEL BACKEND
         const [respuestaProductos, respuestaCategorias] = await Promise.all([
           clientAxios.get('/productos', {
             params: {
-              disponible: true,
-              isDeleted: false
+              includeDeleted: false,      // = isDeleted: false
+              includeUnavailable: false   // = disponible: true
             }
           }),
           clientAxios.get('/categorias')
         ]);
 
         let datosProductos = respuestaProductos.data || [];
-        if (datosProductos.data && Array.isArray(datosProductos.data)) {
-          datosProductos = datosProductos.data;
-        }
-        if (!Array.isArray(datosProductos)) datosProductos = [];
+        
+        // ✅ EL BACKEND YA FILTRA, SOLO QUITAR PRODUCTOS SIN STOCK
+        datosProductos = datosProductos.filter(producto => producto.stock > 0);
+        
+        console.log('✅ Productos cargados:', datosProductos);
 
+        // Procesar categorías
         let datosCategorias = respuestaCategorias.data || [];
         if (datosCategorias.data && Array.isArray(datosCategorias.data)) {
           datosCategorias = datosCategorias.data;
@@ -38,12 +41,14 @@ export const useProductosFiltrados = () => {
         }
         if (!Array.isArray(datosCategorias)) datosCategorias = [];
 
+        console.log('✅ Categorías cargadas:', datosCategorias);
+        
         setProductos(datosProductos);
         setCategorias(datosCategorias);
 
       } catch (err) {
+        console.error('Error completo:', err);
         setError('Error al cargar los productos');
-        console.error('Error:', err);
       } finally {
         setLoading(false);
       }
@@ -52,20 +57,16 @@ export const useProductosFiltrados = () => {
     cargarDatos();
   }, []);
 
+  // Filtrado por categoría (solo esto queda en el frontend)
   const productosFiltrados = categoriaSeleccionada === 'todos' 
-    ? productos.filter(producto => producto.stock > 0 && producto.disponible && !producto.isDeleted)
+    ? productos  // Ya están filtrados por stock
     : productos.filter(producto => {
         if (!producto.categoria) return false;
         const idCategoria = producto.categoria._id || producto.categoria;
-        return idCategoria === categoriaSeleccionada && 
-               producto.stock > 0 && 
-               producto.disponible &&
-               !producto.isDeleted;
+        return idCategoria === categoriaSeleccionada;
       });
 
-  const productosDestacados = productos
-    .filter(producto => producto.stock > 0 && producto.disponible)
-    .slice(0, 3);
+  const productosDestacados = productos.slice(0, 3);
 
   const manejarCambioCategoria = (evento, nuevoValor) => {
     setCategoriaSeleccionada(nuevoValor);
@@ -74,15 +75,11 @@ export const useProductosFiltrados = () => {
   const obtenerUrlImagen = (producto) => {
     if (producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0) {
       const primeraImagen = producto.imagenes[0];
-      // Si ya es una URL completa, la devuelve tal cual
       if (primeraImagen.startsWith('http')) {
         return primeraImagen;
       }
-      // Si es una ruta relativa, construye la URL completa con tu servidor
       return `http://localhost:5000${primeraImagen.startsWith('/') ? '' : '/'}${primeraImagen}`;
     }
-    
-    // Si no hay imágenes, puedes devolver un placeholder genérico o null
     return null;
   };
 
