@@ -91,7 +91,13 @@ export const GenericRow = ({
     // Campos especiales que necesitan formato
     switch (field) {
       case "precio":
-        return `$${typeof value === "number" ? value.toFixed(2) : value}`;
+        return typeof value === "number"
+          ? new Intl.NumberFormat("es-AR", {
+              style: "currency",
+              currency: "ARS",
+              minimumFractionDigits: 2,
+            }).format(value)
+          : value;
 
       case "stock":
         return (

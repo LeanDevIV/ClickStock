@@ -91,7 +91,33 @@ export const useTableData = (section, options = {}) => {
         setEditingId(null);
         setEditedData({});
       } catch (err) {
-        setError("Error al guardar: " + err.message);
+        const responseData = err.response?.data;
+
+        if (responseData?.errors) {
+          const errorMessages = responseData.errors
+            .map((e) => `<li>${e.message}</li>`)
+            .join("");
+
+          Swal.fire({
+            icon: "error",
+            title: "Errores de validación",
+            html: `<ul style="text-align: left;">${errorMessages}</ul>`,
+            confirmButtonColor: "#D4AF37",
+            background: "#1e1e1e",
+            color: "#fff",
+          });
+        } else {
+          const message =
+            responseData?.message || "Error al guardar: " + err.message;
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: message,
+            confirmButtonColor: "#D4AF37",
+            background: "#1e1e1e",
+            color: "#fff",
+          });
+        }
         console.error("Error saving data:", err);
       }
     },
@@ -366,16 +392,33 @@ export const useTableData = (section, options = {}) => {
           color: "#fff",
         });
       } catch (err) {
-        const message =
-          err.response?.data?.message || "Error al crear: " + err.message;
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: message,
-          confirmButtonColor: "#D4AF37",
-          background: "#1e1e1e",
-          color: "#fff",
-        });
+        const responseData = err.response?.data;
+
+        if (responseData?.errors) {
+          const errorMessages = responseData.errors
+            .map((e) => `<li>${e.message}</li>`)
+            .join("");
+
+          Swal.fire({
+            icon: "error",
+            title: "Errores de validación",
+            html: `<ul style="text-align: left;">${errorMessages}</ul>`,
+            confirmButtonColor: "#D4AF37",
+            background: "#1e1e1e",
+            color: "#fff",
+          });
+        } else {
+          const message =
+            responseData?.message || "Error al crear: " + err.message;
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: message,
+            confirmButtonColor: "#D4AF37",
+            background: "#1e1e1e",
+            color: "#fff",
+          });
+        }
         console.error("Error creating item:", err);
       }
     },

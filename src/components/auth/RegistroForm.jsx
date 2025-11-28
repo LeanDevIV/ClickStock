@@ -4,14 +4,44 @@ import { TextField, Button, Box, InputAdornment } from "@mui/material";
 import { Person, Email, Lock } from "@mui/icons-material";
 import { useStore } from "../../hooks/useStore";
 import { registroService } from "../../services/RegistroService";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { showValidationErrors } from "../../utils/validationErrors";
+
+const registerSchema = z
+  .object({
+    nombre: z
+      .string()
+      .min(2, "El nombre debe tener al menos 2 caracteres")
+      .max(50, "El nombre no puede exceder los 50 caracteres"),
+    apellido: z
+      .string()
+      .min(2, "El apellido debe tener al menos 2 caracteres")
+      .max(50, "El apellido no puede exceder los 50 caracteres"),
+    telefono: z
+      .string()
+      .min(10, "El teléfono debe tener al menos 10 caracteres")
+      .optional()
+      .or(z.literal("")),
+    correo: z.string().email("Debe ser un correo electrónico válido"),
+    contrasenia: z
+      .string()
+      .min(6, "La contraseña debe tener al menos 6 caracteres"),
+    confirmarContrasenia: z.string(),
+  })
+  .refine((data) => data.contrasenia === data.confirmarContrasenia, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmarContrasenia"],
+  });
 
 function RegistroForm({ setMensaje, onSuccess }) {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+  });
 
   const [cargando, setCargando] = useState(false);
 
@@ -42,13 +72,17 @@ function RegistroForm({ setMensaje, onSuccess }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit, showValidationErrors)}
+      sx={{ mt: 1 }}
+    >
       <TextField
         fullWidth
         label="Nombre"
         margin="dense"
         size="small"
-        {...register("nombre", { required: "El nombre es requerido" })}
+        {...register("nombre")}
         error={!!errors.nombre}
         helperText={errors.nombre?.message}
         InputProps={{
@@ -75,7 +109,7 @@ function RegistroForm({ setMensaje, onSuccess }) {
         label="Apellido"
         margin="dense"
         size="small"
-        {...register("apellido", { required: "El apellido es requerido" })}
+        {...register("apellido")}
         error={!!errors.apellido}
         helperText={errors.apellido?.message}
         InputProps={{
@@ -130,13 +164,7 @@ function RegistroForm({ setMensaje, onSuccess }) {
         type="email"
         margin="dense"
         size="small"
-        {...register("correo", {
-          required: "El correo es requerido",
-          pattern: {
-            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-            message: "Dirección de correo inválida",
-          },
-        })}
+        {...register("correo")}
         error={!!errors.correo}
         helperText={errors.correo?.message}
         InputProps={{
@@ -164,9 +192,7 @@ function RegistroForm({ setMensaje, onSuccess }) {
         type="password"
         margin="dense"
         size="small"
-        {...register("contrasenia", {
-          required: "La contraseña es requerida",
-        })}
+        {...register("contrasenia")}
         error={!!errors.contrasenia}
         helperText={errors.contrasenia?.message}
         InputProps={{
@@ -194,14 +220,7 @@ function RegistroForm({ setMensaje, onSuccess }) {
         type="password"
         margin="dense"
         size="small"
-        {...register("confirmarContrasenia", {
-          required: "Confirma tu contraseña",
-          validate: (val) => {
-            if (watch("contrasenia") != val) {
-              return "Las contraseñas no coinciden";
-            }
-          },
-        })}
+        {...register("confirmarContrasenia")}
         error={!!errors.confirmarContrasenia}
         helperText={errors.confirmarContrasenia?.message}
         InputProps={{

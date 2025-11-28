@@ -23,3 +23,19 @@ export async function loginService({ correo, contrasenia }) {
     throw new Error(mensaje);
   }
 }
+
+/**
+ * Realiza el login social (Google/GitHub) enviando el token al backend.
+ * @param {string} token - Token de ID de Firebase
+ * @returns {Promise<object>} respuesta del servidor
+ */
+export async function socialLoginService(token) {
+  try {
+    const { data } = await clientAxios.post("/auth/social", { token });
+    return data;
+  } catch (error) {
+    const mensaje =
+      error.response?.data?.message || error.message || "Error en login social";
+    throw new Error(mensaje);
+  }
+}

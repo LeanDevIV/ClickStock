@@ -4,11 +4,15 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 
+import { GlobalErrorBoundary } from "./components/common/GlobalErrorBoundary.jsx";
+
 createRoot(document.getElementById("root")).render(
   // <StrictMode>
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+  <GlobalErrorBoundary>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </GlobalErrorBoundary>
 
   // </StrictMode>,
 );
