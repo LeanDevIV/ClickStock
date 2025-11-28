@@ -4,13 +4,23 @@ import { TextField, Button, Box, InputAdornment } from "@mui/material";
 import { Email, Lock } from "@mui/icons-material";
 import { useStore } from "../../hooks/useStore";
 import { loginService } from "../../services/LoginService";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { showValidationErrors } from "../../utils/validationErrors";
+
+const loginSchema = z.object({
+  correo: z.string().email("Debe ser un correo electrónico válido"),
+  contrasenia: z.string().min(1, "La contraseña es requerida"),
+});
 
 function LoginForm({ setMensaje, onSuccess }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
 
   const [cargando, setCargando] = useState(false);
 
@@ -34,19 +44,17 @@ function LoginForm({ setMensaje, onSuccess }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit(onSubmit, showValidationErrors)}
+      sx={{ mt: 1 }}
+    >
       <TextField
         fullWidth
         label="Correo electrónico"
         type="email"
         margin="dense"
-        {...register("correo", {
-          required: "El correo es requerido",
-          pattern: {
-            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-            message: "Dirección de correo inválida",
-          },
-        })}
+        {...register("correo")}
         error={!!errors.correo}
         helperText={errors.correo?.message}
         sx={{
@@ -67,7 +75,7 @@ function LoginForm({ setMensaje, onSuccess }) {
         label="Contraseña"
         type="password"
         margin="dense"
-        {...register("contrasenia", { required: "La contraseña es requerida" })}
+        {...register("contrasenia")}
         error={!!errors.contrasenia}
         helperText={errors.contrasenia?.message}
         InputProps={{

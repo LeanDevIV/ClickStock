@@ -17,6 +17,7 @@ import { useStore } from "../../hooks/useStore";
 
 import toast from "react-hot-toast";
 import { updateUserService } from "../../services/usuarioService";
+import { showValidationErrors } from "../../utils/validationErrors";
 
 const EditProfileModal = ({ open, onClose }) => {
   const { user, setUser } = useStore();
@@ -107,7 +108,11 @@ const EditProfileModal = ({ open, onClose }) => {
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit, showValidationErrors)}
+          sx={{ mt: 1 }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -189,7 +194,7 @@ const EditProfileModal = ({ open, onClose }) => {
           Cancelar
         </Button>
         <Button
-          onClick={handleSubmit(onSubmit)}
+          onClick={handleSubmit(onSubmit, showValidationErrors)}
           variant="contained"
           disabled={loading}
         >

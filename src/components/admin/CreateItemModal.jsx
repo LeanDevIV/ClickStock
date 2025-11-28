@@ -14,7 +14,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { FIELD_TYPES, SELECT_OPTIONS, THEME } from "../../config/adminConfig";
+import { productoSchema } from "../../schemas/validationSchemas";
+import { showValidationErrors } from "../../utils/validationErrors";
 
 export const CreateItemModal = ({
   open,
@@ -23,12 +26,18 @@ export const CreateItemModal = ({
   section,
   config,
 }) => {
+  // Determinar si debemos usar un esquema de validación (solo para productos por ahora)
+  const resolver =
+    section === "productos" ? zodResolver(productoSchema) : undefined;
+
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver,
+  });
 
   // Resetear formulario cuando se cierra o cambia la sección
   useEffect(() => {
@@ -56,7 +65,7 @@ export const CreateItemModal = ({
       >
         Agregar {section.slice(0, -1)} {/* Intento básico de singularizar */}
       </DialogTitle>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit, showValidationErrors)}>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
             {camposParaMostrar.map((campo) => {
@@ -76,7 +85,12 @@ export const CreateItemModal = ({
                   name={campo}
                   control={control}
                   defaultValue=""
-                  rules={{ required: "Este campo es obligatorio" }}
+                  // Si no hay resolver (otras secciones), mantenemos required básico
+                  rules={
+                    !resolver
+                      ? { required: "Este campo es obligatorio" }
+                      : undefined
+                  }
                   render={({ field }) => {
                     if (esSelect) {
                       const opciones = SELECT_OPTIONS[campo] || [];
