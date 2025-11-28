@@ -13,26 +13,21 @@ export const useProductosFiltrados = () => {
       try {
         setLoading(true);
         setError(null);
-        
-        // ✅ USAR LOS PARÁMETROS CORRECTOS DEL BACKEND
+
         const [respuestaProductos, respuestaCategorias] = await Promise.all([
           clientAxios.get('/productos', {
             params: {
-              includeDeleted: false,      // = isDeleted: false
-              includeUnavailable: false   // = disponible: true
+              includeDeleted: false,
+              includeUnavailable: false
             }
           }),
           clientAxios.get('/categorias')
         ]);
 
         let datosProductos = respuestaProductos.data || [];
-        
-        // ✅ EL BACKEND YA FILTRA, SOLO QUITAR PRODUCTOS SIN STOCK
         datosProductos = datosProductos.filter(producto => producto.stock > 0);
-        
-        console.log('✅ Productos cargados:', datosProductos);
+        setProductos(datosProductos);
 
-        // Procesar categorías
         let datosCategorias = respuestaCategorias.data || [];
         if (datosCategorias.data && Array.isArray(datosCategorias.data)) {
           datosCategorias = datosCategorias.data;
@@ -40,15 +35,10 @@ export const useProductosFiltrados = () => {
           datosCategorias = Object.values(datosCategorias);
         }
         if (!Array.isArray(datosCategorias)) datosCategorias = [];
-
-        console.log('✅ Categorías cargadas:', datosCategorias);
-        
-        setProductos(datosProductos);
         setCategorias(datosCategorias);
 
       } catch (err) {
-        console.error('Error completo:', err);
-        setError('Error al cargar los productos');
+        setError('Lo sentimos, hubo un error al cargar los productos. Por favor, inténtalo de nuevo.');
       } finally {
         setLoading(false);
       }
@@ -57,14 +47,13 @@ export const useProductosFiltrados = () => {
     cargarDatos();
   }, []);
 
-  // Filtrado por categoría (solo esto queda en el frontend)
-  const productosFiltrados = categoriaSeleccionada === 'todos' 
-    ? productos  // Ya están filtrados por stock
+  const productosFiltrados = categoriaSeleccionada === 'todos'
+    ? productos
     : productos.filter(producto => {
-        if (!producto.categoria) return false;
-        const idCategoria = producto.categoria._id || producto.categoria;
-        return idCategoria === categoriaSeleccionada;
-      });
+      if (!producto.categoria) return false;
+      const idCategoria = producto.categoria._id || producto.categoria;
+      return idCategoria === categoriaSeleccionada;
+    });
 
   const productosDestacados = productos.slice(0, 3);
 
@@ -75,11 +64,24 @@ export const useProductosFiltrados = () => {
   const obtenerUrlImagen = (producto) => {
     if (producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0) {
       const primeraImagen = producto.imagenes[0];
+      let urlFinal;
+      
+      // Si la URL es absoluta (http/https), la usamos directamente
       if (primeraImagen.startsWith('http')) {
-        return primeraImagen;
+        urlFinal = primeraImagen;
+      } else {
+        // Si es una ruta relativa, asumimos el dominio local
+        urlFinal = `http://localhost:5000${primeraImagen.startsWith('/') ? '' : '/'}${primeraImagen}`;
       }
-      return `http://localhost:5000${primeraImagen.startsWith('/') ? '' : '/'}${primeraImagen}`;
+
+      // 🚨 PUNTO DE DEPURACIÓN CLAVE
+      console.log(`[DEBUG - ${producto.nombre || 'Producto sin nombre'}] URL Imagen: ${urlFinal}`);
+      
+      return urlFinal;
     }
+    
+    // 🚨 PUNTO DE DEPURACIÓN CLAVE
+    console.log(`[DEBUG - ${producto.nombre || 'Producto sin nombre'}] No se encontraron imágenes. Devolviendo NULL.`);
     return null;
   };
 
