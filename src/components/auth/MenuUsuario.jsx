@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Avatar,
   IconButton,
@@ -70,7 +70,7 @@ export const UserMenu = ({ user, modoOscuro, handleLogout }) => {
       >
         <MenuItem onClick={handleOpenProfile}>Mi Perfil</MenuItem>
 
-        {user?.rol !== "admin" && (
+        {user?.rol === "admin" && (
           <MenuItem component={Link} to="/admin">
             Panel Admin
           </MenuItem>
