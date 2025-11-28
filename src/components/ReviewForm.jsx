@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Form, Button } from "react-bootstrap";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Rating,
+  Paper,
+} from "@mui/material";
 import { createReview } from "../services/reviewService.js";
 
 const ReviewForm = ({ productId, onReviewAdded }) => {
@@ -8,14 +15,20 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
     rating: 5,
     comment: "",
   });
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleRatingChange = (_, value) => {
+    setFormData({ ...formData, rating: value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       setLoading(true);
       await createReview({ ...formData, productId });
@@ -28,52 +41,119 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
     }
   };
 
-  return (
-    <Form onSubmit={handleSubmit} className="mt-4">
-      <h5>Agregar una reseña</h5>
+  const textFieldStyles = {
+    mb: 2,
+    input: { color: "white" },
+    textarea: { color: "white" },
 
-      <Form.Group className="mb-2">
-        <Form.Label>Tu nombre</Form.Label>
-        <Form.Control
-          type="text"
+    "& label": { color: "#cccccc" },
+    "& label.Mui-focused": { color: "#fff" },
+
+    "& .MuiOutlinedInput-root": {
+      transition: "0.25s ease",
+      "& fieldset": {
+        borderColor: "#696969",
+        transition: "0.25s",
+      },
+      "&:hover fieldset": {
+        borderColor: "#f5d76e",
+        boxShadow: "0 0 8px #f5d76e",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#ffeb3b",
+        boxShadow: "0 0 12px #ffeb3b",
+      },
+    },
+  };
+
+  return (
+    <Paper
+      sx={{
+        p: 3,
+        mb: 4,
+        borderRadius: 3,
+        backgroundColor: "#121212",
+        color: "white",
+        boxShadow: "0 0 25px rgba(255, 255, 255, 0.08)",
+        border: "1px solid rgba(255,255,255,0.15)",
+      }}
+      elevation={6}
+    >
+      <Typography
+        variant="h6"
+        fontWeight="bold"
+        gutterBottom
+        sx={{
+          textShadow: "0 0 10px #ffffff77",
+        }}
+      >
+        Agregar una reseña
+      </Typography>
+
+      <Box component="form" onSubmit={handleSubmit}>
+        <TextField
+          label="Tu nombre"
           name="user"
+          fullWidth
+          required
+          sx={textFieldStyles}
           value={formData.user}
           onChange={handleChange}
-          required
         />
-      </Form.Group>
 
-      <Form.Group className="mb-2">
-        <Form.Label>Puntaje</Form.Label>
-        <Form.Select
-          name="rating"
-          value={formData.rating}
-          onChange={handleChange}
-        >
-          {[1, 2, 3, 4, 5].map((n) => (
-            <option key={n} value={n}>
-              {n} ⭐
-            </option>
-          ))}
-        </Form.Select>
-      </Form.Group>
+        <Box sx={{ mb: 2 }}>
+          <Typography sx={{ color: "#fff", textShadow: "0 0 8px #ffffff55" }}>
+            Puntaje
+          </Typography>
 
-      <Form.Group className="mb-2">
-        <Form.Label>Comentario</Form.Label>
-        <Form.Control
-          as="textarea"
+          <Rating
+            value={formData.rating}
+            onChange={handleRatingChange}
+            precision={1}
+            sx={{
+              "& .MuiRating-iconFilled": {
+                color: "#ffeb3b",
+                filter: "drop-shadow(0 0 4px #ffeb3b)",
+              },
+              "& .MuiRating-iconHover": {
+                filter: "drop-shadow(0 0 6px #ffea00)",
+              },
+            }}
+          />
+        </Box>
+
+        <TextField
+          label="Comentario"
           name="comment"
+          fullWidth
+          required
+          multiline
           rows={3}
+          sx={textFieldStyles}
           value={formData.comment}
           onChange={handleChange}
-          required
         />
-      </Form.Group>
 
-      <Button type="submit" disabled={loading}>
-        {loading ? "Enviando..." : "Enviar reseña"}
-      </Button>
-    </Form>
+        <Button
+          variant="contained"
+          type="submit"
+          disabled={loading}
+          sx={{
+            mt: 1,
+            backgroundColor: "#f5d76e",
+            color: "#000",
+            fontWeight: "bold",
+            transition: "0.25s",
+            "&:hover": {
+              backgroundColor: "#ffe27a",
+              boxShadow: "0 0 12px #ffe27a",
+            },
+          }}
+        >
+          {loading ? "Enviando..." : "Enviar reseña"}
+        </Button>
+      </Box>
+    </Paper>
   );
 };
 
