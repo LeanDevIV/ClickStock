@@ -101,7 +101,7 @@ function App() {
         toggleBackground={toggleBackground}
       />
       <FloatingChat />
-      <Footer />
+      {/* <Footer /> */}
     </ThemeProvider>
   );
 }

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import toast from 'react-hot-toast'; 
-export const useCompartir = (idProducto, nombreProducto) => {
+export const useCompartir = (idProducto) => {
   const [enlaceCopiado, setEnlaceCopiado] = useState(false);
   const [mostrarOpciones, setMostrarOpciones] = useState(false);
   const [mostrarQR, setMostrarQR] = useState(false);
   const generarEnlace = () => {
     const urlBase = window.location.origin;
-    return `${urlBase}/producto/${idProducto}`;
+    return `${urlBase}/producto/detalle/${idProducto}`;
   };
 
   const copiarEnlace = async () => {
