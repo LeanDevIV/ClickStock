@@ -13,12 +13,17 @@ import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import RegistroForm from "./RegistroForm";
 import LoginForm from "./LoginForm";
+import { auth, googleProvider, githubProvider } from "../../config/firebase";
+import { signInWithPopup } from "firebase/auth";
+import { socialLoginService } from "../../services/LoginService";
+import { useStore } from "../../hooks/useStore";
 
 function AuthModal({ show, handleClose }) {
   const [modo, setModo] = useState(0); // 0 = login, 1 = registro
   const [mensaje, setMensaje] = useState("");
   const [height, setHeight] = useState("auto");
   const contentRef = useRef(null);
+  const setUser = useStore((state) => state.setUser);
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -41,6 +46,24 @@ function AuthModal({ show, handleClose }) {
     setTimeout(() => {
       handleClose();
     }, 700);
+  };
+
+  const handleSocialLogin = async (provider) => {
+    try {
+      setMensaje("");
+      const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
+
+      const data = await socialLoginService(token);
+
+      if (data.usuario || data.token) {
+        setUser(data.usuario, data.token);
+        handleSuccess();
+      }
+    } catch (error) {
+      console.error("Error Social Login:", error);
+      setMensaje(error.message || "Error al iniciar sesión");
+    }
   };
 
   return (
@@ -113,8 +136,10 @@ function AuthModal({ show, handleClose }) {
             sx={{
               mb: 2,
               p: 1,
-              bgcolor: "rgba(46, 125, 50, 0.2)", // Darker success bg
-              color: "#66bb6a", // Light green text
+              bgcolor: mensaje.includes("Error")
+                ? "rgba(211, 47, 47, 0.2)"
+                : "rgba(46, 125, 50, 0.2)",
+              color: mensaje.includes("Error") ? "#ef5350" : "#66bb6a",
               borderRadius: 1,
               textAlign: "center",
               fontSize: "0.875rem",
@@ -193,7 +218,7 @@ function AuthModal({ show, handleClose }) {
               fullWidth
               variant="outlined"
               startIcon={<FcGoogle size={20} />}
-              onClick={() => console.log("Login con Google")}
+              onClick={() => handleSocialLogin(googleProvider)}
               size="small"
               sx={{
                 borderColor: "rgba(255,255,255,0.2)",
@@ -211,7 +236,7 @@ function AuthModal({ show, handleClose }) {
               fullWidth
               variant="outlined"
               startIcon={<FaGithub size={20} />}
-              onClick={() => console.log("Login con GitHub")}
+              onClick={() => handleSocialLogin(githubProvider)}
               size="small"
               sx={{
                 borderColor: "rgba(255,255,255,0.2)",
