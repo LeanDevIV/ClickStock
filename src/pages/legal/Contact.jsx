@@ -3,6 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import "../../styles/contact.css";
 import Swal from "sweetalert2";
+import { showValidationErrors } from "../../utils/validationErrors";
 
 const Contacto = () => {
   const {
@@ -64,7 +65,10 @@ const Contacto = () => {
 
           {/* FORMULARIO */}
           <div className="contact-form-box">
-            <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+            <Box
+              component="form"
+              onSubmit={handleSubmit(onSubmit, showValidationErrors)}
+            >
               {/* Nombre */}
               <Controller
                 name="nombre"
