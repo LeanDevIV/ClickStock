@@ -105,7 +105,7 @@ export const GenericTable = ({
         showDeletedLabel="Mostrar eliminados"
         showDeletedInitial={true}
         onShowDeletedChange={setShowDeleted}
-        //onAdd={() => setShowCreateModal(true)}
+       onAdd={() => setShowCreateModal(true)}
         showDeletedSwitch={shouldShowDeleted}
       />
 

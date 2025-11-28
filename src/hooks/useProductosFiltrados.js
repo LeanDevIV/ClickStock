@@ -73,15 +73,10 @@ export const useProductosFiltrados = () => {
         // Si es una ruta relativa, asumimos el dominio local
         urlFinal = `http://localhost:5000${primeraImagen.startsWith('/') ? '' : '/'}${primeraImagen}`;
       }
-
-      // 🚨 PUNTO DE DEPURACIÓN CLAVE
-      console.log(`[DEBUG - ${producto.nombre || 'Producto sin nombre'}] URL Imagen: ${urlFinal}`);
       
       return urlFinal;
     }
     
-    // 🚨 PUNTO DE DEPURACIÓN CLAVE
-    console.log(`[DEBUG - ${producto.nombre || 'Producto sin nombre'}] No se encontraron imágenes. Devolviendo NULL.`);
     return null;
   };
 
