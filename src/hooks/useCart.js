@@ -36,9 +36,11 @@ export const useCart = () => {
         totalArticulos: totalArticulos,
       });
     } catch (error) {
-      console.error("Error al cargar carrito:", error);
       if (error.response?.status !== 401) {
-        toast.error("Error al cargar el carrito");
+        toast.error("Error al cargar el carrito", {
+          position: "top-center",
+          duration: 2000,
+        });
       }
     } finally {
       setCartLoading(false);
@@ -51,7 +53,10 @@ export const useCart = () => {
   const añadirAlCarrito = useCallback(
     async (producto, cantidad = 1) => {
       if (!token) {
-        toast.error("Debes iniciar sesión para agregar productos al carrito");
+        toast.error("Debes iniciar sesión para agregar productos al carrito", {
+          position: "top-center",
+          duration: 2000,
+        });
         return;
       }
 
@@ -78,14 +83,19 @@ export const useCart = () => {
           totalArticulos: totalArticulos,
         });
 
-        toast.success("Producto agregado al carrito");
+        toast.success("Producto agregado al carrito", {
+          position: "top-center",
+          duration: 2000,
+        });
       } catch (error) {
-        console.error("❌ Error al agregar producto al carrito:", error);
         const mensaje =
           error.response?.data?.mensaje ||
           error.response?.data?.msg ||
           "Error al agregar producto al carrito";
-        toast.error(mensaje);
+        toast.error(mensaje, {
+          position: "top-center",
+          duration: 2000,
+        });
       } finally {
         setCartLoading(false);
       }
@@ -99,7 +109,10 @@ export const useCart = () => {
   const quitarDelCarrito = useCallback(
     async (idProducto) => {
       if (!token) {
-        toast.error("Debes iniciar sesión para modificar el carrito");
+        toast.error("Debes iniciar sesión para modificar el carrito", {
+          position: "top-center",
+          duration: 2000,
+        });
         return;
       }
 
@@ -119,14 +132,19 @@ export const useCart = () => {
           totalArticulos: totalArticulos,
         });
 
-        toast.success("Producto eliminado del carrito");
+        toast.success("Producto eliminado del carrito", {
+          position: "top-center",
+          duration: 2000,
+        });
       } catch (error) {
-        console.error("Error al eliminar producto del carrito:", error);
         const mensaje =
           error.response?.data?.mensaje ||
           error.response?.data?.msg ||
           "Error al eliminar producto del carrito";
-        toast.error(mensaje);
+        toast.error(mensaje, {
+          position: "top-center",
+          duration: 2000,
+        });
       } finally {
         setCartLoading(false);
       }
@@ -140,12 +158,18 @@ export const useCart = () => {
   const actualizarCantidadProducto = useCallback(
     async (idProducto, cantidad) => {
       if (!token) {
-        toast.error("Debes iniciar sesión para modificar el carrito");
+        toast.error("Debes iniciar sesión para modificar el carrito", {
+          position: "top-center",
+          duration: 2000,
+        });
         return;
       }
 
       if (cantidad < 1) {
-        toast.error("La cantidad debe ser mayor a 0");
+        toast.error("La cantidad debe ser mayor a 0", {
+          position: "top-center",
+          duration: 2000,
+        });
         return;
       }
 
@@ -165,12 +189,14 @@ export const useCart = () => {
           totalArticulos: totalArticulos,
         });
       } catch (error) {
-        console.error("Error al actualizar cantidad:", error);
         const mensaje =
           error.response?.data?.mensaje ||
           error.response?.data?.msg ||
           "Error al actualizar cantidad";
-        toast.error(mensaje);
+        toast.error(mensaje, {
+          position: "top-center",
+          duration: 2000,
+        });
       } finally {
         setCartLoading(false);
       }
@@ -183,7 +209,10 @@ export const useCart = () => {
    */
   const limpiarCarrito = useCallback(async () => {
     if (!token) {
-      toast.error("Debes iniciar sesión para modificar el carrito");
+      toast.error("Debes iniciar sesión para modificar el carrito", {
+        position: "top-center",
+        duration: 2000,
+      });
       return;
     }
 
@@ -198,14 +227,19 @@ export const useCart = () => {
         totalArticulos: 0,
       });
 
-      toast.success("Carrito limpiado");
+      toast.success("Carrito limpiado", {
+        position: "top-center",
+        duration: 2000,
+      });
     } catch (error) {
-      console.error("Error al limpiar carrito:", error);
       const mensaje =
         error.response?.data?.mensaje ||
         error.response?.data?.msg ||
         "Error al limpiar el carrito";
-      toast.error(mensaje);
+      toast.error(mensaje, {
+        position: "top-center",
+        duration: 2000,
+      });
     } finally {
       setCartLoading(false);
     }
