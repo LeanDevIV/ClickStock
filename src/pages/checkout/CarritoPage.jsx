@@ -416,9 +416,10 @@ const CarritoPage = () => {
                               border: `2px solid ${theme.palette.primary.main}`,
                             }}
                           >
-                            {producto.imagen ? (
+                            {/* SOLUCIÓN: Cambiar producto.imagen por producto.imagenes[0] */}
+                            {producto.imagenes && producto.imagenes.length > 0 ? (
                               <img
-                                src={producto.imagen}
+                                src={producto.imagenes[0]}
                                 alt={producto.nombre}
                                 style={{
                                   width: "100%",
