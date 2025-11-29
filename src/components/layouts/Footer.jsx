@@ -294,21 +294,7 @@ const Footer = () => {
               >
                 Inicio
               </Link>
-              <Link
-                href="/productos"
-                underline="none"
-                sx={{
-                  color: "#F5F5F5",
-                  fontSize: "0.95rem",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    color: "#D4AF37",
-                    paddingLeft: "6px",
-                  },
-                }}
-              >
-                Productos
-              </Link>
+
               <Link
                 href="/contacto"
                 underline="none"

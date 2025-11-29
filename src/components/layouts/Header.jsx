@@ -121,13 +121,6 @@ export const Header = ({
     navigate("/");
   };
 
-  const navLinks = [
-    { title: "Inicio", path: "/" },
-    { title: "Productos", path: "/productos" },
-    { title: "Nosotros", path: "/nosotros" },
-    { title: "Contacto", path: "/contacto" },
-  ];
-
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -148,25 +141,15 @@ export const Header = ({
             color: "inherit",
             fontWeight: "bold",
             fontSize: "1.2rem",
+            fontFamily: "'Orbitron', sans-serif",
+            letterSpacing: "1px",
           }}
         >
           ClickStock
         </Link>
       </Box>
       <Divider />
-      <List>
-        {navLinks.map((item) => (
-          <ListItem key={item.title} disablePadding>
-            <ListItemButton
-              component={Link}
-              to={item.path}
-              sx={{ textAlign: "center" }}
-            >
-              <ListItemText primary={item.title} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <List>{/* Nav links removed */}</List>
       <Divider />
       {/* Mobile Actions in Drawer */}
       <List>
@@ -286,6 +269,8 @@ export const Header = ({
                   color: "inherit",
                   fontWeight: "bold",
                   fontSize: "1.5rem",
+                  fontFamily: "'Orbitron', sans-serif",
+                  letterSpacing: "1px",
                 }}
               >
                 ClickStock
@@ -301,13 +286,15 @@ export const Header = ({
                   color: "inherit",
                   fontWeight: "bold",
                   fontSize: "1.2rem",
+                  fontFamily: "'Orbitron', sans-serif",
+                  letterSpacing: "1px",
                 }}
               >
                 ClickStock
               </Link>
             </Box>
 
-            {/* Desktop Nav Links */}
+            {/* Desktop Nav Links - Removed as per request */}
             <Box
               sx={{
                 flexGrow: 1,
@@ -315,18 +302,7 @@ export const Header = ({
                 justifyContent: "center",
                 gap: 2,
               }}
-            >
-              {navLinks.map((page) => (
-                <Button
-                  key={page.title}
-                  component={Link}
-                  to={page.path}
-                  sx={{ my: 2, color: "inherit", display: "block" }}
-                >
-                  {page.title}
-                </Button>
-              ))}
-            </Box>
+            ></Box>
 
             {/* Actions (Search, Cart, etc.) - Hidden on Mobile */}
             <Box
