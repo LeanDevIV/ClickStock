@@ -22,7 +22,8 @@ function App() {
   });
 
   const [accessGranted, setAccessGranted] = useState(() => {
-    return getItem("site_access_granted", false) === "true";
+    const stored = getItem("site_access_granted", false);
+    return stored === true || stored === "true";
   });
 
   const MAINTENANCE_MODE = true;
