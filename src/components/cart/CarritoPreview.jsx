@@ -44,7 +44,6 @@ const CarritoPreview = ({ show, handleClose }) => {
           height: "100%",
         }}
       >
-        {/* HEADER */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6">Tu carrito</Typography>
           <IconButton onClick={handleClose}>
@@ -54,7 +53,6 @@ const CarritoPreview = ({ show, handleClose }) => {
 
         <Divider sx={{ my: 2 }} />
 
-        {/* LISTA */}
         {ultimosCinco.length === 0 ? (
           <Typography color="text.secondary" align="center">
             El carrito está vacío.
@@ -76,7 +74,6 @@ const CarritoPreview = ({ show, handleClose }) => {
 
         <Divider sx={{ my: 2 }} />
 
-        {/* TOTAL */}
         <Box display="flex" justifyContent="space-between" mb={2}>
           <Typography variant="subtitle1" fontWeight="bold">
             Total:
@@ -86,7 +83,6 @@ const CarritoPreview = ({ show, handleClose }) => {
           </Typography>
         </Box>
 
-        {/* BOTÓN IR AL CARRITO */}
         <Button
           component={Link}
           to="/carrito"

@@ -13,13 +13,11 @@ function BannerPromocional() {
   const [indice, setIndice] = useState(0);
   const [cerrado, setCerrado] = useState(false);
 
-  // Verifica si el usuario ya cerró el banner
   useEffect(() => {
     const bannerCerrado = localStorage.getItem("bannerCerrado");
     if (!bannerCerrado) setVisible(true);
   }, []);
 
-  // Rotación de banners cada 5 segundos
   useEffect(() => {
     if (!visible) return;
     const intervalo = setInterval(() => {
@@ -28,7 +26,6 @@ function BannerPromocional() {
     return () => clearInterval(intervalo);
   }, [visible]);
 
-  // Cerrar banner
   const handleCerrar = () => {
     setCerrado(true);
     localStorage.setItem("bannerCerrado", "true");
@@ -45,10 +42,10 @@ function BannerPromocional() {
           bottom: 24,
           left: 24,
           zIndex: 1300,
-          bgcolor: "background.paper", // Usar color de fondo del tema para mejor contraste
+          bgcolor: "background.paper",
           color: "text.primary",
           boxShadow: 6,
-          borderRadius: 50, // Forma de píldora
+          borderRadius: 50,
           px: 3,
           py: 1,
           display: "flex",

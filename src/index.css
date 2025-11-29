@@ -1,15 +1,13 @@
 * {
   font-family: "Exo 2", sans-serif;
 }
-/* En tu index.css */
+
 body {
-  /* background: linear-gradient(135deg, #D4AF37 0%, #FFFF 100%) !important; */
   background-attachment: fixed !important;
   min-height: 100vh !important;
   margin: 0 !important;
 }
 
-/* Para asegurar que todos los elementos tengan fondo transparente */
 .contenedor-principal {
   background-color: transparent !important;
 }

@@ -13,11 +13,11 @@ import BannerPromocional from "./components/common/BannerPromocional.jsx";
 
 function App() {
   const [modoOscuro, setModoOscuro] = useState(() => {
-    return getItem("modoOscuro", false); // Retorna boolean directamente
+    return getItem("modoOscuro", false);
   });
 
   const [backgroundEnabled, setBackgroundEnabled] = useState(() => {
-    return getItem("backgroundEnabled", false); // Default false
+    return getItem("backgroundEnabled", false);
   });
 
   const theme = useMemo(() => getCustomTheme(modoOscuro), [modoOscuro]);
@@ -25,7 +25,7 @@ function App() {
   const toggleModo = () => {
     setModoOscuro((prev) => {
       const nuevoModo = !prev;
-      setItem("modoOscuro", nuevoModo); // Guarda boolean directamente
+      setItem("modoOscuro", nuevoModo);
       return nuevoModo;
     });
   };
@@ -65,7 +65,7 @@ function App() {
           },
         }}
       />
-      {/* Background animado - posición absoluta (Solo en Modo Oscuro) */}
+
       {backgroundEnabled && modoOscuro && (
         <div
           style={{
