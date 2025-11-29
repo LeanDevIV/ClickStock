@@ -13,14 +13,15 @@ import {
   useTheme,
   useMediaQuery,
   Paper,
-  Chip,
+  IconButton,
 } from "@mui/material";
-import { AddShoppingCart, ArrowBack, Inventory } from "@mui/icons-material";
+import { AddShoppingCart, ArrowBack, Inventory, Favorite, FavoriteBorder } from "@mui/icons-material";
 import { Snackbar, Alert } from "@mui/material";
 import clientAxios from "../../utils/clientAxios.js";
 import ReviewForm from "../../components/reviews/ReviewForm.jsx";
 import ReviewsList from "../../components/reviews/ReviewsList.jsx";
 import useCart from "../../hooks/useCart.js";
+import { useFavoritos } from "../../hooks/useFavoritos.js";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -37,6 +38,8 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
 
   const { añadirAlCarrito, cargando } = useCart();
+  
+  const { toggleFavorito, esFavorito, loading: cargandoFavorito } = useFavoritos();
 
   const handleReviewAdded = () => setRefresh((prev) => prev + 1);
 
@@ -49,7 +52,19 @@ const ProductDetail = () => {
       setSnackbarOpen(true);
     } catch (error) {
       console.error("Error al agregar al carrito:", error);
-      setSnackbarMessage("Error al agregar al carrito", error.message);
+      setSnackbarMessage("Error al agregar al carrito");
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleToggleFavorito = async () => {
+    if (!product) return;
+    
+    try {
+      await toggleFavorito(product._id);
+    } catch (error) {
+      console.error("Error al gestionar favoritos:", error);
+      setSnackbarMessage("Error al gestionar favoritos");
       setSnackbarOpen(true);
     }
   };
@@ -78,7 +93,7 @@ const ProductDetail = () => {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={4}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Skeleton
               variant="rectangular"
               height={400}
@@ -88,7 +103,7 @@ const ProductDetail = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Skeleton variant="text" height={60} sx={{ mb: 2 }} />
             <Skeleton variant="text" height={40} width="40%" sx={{ mb: 3 }} />
             <Skeleton variant="text" height={100} sx={{ mb: 3 }} />
@@ -147,8 +162,7 @@ const ProductDetail = () => {
 
   return (
     <>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Botón de volver */}
+      <Container maxWidth="lg" sx={{ py: 4, position: "relative" }}>
         <Button
           startIcon={<ArrowBack />}
           onClick={() => navigate("/productos")}
@@ -164,17 +178,18 @@ const ProductDetail = () => {
         </Button>
 
         <Grid container spacing={4}>
-          {/* Sección de Imagen */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Paper
               sx={{
                 borderRadius: 2,
                 overflow: "hidden",
                 bgcolor: "background.paper",
                 boxShadow: theme.shadows[2],
+                width: "100%",
+                position: "relative",
               }}
             >
-              <Box sx={{ position: "relative" }}>
+              <Box sx={{ position: "relative", width: "100%" }}>
                 <img
                   src={mainImage}
                   alt={product.nombre}
@@ -184,11 +199,54 @@ const ProductDetail = () => {
                     objectFit: "cover",
                   }}
                 />
+                
+                {/* BOTÓN DE FAVORITOS sobre la imagen */}
+                <IconButton
+                  onClick={handleToggleFavorito}
+                  disabled={cargandoFavorito}
+                  sx={{
+                    position: "absolute",
+                    top: 16,
+                    right: 16,
+                    color: esFavorito(product._id) ? "error.main" : "text.secondary",
+                    bgcolor: "background.paper",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: "12px",
+                    width: 48,
+                    height: 48,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      bgcolor: esFavorito(product._id) ? "error.light" : "primary.light",
+                      color: esFavorito(product._id) ? "error.dark" : "primary.main",
+                      transform: "scale(1.1)",
+                    },
+                    "&:disabled": {
+                      opacity: 0.5,
+                    },
+                  }}
+                >
+                  {esFavorito(product._id) ? <Favorite /> : <FavoriteBorder />}
+                </IconButton>
               </Box>
 
-              {/* Miniaturas */}
               {hasMultipleImages && (
-                <Box sx={{ p: 2, display: "flex", gap: 1, overflowX: "auto" }}>
+                <Box sx={{ 
+                  p: 2, 
+                  display: "flex", 
+                  gap: 1, 
+                  overflowX: "auto",
+                  "&::-webkit-scrollbar": {
+                    height: 6,
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    background: "transparent",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: theme.palette.divider,
+                    borderRadius: 3,
+                  },
+                }}>
                   {product.imagenes.map((img, index) => (
                     <Box
                       key={index}
@@ -227,18 +285,17 @@ const ProductDetail = () => {
             </Paper>
           </Grid>
 
-          {/* Sección de Información */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Stack spacing={3}>
-              {/* Título y precio */}
               <Box>
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "flex-start",
-                    gap: 1,
+                    justifyContent: "space-between",
                     mb: 1,
                     flexDirection: { xs: "column", sm: "row" },
+                    gap: 2,
                   }}
                 >
                   <Typography
@@ -246,22 +303,19 @@ const ProductDetail = () => {
                     component="h1"
                     fontWeight="bold"
                     color="text.primary"
-                    sx={{ lineHeight: 1.2, flex: 1 }}
+                    sx={{ 
+                      lineHeight: 1.2, 
+                      flex: 1,
+                    }}
                   >
                     {product.nombre}
                   </Typography>
 
-                  <Box
-                    sx={{
-                      alignSelf: { xs: "flex-start", sm: "center" },
-                      mt: { xs: 1, sm: 0 },
-                    }}
-                  >
-                    <BotonCompartir
-                      idProducto={product._id}
-                      nombreProducto={product.nombre}
-                    />
-                  </Box>
+                  {/* BOTÓN DE COMPARTIR en el header */}
+                  <BotonCompartir
+                    idProducto={product._id}
+                    nombreProducto={product.nombre}
+                  />
                 </Box>
 
                 <Typography
@@ -274,7 +328,6 @@ const ProductDetail = () => {
                 </Typography>
               </Box>
 
-              {/* Descripción */}
               <Box>
                 <Typography
                   variant="body1"
@@ -290,7 +343,6 @@ const ProductDetail = () => {
                 </Typography>
               </Box>
 
-              {/* Información de stock */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Inventory color="primary" />
                 <Box>
@@ -326,7 +378,6 @@ const ProductDetail = () => {
 
               <Divider />
 
-              {/* Botón principal */}
               <Button
                 variant="contained"
                 size="large"
@@ -361,7 +412,6 @@ const ProductDetail = () => {
                   : "Agregar al Carrito"}
               </Button>
 
-              {/* Botón secundario */}
               <Button
                 variant="outlined"
                 onClick={() => navigate("/productos")}
@@ -382,7 +432,6 @@ const ProductDetail = () => {
           </Grid>
         </Grid>
 
-        {/* Sección de Reseñas */}
         <Box sx={{ mt: 6 }}>
           <Paper
             sx={{
@@ -414,7 +463,6 @@ const ProductDetail = () => {
         </Box>
       </Container>
 
-      {/* Snackbar */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

@@ -114,7 +114,7 @@ const Footer = () => {
           justifyContent="center" // Centra las columnas horizontalmente
         >
           {/* Columna 1: Nuestras redes */}
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Typography
               variant="h6"
               gutterBottom
@@ -188,7 +188,7 @@ const Footer = () => {
           </Grid>
 
           {/* Columna 2: Acerca de nosotros */}
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography
               variant="h6"
               gutterBottom
@@ -258,7 +258,7 @@ const Footer = () => {
           </Grid>
 
           {/* Columna 3: Enlaces/Links de las páginas */}
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography
               variant="h6"
               gutterBottom
@@ -269,7 +269,7 @@ const Footer = () => {
                 textAlign: "left",
               }}
             >
-              Enlaces/Links de las páginas
+            Links útiles
             </Typography>
             <Box
               sx={{
@@ -347,7 +347,7 @@ const Footer = () => {
             fontSize: "0.9rem",
           }}
         >
-          Todos los derechos reservados © {new Date().getFullYear()}
+          © {new Date().getFullYear()} BugBusters. Todos los derechos reservados.
         </Typography>
       </Container>
     </FooterContainer>

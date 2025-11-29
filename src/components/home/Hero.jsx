@@ -13,10 +13,16 @@ const HeroHomePage = () => {
     {
       image: "https://i.imgur.com/WQCfEbH.jpeg",
       link: "/productos",
+      title: "Una comunidad de confianza",
+      description: "Únete a miles de usuarios satisfechos que gestionan su inventario con nosotros.",
+      buttonText: "Empezar Ahora",
     },
     {
       image: "https://i.imgur.com/27tgbdE.jpeg",
       link: "/productos",
+      title: "Una gran variedad de productos",
+      description: "Encuentra todo lo que necesitas para tu negocio en un solo lugar.",
+      buttonText: "Empezar Ahora",
     },
     {
       image: "https://i.imgur.com/Db3z0Pj.jpeg",
