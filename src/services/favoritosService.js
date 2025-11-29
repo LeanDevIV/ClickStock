@@ -7,14 +7,34 @@ import clientAxios from "../utils/clientAxios";
 export const obtenerFavoritos = async () => {
   try {
     const response = await clientAxios.get("/favoritos");
-    const favoritosData = response.data?.productos || response.data?.favoritos || response.data;
-    
+    const favoritosData =
+      response.data?.productos || response.data?.favoritos || response.data;
+
     if (Array.isArray(favoritosData)) {
       return favoritosData
-        .map((fav) => fav.idProducto?.toString() || fav._id?.toString() || fav.toString())
+        .map(
+          (fav) =>
+            fav.idProducto?.toString() || fav._id?.toString() || fav.toString()
+        )
         .filter(Boolean);
     }
     return [];
+  } catch (error) {
+    if (error.response?.status === 401) {
+      return [];
+    }
+    throw error;
+  }
+};
+
+/**
+ * Obtiene los favoritos del usuario con todos los detalles poblados
+ * @returns {Promise<Array>} Array de objetos producto completos
+ */
+export const obtenerDetalleFavoritos = async () => {
+  try {
+    const response = await clientAxios.get("/favoritos");
+    return response.data?.productos || [];
   } catch (error) {
     if (error.response?.status === 401) {
       return [];
@@ -50,7 +70,9 @@ export const eliminarFavorito = async (idProducto) => {
  */
 export const verificarFavorito = async (idProducto) => {
   try {
-    const response = await clientAxios.get(`/favoritos/${idProducto}/verificar`);
+    const response = await clientAxios.get(
+      `/favoritos/${idProducto}/verificar`
+    );
     return response.data?.estaEnFavoritos || false;
   } catch (error) {
     if (error.response?.status === 401) {
@@ -59,4 +81,3 @@ export const verificarFavorito = async (idProducto) => {
     throw error;
   }
 };
-

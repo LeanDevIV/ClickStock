@@ -1,11 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-// Limpieza automática al cargar el store
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   try {
-    if (localStorage.getItem('ecommerce-storage')) {
-      localStorage.removeItem('ecommerce-storage');
+    if (localStorage.getItem("ecommerce-storage")) {
+      localStorage.removeItem("ecommerce-storage");
     }
   } catch (error) {
     // Silencioso
@@ -23,12 +22,12 @@ export const useStore = create(
         totalArticulos: 0,
         cargando: false,
       },
+      favoritos: [], // Array of favorite product IDs
 
       setUser: (userData, token) => {
         set({ user: userData, token });
       },
 
-      // 🔹 Limpia la sesión (logout)
       logout: () => {
         set({
           user: null,
@@ -39,6 +38,7 @@ export const useStore = create(
             totalArticulos: 0,
             cargando: false,
           },
+          favoritos: [],
         });
       },
       setCart: (cart) => set({ cart }),
@@ -46,6 +46,14 @@ export const useStore = create(
       setCartLoading: (cargando) =>
         set((state) => ({
           cart: { ...state.cart, cargando },
+        })),
+
+      setFavoritos: (favoritos) => set({ favoritos }),
+      addFavorito: (id) =>
+        set((state) => ({ favoritos: [...state.favoritos, id] })),
+      removeFavorito: (id) =>
+        set((state) => ({
+          favoritos: state.favoritos.filter((favId) => favId !== id),
         })),
     }),
     {
