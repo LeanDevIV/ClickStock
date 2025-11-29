@@ -5,7 +5,7 @@
 }
 
 .header-modal {
-  background: linear-gradient(135deg, #000000 0%, #F5F5F5 90%) !important;
+  background: linear-gradient(135deg, #000000 0%, #f5f5f5 90%) !important;
   color: white !important;
   padding: 24px 24px 20px 24px !important;
 }
@@ -44,7 +44,7 @@
 
 .etiqueta-dato {
   font-weight: 600 !important;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
   margin-bottom: 12px !important;
   display: flex !important;
   align-items: center !important;
@@ -53,7 +53,7 @@
 }
 
 .valor-dato {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
   font-weight: 600 !important;
   font-size: 1.1rem !important;
   margin-bottom: 4px !important;
@@ -62,18 +62,18 @@
 .valor-dato-cliente {
   font-size: 1.2rem !important;
   font-weight: 700 !important;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .valor-dato-total {
   font-size: 1.4rem !important;
   font-weight: 700 !important;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .texto-email {
   font-size: 0.85rem !important;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
   font-style: italic;
 }
 
@@ -87,7 +87,7 @@
 
 .campo-direccion .MuiInputLabel-root,
 .campo-direccion .MuiOutlinedInput-input {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .campo-estado {
@@ -100,7 +100,7 @@
 
 .campo-estado .MuiInputLabel-root,
 .campo-estado .MuiSelect-select {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .seccion-productos {
@@ -116,7 +116,7 @@
 
 .titulo-productos h6,
 .titulo-productos .MuiTypography-body2 {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .boton-agregar-producto {
@@ -159,13 +159,13 @@
 
 .nombre-producto {
   font-weight: 600 !important;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
   margin-bottom: 4px !important;
   font-size: 1rem !important;
 }
 
 .precio-producto {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
   font-size: 0.875rem !important;
 }
 
@@ -184,7 +184,7 @@
   text-align: center;
   padding: 8px 12px;
   font-weight: 600;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .boton-eliminar-producto {
@@ -214,13 +214,13 @@
 }
 
 .fila-total .MuiTypography-root {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .total-final {
   font-size: 1.3rem !important;
   font-weight: 700 !important;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
   border-top: 2px solid #d1fae5;
   padding-top: 12px;
   margin-top: 8px;
@@ -237,7 +237,7 @@
   padding: 10px 24px !important;
   font-weight: 600 !important;
   text-transform: none !important;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
   border-color: #000000 !important; /* Cambiado a negro */
 }
 
@@ -248,7 +248,7 @@
   text-transform: none !important;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3) !important;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .boton-guardar:hover {
@@ -264,27 +264,27 @@
 .estado-option {
   font-weight: 500 !important;
   padding: 8px 16px !important;
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .estado-pendiente {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .estado-procesando {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .estado-enviado {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .estado-entregado {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .estado-cancelado {
-  color: #000000 !important; /* Cambiado a negro */
+  color: #000000 !important;
 }
 
 .contenedor-productos::-webkit-scrollbar {
@@ -310,26 +310,26 @@
     min-width: auto !important;
     margin: 16px !important;
   }
-  
+
   .tarjeta-dato {
     min-height: 80px !important;
     padding: 16px !important;
   }
-  
+
   .valor-dato-cliente {
     font-size: 1.1rem !important;
   }
-  
+
   .valor-dato-total {
     font-size: 1.2rem !important;
   }
-  
+
   .contenido-producto {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .controles-cantidad {
     width: 100%;
     justify-content: space-between;
@@ -337,7 +337,9 @@
 }
 
 /* Validaciones no tan exigentes para dirección */
-.campo-direccion .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+.campo-direccion
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
   border-color: #000000 !important;
   border-width: 2px !important;
 }

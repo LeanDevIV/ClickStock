@@ -26,7 +26,6 @@ function IndexRoutes({
     <>
       <ScrollToTop />
       <Routes>
-        {/* Layout público */}
         <Route
           element={
             <MainLayout
@@ -45,10 +44,8 @@ function IndexRoutes({
           <Route path="/buscar" element={<SearchResults />} />
           <Route path="/favoritos" element={<FavoritosPage />} />
 
-          {/* ✅ Página de productos */}
           <Route path="/producto/detalle/:id" element={<ProductDetail />} />
-          {/* ✅ Dinámica */}
-          {/* Layout administrativo */}
+
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminHome />} />
             <Route path="dashboard" element={<AdminDashboard />} />
@@ -57,7 +54,6 @@ function IndexRoutes({
           </Route>
         </Route>
 
-        {/* Página 404 */}
         <Route path="*" element={<Error404 />} />
       </Routes>
     </>
