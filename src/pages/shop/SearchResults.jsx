@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Container, Typography, Box, CircularProgress } from "@mui/material";
-import ProductosRender from "../../components/products/ProductosRender";
+import ProductGrid from "../../components/products/ProductGrid";
 import clientAxios from "../../utils/clientAxios";
 
 const SearchResults = () => {
@@ -39,7 +39,7 @@ const SearchResults = () => {
           <CircularProgress />
         </Box>
       ) : productos.length > 0 ? (
-        <ProductosRender productos={productos} />
+        <ProductGrid productos={productos} />
       ) : (
         <Box sx={{ textAlign: "center", mt: 8 }}>
           <Typography variant="h6" color="text.secondary">

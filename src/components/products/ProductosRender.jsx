@@ -50,14 +50,21 @@ function Products({ productos: productosExternos }) {
     return articulos.some((item) => item.idProducto === productoId);
   };
 
+  // Efecto para sincronizar props con estado
   useEffect(() => {
     if (productosExternos) {
       setProductos(productosExternos);
       setLoading(false);
-    } else {
-      obtenerProductos();
     }
   }, [productosExternos]);
+
+  // Efecto para cargar productos si no se pasan props (solo al montar)
+  useEffect(() => {
+    if (!productosExternos) {
+      obtenerProductos();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function obtenerProductos() {
     try {
