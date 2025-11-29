@@ -37,7 +37,7 @@ import { useScrollDirection } from "../../hooks/useScrollDirection";
 import { UserMenu } from "../auth/MenuUsuario";
 import AuthModal from "../auth/AuthModal";
 import "../../styles/header.css";
-// Search Styles
+
 const SearchContainer = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -90,7 +90,7 @@ export const Header = ({
   const [showCarrito, setShowCarrito] = useState(false);
   const handleOpenPreview = () => setShowCarrito(true);
   const handleClosePreview = () => setShowCarrito(false);
-  // const [showAuthModal, setShowAuthModal] = useState(false); // Removed local state
+
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -108,9 +108,6 @@ export const Header = ({
       setMobileOpen(false);
     }
   };
-
-  // const handleOpenAuth = () => setShowAuthModal(true); // Removed local handler
-  // const handleCloseAuth = () => setShowAuthModal(false); // Removed local handler
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -149,9 +146,9 @@ export const Header = ({
         </Link>
       </Box>
       <Divider />
-      <List>{/* Nav links removed */}</List>
+      <List></List>
       <Divider />
-      {/* Mobile Actions in Drawer */}
+
       <List>
         <ListItem disablePadding>
           <ListItemButton onClick={handleOpenPreview}>
@@ -260,7 +257,6 @@ export const Header = ({
       >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            {/* Logo Desktop */}
             <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
               <Link
                 to="/"
@@ -277,7 +273,6 @@ export const Header = ({
               </Link>
             </Box>
 
-            {/* Logo Mobile (Moved to start) */}
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               <Link
                 to="/"
@@ -294,7 +289,6 @@ export const Header = ({
               </Link>
             </Box>
 
-            {/* Desktop Nav Links - Removed as per request */}
             <Box
               sx={{
                 flexGrow: 1,
@@ -304,11 +298,10 @@ export const Header = ({
               }}
             ></Box>
 
-            {/* Actions (Search, Cart, etc.) - Hidden on Mobile */}
             <Box
               sx={{
                 flexGrow: 0,
-                display: { xs: "none", md: "flex" }, // Hide on mobile
+                display: { xs: "none", md: "flex" },
                 alignItems: "center",
                 gap: 1,
               }}
@@ -383,7 +376,6 @@ export const Header = ({
               )}
             </Box>
 
-            {/* Mobile Menu Button (Moved to end) */}
             <Box sx={{ display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
@@ -398,10 +390,9 @@ export const Header = ({
         </Container>
       </AppBar>
 
-      {/* Mobile Drawer */}
       <nav>
         <Drawer
-          anchor="right" // Open from right
+          anchor="right"
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}

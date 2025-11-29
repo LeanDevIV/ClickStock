@@ -22,7 +22,6 @@ import {
 } from "@mui/icons-material";
 import axios from "axios";
 
-// Configurar axios con base URL (ajusta según tu configuración)
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
   headers: {
@@ -34,7 +33,7 @@ import { useTheme } from "@mui/material/styles";
 
 const FloatingChat = () => {
   const theme = useTheme();
-  // Detectar modo oscuro desde el theme
+
   const modoOscuro = theme.palette.mode === "dark";
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -59,7 +58,6 @@ const FloatingChat = () => {
     const messageText = input.trim();
     if (!messageText || loading) return;
 
-    // Agregar mensaje del usuario
     const userMessage = { sender: "user", text: messageText };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
@@ -75,13 +73,10 @@ const FloatingChat = () => {
         error.response?.data?.error ||
         error.message ||
         "Lo siento, hubo un error al conectarse con el asistente. Por favor, intenta de nuevo.";
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: errorMessage },
-      ]);
+      setMessages((prev) => [...prev, { sender: "bot", text: errorMessage }]);
     } finally {
       setLoading(false);
-      // Enfocar el input después de enviar
+
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   };
@@ -93,14 +88,12 @@ const FloatingChat = () => {
     }
   };
 
-  // Scroll automático al final cuando hay nuevos mensajes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
     <>
-      {/* Botón flotante */}
       <Zoom in={!open} timeout={300}>
         <Fab
           color="primary"
@@ -118,7 +111,7 @@ const FloatingChat = () => {
               : "0 8px 24px rgba(0,0,0,0.15)",
             backgroundColor: theme.palette.primary.main,
             color: theme.palette.primary.contrastText,
-            '&:hover': {
+            "&:hover": {
               boxShadow: modoOscuro
                 ? "0 12px 32px rgba(0,0,0,0.9)"
                 : "0 12px 32px rgba(0,0,0,0.2)",
@@ -132,7 +125,6 @@ const FloatingChat = () => {
         </Fab>
       </Zoom>
 
-      {/* Panel de chat */}
       <Slide direction="up" in={open} mountOnEnter unmountOnExit timeout={300}>
         <Paper
           elevation={8}
@@ -155,7 +147,6 @@ const FloatingChat = () => {
             backgroundColor: theme.palette.background.paper,
           }}
         >
-          {/* Header del chat */}
           <Box
             sx={{
               background: modoOscuro
@@ -171,19 +162,29 @@ const FloatingChat = () => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <Avatar
                 sx={{
-                  bgcolor: modoOscuro ? theme.palette.primary.main : "rgba(255,255,255,0.2)",
+                  bgcolor: modoOscuro
+                    ? theme.palette.primary.main
+                    : "rgba(255,255,255,0.2)",
                   width: 40,
                   height: 40,
-                  color: modoOscuro ? theme.palette.primary.contrastText : theme.palette.primary.main,
+                  color: modoOscuro
+                    ? theme.palette.primary.contrastText
+                    : theme.palette.primary.main,
                 }}
               >
                 <RobotIcon />
               </Avatar>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.1rem" }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+                >
                   Asistente Virtual
                 </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.9, fontSize: "0.75rem" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ opacity: 0.9, fontSize: "0.75rem" }}
+                >
                   En línea
                 </Typography>
               </Box>
@@ -192,8 +193,12 @@ const FloatingChat = () => {
               label="En línea"
               size="small"
               sx={{
-                bgcolor: modoOscuro ? theme.palette.primary.dark : "rgba(255,255,255,0.2)",
-                color: modoOscuro ? theme.palette.primary.contrastText : "white",
+                bgcolor: modoOscuro
+                  ? theme.palette.primary.dark
+                  : "rgba(255,255,255,0.2)",
+                color: modoOscuro
+                  ? theme.palette.primary.contrastText
+                  : "white",
                 fontWeight: 500,
                 display: { xs: "none", sm: "flex" },
               }}
@@ -202,8 +207,10 @@ const FloatingChat = () => {
               onClick={toggleChat}
               sx={{
                 color: theme.palette.primary.contrastText,
-                '&:hover': {
-                  bgcolor: modoOscuro ? theme.palette.primary.main : "rgba(255,255,255,0.1)",
+                "&:hover": {
+                  bgcolor: modoOscuro
+                    ? theme.palette.primary.main
+                    : "rgba(255,255,255,0.1)",
                 },
               }}
             >
@@ -211,7 +218,6 @@ const FloatingChat = () => {
             </IconButton>
           </Box>
 
-          {/* Área de mensajes */}
           <Box
             sx={{
               flex: 1,
@@ -241,7 +247,8 @@ const FloatingChat = () => {
                 <Box
                   sx={{
                     display: "flex",
-                    justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
+                    justifyContent:
+                      msg.sender === "user" ? "flex-end" : "flex-start",
                     width: "100%",
                   }}
                 >
@@ -251,7 +258,8 @@ const FloatingChat = () => {
                       display: "flex",
                       flexDirection: "column",
                       gap: 0.5,
-                      alignItems: msg.sender === "user" ? "flex-end" : "flex-start",
+                      alignItems:
+                        msg.sender === "user" ? "flex-end" : "flex-start",
                     }}
                   >
                     <Box
@@ -300,19 +308,25 @@ const FloatingChat = () => {
                       elevation={1}
                       sx={{
                         padding: 1.5,
-                        borderRadius: msg.sender === "bot"
-                          ? "20px 20px 20px 4px"
-                          : "20px 20px 4px 20px",
-                        backgroundColor: msg.sender === "bot"
-                          ? theme.palette.background.paper
-                          : theme.palette.primary.main,
-                        color: msg.sender === "bot"
-                          ? theme.palette.text.primary
-                          : theme.palette.primary.contrastText,
+                        borderRadius:
+                          msg.sender === "bot"
+                            ? "20px 20px 20px 4px"
+                            : "20px 20px 4px 20px",
+                        backgroundColor:
+                          msg.sender === "bot"
+                            ? theme.palette.background.paper
+                            : theme.palette.primary.main,
+                        color:
+                          msg.sender === "bot"
+                            ? theme.palette.text.primary
+                            : theme.palette.primary.contrastText,
                         wordWrap: "break-word",
                         lineHeight: 1.5,
                         maxWidth: "100%",
-                        border: modoOscuro && msg.sender === "bot" ? `1px solid ${theme.palette.primary.dark}` : undefined,
+                        border:
+                          modoOscuro && msg.sender === "bot"
+                            ? `1px solid ${theme.palette.primary.dark}`
+                            : undefined,
                       }}
                     >
                       <Typography variant="body2" sx={{ fontSize: "0.9rem" }}>
@@ -324,7 +338,6 @@ const FloatingChat = () => {
               </Fade>
             ))}
 
-            {/* Indicador de carga */}
             {loading && (
               <Fade in={loading}>
                 <Box
@@ -360,7 +373,10 @@ const FloatingChat = () => {
                     <CircularProgress size={16} thickness={4} />
                     <Typography
                       variant="caption"
-                      sx={{ color: theme.palette.text.secondary, fontSize: "0.8rem" }}
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        fontSize: "0.8rem",
+                      }}
                     >
                       Escribiendo...
                     </Typography>
@@ -372,7 +388,6 @@ const FloatingChat = () => {
             <div ref={messagesEndRef} />
           </Box>
 
-          {/* Input area */}
           <Box
             sx={{
               padding: 2,
@@ -423,10 +438,10 @@ const FloatingChat = () => {
                   color: theme.palette.primary.contrastText,
                   width: 40,
                   height: 40,
-                  '&:hover': {
+                  "&:hover": {
                     bgcolor: theme.palette.primary.dark,
                   },
-                  '&.Mui-disabled': {
+                  "&.Mui-disabled": {
                     bgcolor: theme.palette.action.disabledBackground,
                     color: theme.palette.action.disabled,
                   },
@@ -434,7 +449,10 @@ const FloatingChat = () => {
                 }}
               >
                 {loading ? (
-                  <CircularProgress size={20} sx={{ color: theme.palette.primary.contrastText }} />
+                  <CircularProgress
+                    size={20}
+                    sx={{ color: theme.palette.primary.contrastText }}
+                  />
                 ) : (
                   <SendIcon fontSize="small" />
                 )}

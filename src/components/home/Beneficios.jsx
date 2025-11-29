@@ -8,7 +8,6 @@ import {
 } from "@mui/icons-material";
 import { styled, keyframes } from "@mui/material/styles";
 
-// Keyframe para el efecto de luz neón recorriendo los bordes
 const neonBorder = keyframes`
   0% {
     background-position: 0% 50%;
@@ -18,9 +17,8 @@ const neonBorder = keyframes`
   }
 `;
 
-// Styled Card (Contenedor Principal)
 const NeonCard = styled(Card)(({ theme }) => ({
-  height: "100%", // Se estira para llenar la celda del Grid
+  height: "100%",
   minHeight: "200px",
   width: "100%",
   position: "relative",
@@ -36,7 +34,6 @@ const NeonCard = styled(Card)(({ theme }) => ({
     cursor: "pointer",
   },
 
-  // Capa del Borde Gradiente (Detrás)
   "&::before": {
     content: '""',
     position: "absolute",
@@ -61,13 +58,12 @@ const NeonCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-// Capa de Superficie (Frente - Tapa el centro del gradiente)
 const CardSurface = styled(Box)(({ theme }) => ({
   position: "relative",
   zIndex: 1,
   height: "100%",
   width: "100%",
-  // Color sólido explícito según modo
+
   backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#ffffff",
   borderRadius: "16px",
   display: "flex",
@@ -110,17 +106,16 @@ const BeneficiosHome = () => {
         </Typography>
       </Box>
 
-      {/* CSS Grid Nativo para anchos idénticos garantizados */}
       <Box
         sx={{
           display: "grid",
           gridTemplateColumns: {
-            xs: "repeat(2, 1fr)", // 2 columnas exactas en móvil
-            md: "repeat(4, 1fr)", // 4 columnas exactas en desktop
+            xs: "repeat(2, 1fr)",
+            md: "repeat(4, 1fr)",
           },
-          gap: 3, // Espaciado uniforme
+          gap: 3,
           width: "100%",
-          alignItems: "stretch", // Altura uniforme
+          alignItems: "stretch",
         }}
       >
         {beneficios.map((beneficio, index) => (
