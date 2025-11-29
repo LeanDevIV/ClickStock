@@ -2,21 +2,14 @@ import React from "react";
 import { Button } from "@mui/material";
 import WarningIcon from "@mui/icons-material/Warning";
 
-/**
- * Componente Easter Egg - Simula una pantalla azul de la muerte (BSOD)
- * ⚠️ ADVERTENCIA: Este componente es solo para diversión/easter egg
- * Reemplaza todo el contenido de la página con una pantalla azul
- */
 const Bsod = ({ variant = "contained", size = "small", style = {} }) => {
   const triggerBSOD = () => {
-    // 1. Intentar pantalla completa para más realismo
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen().catch((err) => {
         console.log("No se pudo activar pantalla completa:", err);
       });
     }
 
-    // 2. Mostrar pantalla de "carga" primero
     setTimeout(() => {
       document.body.innerHTML = `
         <div id="loading-screen" style="background-color: #000; color: #0f0; font-family: 'Courier New', monospace; height: 100vh; padding: 50px; box-sizing: border-box; overflow: hidden;">
@@ -67,7 +60,6 @@ const Bsod = ({ variant = "contained", size = "small", style = {} }) => {
           consoleOutput.appendChild(p);
           consoleOutput.scrollTop = consoleOutput.scrollHeight;
 
-          // Mostrar advertencia a mitad del proceso
           if (messageIndex === 7) {
             warning.style.display = "block";
           }
@@ -77,18 +69,16 @@ const Bsod = ({ variant = "contained", size = "small", style = {} }) => {
           progressBar.style.width = `${progress}%`;
           progressText.textContent = Math.floor(progress);
 
-          // Cuando llegue al 100%, mostrar el BSOD
           if (progress >= 100) {
             clearInterval(interval);
             setTimeout(showBSOD, 1000);
           }
         }
-      }, 400); // Cada 400ms un nuevo mensaje
+      }, 400);
     }, 100);
   };
 
   const showBSOD = () => {
-    // Mostrar la pantalla azul de la muerte
     document.body.innerHTML = `
       <div style="background-color: #0078D7; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; padding: 100px; box-sizing: border-box; cursor: none; overflow: hidden;">
         <h1 style="font-size: 100px; margin: 0;">:(</h1>
@@ -113,10 +103,8 @@ const Bsod = ({ variant = "contained", size = "small", style = {} }) => {
       </div>
     `;
 
-    // Bloquear click derecho
     document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-    // Mensaje en consola
     console.log(
       "%c¡BSOD ACTIVADO! 💀",
       "color: #0078D7; font-size: 30px; font-weight: bold;"

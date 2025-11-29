@@ -36,17 +36,12 @@ export const GenericTable = ({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const config = TABLE_CONFIG[section];
 
-  // Verificar si la sección soporta soft delete
   const shouldShowDeleted = config.softDeleteEndpoint !== undefined;
 
-  // Filtrar datos según showDeleted
   const filteredData = showDeleted
     ? data
     : data?.filter((item) => !item.isDeleted) || [];
 
-  // Vista de tabla para desktop (modo no-responsivo)
-
-  // Construir headers basado en displayFields
   const tableHeader = config.displayFields.map((field) => {
     const labels = {
       fotoPerfil: "Foto",
@@ -79,7 +74,7 @@ export const GenericTable = ({
       user: "Usuario",
       rating: "Calificación",
       comment: "Comentario",
-      // Promociones
+
       titulo: "Título",
       descuento: "Descuento",
       fechaInicio: "Fecha Inicio",
@@ -95,14 +90,12 @@ export const GenericTable = ({
     };
   });
 
-  // Agregar columna de acciones al final
   if (!tableHeader.find((h) => h.key === "actions")) {
     tableHeader.push({ key: "actions", label: "Acciones", align: "center" });
   }
 
   return (
     <Box sx={{ width: "100%", overflow: "hidden" }}>
-      {/* Tabla con scroll horizontal solo si es necesario */}
       <TableContainer
         component={Paper}
         sx={{
@@ -204,7 +197,6 @@ export const GenericTable = ({
         />
       </Box>
 
-      {/* Modal de Creación */}
       <CreateItemModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}

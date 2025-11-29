@@ -56,7 +56,6 @@ export const GenericRow = ({
     currentUser &&
     (currentUser._id === item._id || currentUser.id === item._id);
 
-  // Estado para edición rápida de imagen
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imageTab, setImageTab] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
@@ -77,7 +76,6 @@ export const GenericRow = ({
     const value = imageTab === 0 ? imageFile : imageUrl;
     if (!value) return;
 
-    // Determinar directorio basado en la sección
     const directory = section.toLowerCase();
 
     await onUpdateImage(item._id || item.id, editingField, value, directory);
@@ -140,7 +138,6 @@ export const GenericRow = ({
     );
   };
 
-  // Función para obtener el nombre de la categoría por ID
   const getCategoriaNombre = (categoriaId) => {
     if (!categoriaId) return "N/A";
     const cat = categorias.find(
@@ -150,7 +147,6 @@ export const GenericRow = ({
     return cat?.nombre || categoriaId;
   };
 
-  // Función para obtener la representación correcta del valor
   const renderCellValue = (field, value, displayValue) => {
     if (isEditing && config.editableFields.includes(field)) {
       return (
@@ -165,7 +161,6 @@ export const GenericRow = ({
       );
     }
 
-    // Mostrar indicador de usuario actual en la tabla de Usuarios
     if (section === "Usuarios" && field === "nombre") {
       return (
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -186,12 +181,10 @@ export const GenericRow = ({
       );
     }
 
-    // Si el campo tiene un displayValue (como categoría), mostrarlo
     if (displayValue !== undefined) {
       return displayValue;
     }
 
-    // Campos especiales que necesitan formato
     switch (field) {
       case "fotoPerfil": {
         return renderImageCell(value, itemActual.nombre, "fotoPerfil", false);
@@ -343,15 +336,12 @@ export const GenericRow = ({
             color={value ? "success" : "default"}
           />
         );
-
       default:
-        // Manejo de arrays (ej: productos en Promociones)
         if (Array.isArray(value)) {
           return value.length > 0 ? `${value.length} items` : "-";
         }
-        // Si es un objeto y no lo hemos manejado antes, evitar crash
         if (value && typeof value === "object") {
-          return JSON.stringify(value); // O retornar "-" o value.nombre si existe
+          return JSON.stringify(value);
         }
         return value || "-";
     }
@@ -400,12 +390,10 @@ export const GenericRow = ({
           let value = itemActual[header.key];
           let displayValue = undefined;
 
-          // Manejo especial para categoría
           if (header.key === "categoria") {
             const rawCategoria = itemActual.categoria;
             let categoriaId = rawCategoria;
 
-            // Si es un objeto, intentar extraer el ID
             if (rawCategoria && typeof rawCategoria === "object") {
               categoriaId = rawCategoria._id || rawCategoria.id;
             }
@@ -433,7 +421,6 @@ export const GenericRow = ({
         })}
       </TableRow>
 
-      {/* Dialog para edición de imagen */}
       <Dialog
         open={imageDialogOpen}
         onClose={() => setImageDialogOpen(false)}

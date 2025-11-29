@@ -41,7 +41,6 @@ function PromocionesForm() {
     },
   });
 
-  // Watch fields for preview
   const watchedValues = watch();
 
   useEffect(() => {
@@ -61,7 +60,6 @@ function PromocionesForm() {
 
   const onSubmit = async (data) => {
     try {
-      // Crear FormData para envío
       const formDataToSend = new FormData();
       formDataToSend.append("titulo", data.titulo);
       formDataToSend.append("descripcion", data.descripcion);
