@@ -10,6 +10,7 @@ import { getItem, setItem } from "./utils/localStorageHelper";
 import LiquidEther from "./styles/liquid-ether/LiquidEther.jsx";
 import WelcomeScreen from "./styles/welcome-screen/WelcomeScreen.jsx";
 import BannerPromocional from "./components/common/BannerPromocional.jsx";
+import CountdownPage from "./pages/CountdownPage.jsx";
 
 function App() {
   const [modoOscuro, setModoOscuro] = useState(() => {
@@ -19,6 +20,12 @@ function App() {
   const [backgroundEnabled, setBackgroundEnabled] = useState(() => {
     return getItem("backgroundEnabled", false);
   });
+
+  const [accessGranted, setAccessGranted] = useState(() => {
+    return getItem("site_access_granted", false) === "true";
+  });
+
+  const MAINTENANCE_MODE = true;
 
   const theme = useMemo(() => getCustomTheme(modoOscuro), [modoOscuro]);
 
@@ -37,6 +44,15 @@ function App() {
       return newState;
     });
   };
+
+  if (MAINTENANCE_MODE && !accessGranted) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <CountdownPage onLogin={() => setAccessGranted(true)} />
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ThemeProvider theme={theme}>
