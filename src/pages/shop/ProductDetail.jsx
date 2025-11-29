@@ -148,7 +148,6 @@ const ProductDetail = () => {
   return (
     <>
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {/* Botón de volver */}
         <Button
           startIcon={<ArrowBack />}
           onClick={() => navigate("/productos")}
@@ -164,7 +163,6 @@ const ProductDetail = () => {
         </Button>
 
         <Grid container spacing={4}>
-          {/* Sección de Imagen */}
           <Grid item xs={12} md={6}>
             <Paper
               sx={{
@@ -186,7 +184,6 @@ const ProductDetail = () => {
                 />
               </Box>
 
-              {/* Miniaturas */}
               {hasMultipleImages && (
                 <Box sx={{ p: 2, display: "flex", gap: 1, overflowX: "auto" }}>
                   {product.imagenes.map((img, index) => (
@@ -227,10 +224,8 @@ const ProductDetail = () => {
             </Paper>
           </Grid>
 
-          {/* Sección de Información */}
           <Grid item xs={12} md={6}>
             <Stack spacing={3}>
-              {/* Título y precio */}
               <Box>
                 <Box
                   sx={{
@@ -274,7 +269,6 @@ const ProductDetail = () => {
                 </Typography>
               </Box>
 
-              {/* Descripción */}
               <Box>
                 <Typography
                   variant="body1"
@@ -290,7 +284,6 @@ const ProductDetail = () => {
                 </Typography>
               </Box>
 
-              {/* Información de stock */}
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Inventory color="primary" />
                 <Box>
@@ -326,7 +319,6 @@ const ProductDetail = () => {
 
               <Divider />
 
-              {/* Botón principal */}
               <Button
                 variant="contained"
                 size="large"
@@ -361,7 +353,6 @@ const ProductDetail = () => {
                   : "Agregar al Carrito"}
               </Button>
 
-              {/* Botón secundario */}
               <Button
                 variant="outlined"
                 onClick={() => navigate("/productos")}
@@ -382,7 +373,6 @@ const ProductDetail = () => {
           </Grid>
         </Grid>
 
-        {/* Sección de Reseñas */}
         <Box sx={{ mt: 6 }}>
           <Paper
             sx={{
@@ -414,7 +404,6 @@ const ProductDetail = () => {
         </Box>
       </Container>
 
-      {/* Snackbar */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

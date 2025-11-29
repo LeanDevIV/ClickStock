@@ -13,9 +13,8 @@ export const AdminDashboard = () => {
 
   const [page, setPage] = useState(1);
 
-  // Hook para obtener categorías
   const { categorias, fetchCategorias } = useCategoriesStore();
-  // Opciones estables para evitar recrear el objeto en cada render (previene loops de fetch)
+
   const adminOptions = useMemo(
     () => ({ includeDeleted: true, includeUnavailable: true }),
     []
@@ -39,12 +38,10 @@ export const AdminDashboard = () => {
     handleUpdateImage,
   } = useTableData(selectedSection, adminOptions);
 
-  // Cargar categorías al montar el componente
   useEffect(() => {
     fetchCategorias();
   }, [fetchCategorias]);
 
-  // Actualizar SELECT_OPTIONS.categoria cuando se carguen las categorías
   useEffect(() => {
     if (categorias.length > 0) {
       SELECT_OPTIONS.categoria = categorias.map((cat) => ({
@@ -104,7 +101,6 @@ export const AdminDashboard = () => {
       onUpdateImage: handleUpdateImage,
     };
 
-    // Usar GenericTable para todas las secciones
     return (
       <GenericTable
         {...commonProps}
@@ -130,7 +126,6 @@ export const AdminDashboard = () => {
         component="main"
         sx={{ flexGrow: 1, p: 2, width: "100%", overflow: "hidden" }}
       >
-        {/* Contenedor Sidebar + Tabla en flex */}
         <Box
           sx={{
             display: "flex",
@@ -140,13 +135,11 @@ export const AdminDashboard = () => {
             overflow: "hidden",
           }}
         >
-          {/* Sidebar */}
           <AdminSidebar
             selectedSection={selectedSection}
             onSelectSection={setSelectedSection}
           />
 
-          {/* Main Content (Tabla) */}
           <Box sx={{ flex: 1, minWidth: 0, overflow: "auto" }}>
             <Typography
               variant="h4"
