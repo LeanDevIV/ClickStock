@@ -11,7 +11,7 @@ const WelcomeScreen = () => {
     const hasSeenWelcome = localStorage.getItem("hasSeenWelcome");
     if (!hasSeenWelcome) {
       setIsVisible(true);
-      // Bloquear scroll cuando está visible
+
       document.body.style.overflow = "hidden";
     } else {
       setShouldRender(false);
@@ -21,10 +21,9 @@ const WelcomeScreen = () => {
   const handleContinue = () => {
     setIsVisible(false);
     localStorage.setItem("hasSeenWelcome", "true");
-    // Restaurar scroll
+
     document.body.style.overflow = "unset";
 
-    // Esperar a que termine la animación para desmontar
     setTimeout(() => {
       setShouldRender(false);
     }, 800);
