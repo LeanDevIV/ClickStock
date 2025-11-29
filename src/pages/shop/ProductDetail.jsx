@@ -129,10 +129,10 @@ const ProductDetail = () => {
         </Alert>
         <Button
           variant="contained"
-          onClick={() => navigate("/productos")}
+          onClick={() => navigate("/")}
           startIcon={<ArrowBack />}
         >
-          Volver a Productos
+          Volver a Inicio
         </Button>
       </Container>
     );
@@ -146,10 +146,10 @@ const ProductDetail = () => {
         </Alert>
         <Button
           variant="contained"
-          onClick={() => navigate("/productos")}
+          onClick={() => navigate("/")}
           startIcon={<ArrowBack />}
         >
-          Volver a Productos
+          Volver a Inicio
         </Button>
       </Container>
     );
@@ -162,10 +162,10 @@ const ProductDetail = () => {
 
   return (
     <>
-      <Container maxWidth="lg" sx={{ py: 4, position: "relative" }}>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         <Button
           startIcon={<ArrowBack />}
-          onClick={() => navigate("/productos")}
+          onClick={() => navigate("/")}
           sx={{
             mb: 3,
             color: "text.secondary",
@@ -174,11 +174,11 @@ const ProductDetail = () => {
             },
           }}
         >
-          Volver a productos
+          Volver a Inicio
         </Button>
 
         <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid item xs={12} md={6}>
             <Paper
               sx={{
                 borderRadius: 2,
@@ -285,7 +285,7 @@ const ProductDetail = () => {
             </Paper>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid item xs={12} md={6}>
             <Stack spacing={3}>
               <Box>
                 <Box
@@ -414,7 +414,7 @@ const ProductDetail = () => {
 
               <Button
                 variant="outlined"
-                onClick={() => navigate("/productos")}
+                onClick={() => navigate("/")}
                 sx={{
                   py: 1.5,
                   borderRadius: 2,

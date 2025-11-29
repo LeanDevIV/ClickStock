@@ -14,12 +14,10 @@ export const useTableData = (section, options = {}) => {
 
   const config = TABLE_CONFIG[section];
 
-  // Fetch de datos
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // Construir query params según opciones (admin quiere ver también eliminados/no disponibles)
       const { includeDeleted = false, includeUnavailable = false } = options;
       const params = new URLSearchParams();
       if (includeDeleted) params.append("includeDeleted", "true");
@@ -39,7 +37,6 @@ export const useTableData = (section, options = {}) => {
     }
   }, [config.endpoint, options]);
 
-  // Manejo de edición
   const handleEdit = useCallback((item) => {
     setEditingId(item._id);
     setEditedData({ ...item });
@@ -54,11 +51,9 @@ export const useTableData = (section, options = {}) => {
     setEditedData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  // Guardar cambios
   const handleSave = useCallback(
     async (id) => {
       try {
-        // Validar antes de enviar
         if (config.validate) {
           const validationError = config.validate(editedData);
           if (validationError) {
@@ -76,7 +71,6 @@ export const useTableData = (section, options = {}) => {
 
         const endpoint = config.updateEndpoint.replace(":id", id);
 
-        // Sanitizar datos antes de enviar (convertir objetos poblados a IDs)
         const dataToSend = { ...editedData };
         Object.keys(dataToSend).forEach((key) => {
           const value = dataToSend[key];
@@ -96,8 +90,6 @@ export const useTableData = (section, options = {}) => {
         setData((prev) =>
           prev.map((item) => {
             if (item._id === id) {
-              // Combinar el estado actual del item (que puede haber sido restaurado)
-              // con los cambios editados
               return { ...item, ...editedData };
             }
             return item;
@@ -140,7 +132,6 @@ export const useTableData = (section, options = {}) => {
     [editedData, config]
   );
 
-  // Restaurar elemento eliminado
   const handleRestore = useCallback(
     async (id) => {
       if (!config.restoreEndpoint) {
@@ -148,7 +139,6 @@ export const useTableData = (section, options = {}) => {
         return;
       }
 
-      // Mostrar confirmación antes de restaurar
       const result = await Swal.fire({
         title: "¿Restaurar elemento?",
         text: "El elemento volverá a estar activo",
@@ -169,7 +159,6 @@ export const useTableData = (section, options = {}) => {
         const endpoint = config.restoreEndpoint.replace(":id", id);
         const { data: responseData } = await clientAxios.patch(endpoint);
 
-        // Intentar encontrar el objeto restaurado en la respuesta
         const restoredItem =
           responseData.producto ||
           responseData.usuario ||
@@ -210,10 +199,8 @@ export const useTableData = (section, options = {}) => {
     [section, config.restoreEndpoint]
   );
 
-  // Soft Delete (marcar como eliminado)
   const handleSoftDelete = useCallback(
     async (id) => {
-      // Prevenir que el admin se elimine a sí mismo
       if (section === "Usuarios") {
         const currentUser = useStore.getState().user;
         console.log("Current user ID:", currentUser?._id, "Target ID:", id);
@@ -251,22 +238,20 @@ export const useTableData = (section, options = {}) => {
         const endpoint =
           config.softDeleteEndpoint?.replace(":id", id) ||
           config.updateEndpoint.replace(":id", id);
-        // Usar DELETE para soft delete (el backend captura el usuario desde el token)
+
         const { data: productoActualizado } = await clientAxios.delete(
           endpoint
         );
 
-        // Obtener usuario actual para actualización optimista
         const currentUser = useStore.getState().user;
 
-        // Usar la respuesta del servidor que incluye deletedBy y deletedAt
         setData((prev) =>
           prev.map((item) =>
             item._id === id
               ? productoActualizado.producto || {
                   ...item,
                   isDeleted: true,
-                  deletedBy: currentUser, // Inyectar usuario actual
+                  deletedBy: currentUser,
                   deletedAt: new Date(),
                   ...(section === "Productos" ? { disponible: false } : {}),
                 }
@@ -288,10 +273,8 @@ export const useTableData = (section, options = {}) => {
     [config.softDeleteEndpoint, config.updateEndpoint, section]
   );
 
-  // Hard Delete (eliminar permanentemente)
   const handleHardDelete = useCallback(
     async (id) => {
-      // Prevenir que el admin se elimine a sí mismo
       if (section === "Usuarios") {
         const currentUser = useStore.getState().user;
         console.log(
@@ -314,7 +297,6 @@ export const useTableData = (section, options = {}) => {
       }
 
       try {
-        // Usar deleteEndpoint configurado en TABLE_CONFIG
         const endpoint = config.deleteEndpoint?.replace(":id", id);
         if (!endpoint) {
           throw new Error(
@@ -351,7 +333,7 @@ export const useTableData = (section, options = {}) => {
     error,
     fetchData,
     handleEdit,
-    // backward-compatible alias: algunas partes del código esperan `onEdit`
+
     onEdit: handleEdit,
     handleSave,
     handleCancel,
@@ -363,13 +345,11 @@ export const useTableData = (section, options = {}) => {
       try {
         let itemToCreate = { ...newItem };
 
-        // Verificar si hay archivos para subir
         const fileFields = Object.keys(newItem).filter(
           (key) => newItem[key] instanceof File
         );
 
         if (fileFields.length > 0) {
-          // Mostrar loading de subida
           Swal.fire({
             title: "Subiendo archivos...",
             allowOutsideClick: false,
@@ -382,12 +362,10 @@ export const useTableData = (section, options = {}) => {
 
           for (const field of fileFields) {
             const file = newItem[field];
-            // Subir archivo y obtener URL
-            // Asumimos que 'productos' es el directorio por defecto, o podríamos deducirlo de 'section'
+
             const directorio = section.toLowerCase();
             const url = await subirArchivo(file, directorio);
 
-            // Si el campo es 'imagenes', guardar como array
             if (field === "imagenes") {
               itemToCreate[field] = [url];
             } else {
@@ -396,7 +374,7 @@ export const useTableData = (section, options = {}) => {
           }
         }
 
-        const endpoint = config.endpoint; // Asumimos que el endpoint base acepta POST
+        const endpoint = config.endpoint;
         const { data: createdItem } = await clientAxios.post(
           endpoint,
           itemToCreate
@@ -446,7 +424,6 @@ export const useTableData = (section, options = {}) => {
       try {
         let url = value;
 
-        // Si es un archivo, subirlo primero
         if (value instanceof File) {
           Swal.fire({
             title: "Subiendo imagen...",
@@ -461,7 +438,6 @@ export const useTableData = (section, options = {}) => {
           url = await subirArchivo(value, directory);
         }
 
-        // Preparar datos para actualizar
         const dataToUpdate = {};
         if (field === "imagenes") {
           dataToUpdate[field] = [url];
@@ -472,7 +448,6 @@ export const useTableData = (section, options = {}) => {
         const endpoint = config.updateEndpoint.replace(":id", id);
         await clientAxios.put(endpoint, dataToUpdate);
 
-        // Actualizar estado local
         setData((prev) =>
           prev.map((item) => {
             if (item._id === id) {

@@ -33,7 +33,6 @@ export const getItem = (key, defaultValue = null) => {
       return defaultValue;
     }
 
-    // Intentar parsear JSON, si falla retornar el string
     try {
       return JSON.parse(item);
     } catch {
@@ -65,7 +64,6 @@ export const setItem = (key, value) => {
   } catch (error) {
     console.error(`Error al guardar en localStorage (key: ${key}):`, error);
 
-    // Manejar error de cuota excedida
     if (error.name === "QuotaExceededError") {
       console.warn(
         "Cuota de localStorage excedida. Considera limpiar datos antiguos."

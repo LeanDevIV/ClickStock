@@ -1,21 +1,28 @@
 import React, { useState } from "react";
 import {
-  TableRow,
-  TableCell,
+  Card,
+  CardContent,
+  CardActions,
+  Typography,
+  Box,
   Avatar,
   Chip,
+  Collapse,
+  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  Button,
   Tabs,
   Tab,
-  Box,
-  Button,
   TextField,
-  Typography,
+  useTheme,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
+import {
+  ExpandMore as ExpandMoreIcon,
+  Edit as EditIcon,
+} from "@mui/icons-material";
 import {
   EditableCell,
   StatusChip,
@@ -26,10 +33,7 @@ import {
 import { TABLE_CONFIG, CHIP_COLORS, THEME } from "../../config/adminConfig";
 import { useStore } from "../../hooks/useStore";
 
-/**
- * Fila genérica reutilizable para todas las tablas
- */
-export const GenericRow = ({
+export const GenericCard = ({
   item,
   section,
   tableHeader,
@@ -45,6 +49,8 @@ export const GenericRow = ({
   onUpdateImage,
   categorias = [],
 }) => {
+  const theme = useTheme();
+  const [expanded, setExpanded] = useState(false);
   const isEditing = editingId === (item._id || item.id);
   const itemId = item._id || item.id;
   const itemActual = isEditing ? { ...item, ...editedData } : item;
@@ -82,6 +88,20 @@ export const GenericRow = ({
     setImageDialogOpen(false);
   };
 
+  const getCategoriaNombre = (categoriaOrId) => {
+    if (!categoriaOrId) return "N/A";
+
+    if (typeof categoriaOrId === "object") {
+      return categoriaOrId.nombre || "N/A";
+    }
+
+    const cat = categorias.find(
+      (categoria) =>
+        categoria._id === categoriaOrId || categoria.id === categoriaOrId
+    );
+    return cat?.nombre || categoriaOrId;
+  };
+
   const renderImageCell = (src, alt, field, isRounded = false) => {
     const canEdit = section !== "Usuarios";
 
@@ -89,8 +109,9 @@ export const GenericRow = ({
       <Box
         sx={{
           position: "relative",
-          width: isRounded ? 50 : 40,
-          height: isRounded ? 50 : 40,
+          width: 60,
+          height: 60,
+          mr: 2,
           "&:hover .edit-overlay": {
             opacity: canEdit ? 1 : 0,
           },
@@ -104,6 +125,7 @@ export const GenericRow = ({
             width: "100%",
             height: "100%",
             bgcolor: "rgba(212, 175, 55, 0.1)",
+            border: `1px solid ${THEME.primaryColor}`,
           }}
         >
           {alt?.charAt(0)}
@@ -136,15 +158,6 @@ export const GenericRow = ({
         )}
       </Box>
     );
-  };
-
-  const getCategoriaNombre = (categoriaId) => {
-    if (!categoriaId) return "N/A";
-    const cat = categorias.find(
-      (categoria) =>
-        categoria._id === categoriaId || categoria.id === categoriaId
-    );
-    return cat?.nombre || categoriaId;
   };
 
   const renderCellValue = (field, value, displayValue) => {
@@ -186,15 +199,12 @@ export const GenericRow = ({
     }
 
     switch (field) {
-      case "fotoPerfil": {
+      case "fotoPerfil":
         return renderImageCell(value, itemActual.nombre, "fotoPerfil", false);
-      }
-
       case "imagen": {
         const imgSrc = itemActual.imagenes?.[0];
         return renderImageCell(imgSrc, itemActual.nombre, "imagenes", true);
       }
-
       case "precio":
         return typeof value === "number"
           ? new Intl.NumberFormat("es-AR", {
@@ -204,30 +214,20 @@ export const GenericRow = ({
               maximumFractionDigits: 0,
             }).format(value)
           : value;
-
       case "stock": {
         let color = "default";
         let sx = {};
-
-        if (value <= 10) {
-          color = "error";
-        } else if (value <= 30) {
-          color = "warning";
-        } else if (value <= 50) {
+        if (value <= 10) color = "error";
+        else if (value <= 30) color = "warning";
+        else if (value <= 50) {
           sx = {
             bgcolor: "#ffeb3b",
             color: "#000",
             "& .MuiChip-label": { fontWeight: "bold" },
           };
-        } else if (value <= 100) {
-          color = "success";
-        } else {
-          color = "success";
-        }
-
+        } else color = "success";
         return <Chip label={value} size="small" color={color} sx={sx} />;
       }
-
       case "disponible":
         return (
           <Chip
@@ -236,10 +236,8 @@ export const GenericRow = ({
             color={value ? "success" : "default"}
           />
         );
-
       case "isDeleted":
         return <DeletedChip isDeleted={value} />;
-
       case "estado":
         return isEditing && config.editableFields.includes(field) ? (
           <EditableCell
@@ -251,7 +249,6 @@ export const GenericRow = ({
         ) : (
           <StatusChip value={value} type="estado" />
         );
-
       case "rolUsuario":
         return isEditing && config.editableFields.includes(field) ? (
           <EditableCell
@@ -267,7 +264,6 @@ export const GenericRow = ({
             color={CHIP_COLORS.rolUsuario?.[value] || "default"}
           />
         );
-
       case "deletedAt":
       case "createdAt":
       case "fecha":
@@ -285,22 +281,19 @@ export const GenericRow = ({
             hour: "2-digit",
             minute: "2-digit",
           });
-        } catch (error) {
-          console.error(`Error formatting date for field ${field}:`, error);
+        } catch {
           return "-";
         }
-
       case "deletedBy":
         return <DeletedByCell value={value} />;
-
       case "usuario":
+      case "user":
         if (!value) return "-";
         return typeof value === "object"
           ? value.nombreUsuario || value.name
           : value;
-
       case "productId":
-        if (!value) {
+        if (!value)
           return (
             <Chip
               label="Producto Eliminado"
@@ -309,15 +302,7 @@ export const GenericRow = ({
               variant="outlined"
             />
           );
-        }
         return typeof value === "object" ? value.nombre || value.name : value;
-
-      case "user":
-        if (!value) return "-";
-        return typeof value === "object"
-          ? value.nombreUsuario || value.name
-          : value;
-
       case "rating":
         return (
           <Chip
@@ -326,7 +311,6 @@ export const GenericRow = ({
             color={value >= 4 ? "success" : "warning"}
           />
         );
-
       case "activa":
       case "destacado":
         return (
@@ -337,89 +321,182 @@ export const GenericRow = ({
           />
         );
       default:
-        if (Array.isArray(value)) {
+        if (Array.isArray(value))
           return value.length > 0 ? `${value.length} items` : "-";
-        }
-        if (value && typeof value === "object") {
-          return JSON.stringify(value);
-        }
+        if (value && typeof value === "object") return JSON.stringify(value);
         return value || "-";
     }
   };
 
+  const imageField = tableHeader.find(
+    (h) => h.key === "imagen" || h.key === "fotoPerfil"
+  );
+  const titleField = tableHeader.find(
+    (h) =>
+      h.key === "nombre" ||
+      h.key === "nombreUsuario" ||
+      h.key === "titulo" ||
+      h.key === "asunto"
+  );
+  const subtitleField = tableHeader.find(
+    (h) =>
+      h.key === "precio" ||
+      h.key === "email" ||
+      h.key === "rolUsuario" ||
+      h.key === "categoria"
+  );
+
+  const otherFields = tableHeader.filter(
+    (h) =>
+      h.key !== "actions" &&
+      h.key !== imageField?.key &&
+      h.key !== titleField?.key &&
+      h.key !== subtitleField?.key
+  );
+
   return (
     <>
-      <TableRow
+      <Card
         sx={{
-          bgcolor: "transparent",
-          transition: "all 0.2s ease",
-          "&:hover": {
-            bgcolor: "rgba(212, 175, 55, 0.05)",
-            cursor: "pointer",
-          },
-          "& td": {
-            borderBottom: "1px solid rgba(212, 175, 55, 0.2)",
-          },
-          opacity: item.isDeleted ? 0.6 : 1,
+          mb: 2,
+          bgcolor: "background.paper",
+          backgroundImage: "none",
+          border: `1px solid ${
+            item.isDeleted
+              ? theme.palette.error.main
+              : "rgba(212, 175, 55, 0.3)"
+          }`,
+          boxShadow: `0 0 10px ${
+            item.isDeleted
+              ? "rgba(211, 47, 47, 0.1)"
+              : "rgba(212, 175, 55, 0.05)"
+          }`,
+          borderRadius: 2,
+          overflow: "visible",
+          opacity: item.isDeleted ? 0.8 : 1,
+          position: "relative",
         }}
       >
-        {tableHeader.map((header) => {
-          if (header.key === "actions") {
-            return (
-              <TableCell
-                key={header.key}
-                align="center"
-                sx={{ verticalAlign: "middle" }}
-              >
-                <TableRowActions
-                  isEditing={isEditing}
-                  onEdit={() => onEdit(item)}
-                  onSave={() => onSave(itemId)}
-                  onCancel={onCancel}
-                  onRestore={() => onRestore(itemId)}
-                  onSoftDelete={() => onSoftDelete(itemId)}
-                  onHardDelete={() => onHardDelete(itemId)}
-                  id={itemId}
-                  isDeleted={item.isDeleted}
-                  isCurrentUser={isCurrentUser}
-                />
-              </TableCell>
-            );
-          }
+        <CardContent sx={{ pb: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "flex-start", mb: 2 }}>
+            {imageField && (
+              <Box sx={{ flexShrink: 0 }}>
+                {renderCellValue(
+                  imageField.key,
+                  itemActual[imageField.key],
+                  undefined
+                )}
+              </Box>
+            )}
+            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+              {titleField && (
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{
+                    fontWeight: "bold",
+                    lineHeight: 1.2,
+                    mb: 0.5,
+                    color: THEME.primaryColor,
+                  }}
+                >
+                  {renderCellValue(
+                    titleField.key,
+                    itemActual[titleField.key],
+                    undefined
+                  )}
+                </Typography>
+              )}
+              {subtitleField && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 0.5 }}
+                >
+                  {subtitleField.label}:{" "}
+                  {renderCellValue(
+                    subtitleField.key,
+                    itemActual[subtitleField.key],
+                    subtitleField.key === "categoria"
+                      ? getCategoriaNombre(itemActual.categoria)
+                      : undefined
+                  )}
+                </Typography>
+              )}
+            </Box>
+          </Box>
 
-          let value = itemActual[header.key];
-          let displayValue = undefined;
+          <Collapse in={expanded} timeout="auto" unmountOnExit>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {otherFields.map((header) => {
+                let value = itemActual[header.key];
+                let displayValue = undefined;
 
-          if (header.key === "categoria") {
-            const rawCategoria = itemActual.categoria;
-            let categoriaId = rawCategoria;
+                if (header.key === "categoria") {
+                  displayValue = getCategoriaNombre(value);
+                }
 
-            if (rawCategoria && typeof rawCategoria === "object") {
-              categoriaId = rawCategoria._id || rawCategoria.id;
-            }
+                return (
+                  <Box
+                    key={header.key}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      borderBottom: "1px solid rgba(255,255,255,0.05)",
+                      py: 0.5,
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ fontWeight: "bold" }}
+                    >
+                      {header.label}
+                    </Typography>
+                    <Box sx={{ textAlign: "right", maxWidth: "60%" }}>
+                      {renderCellValue(header.key, value, displayValue)}
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+          </Collapse>
+        </CardContent>
 
-            value = categoriaId;
-            displayValue = getCategoriaNombre(categoriaId);
-          }
-
-          return (
-            <TableCell
-              key={header.key}
-              sx={{
-                textAlign: header.align || "left",
-                padding: "16px",
-                fontSize: "0.875rem",
-                color: "text.primary",
-                wordBreak: "break-word",
-                verticalAlign: "middle",
-                whiteSpace: header.key === "precio" ? "nowrap" : "normal",
-              }}
-            >
-              {renderCellValue(header.key, value, displayValue)}
-            </TableCell>
-          );
-        })}
-      </TableRow>
+        <CardActions
+          sx={{
+            justifyContent: "space-between",
+            borderTop: "1px solid rgba(255,255,255,0.05)",
+            p: 1,
+            bgcolor: "rgba(0,0,0,0.2)",
+          }}
+        >
+          <IconButton
+            onClick={() => setExpanded(!expanded)}
+            size="small"
+            sx={{
+              color: THEME.primaryColor,
+              transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+              transition: "transform 0.3s",
+            }}
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+          <TableRowActions
+            isEditing={isEditing}
+            onEdit={() => onEdit(item)}
+            onSave={() => onSave(itemId)}
+            onCancel={onCancel}
+            onRestore={() => onRestore(itemId)}
+            onSoftDelete={() => onSoftDelete(itemId)}
+            onHardDelete={() => onHardDelete(itemId)}
+            id={itemId}
+            isDeleted={item.isDeleted}
+            isCurrentUser={isCurrentUser}
+          />
+        </CardActions>
+      </Card>
 
       <Dialog
         open={imageDialogOpen}

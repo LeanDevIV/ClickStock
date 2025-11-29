@@ -10,7 +10,6 @@ import {
 import { Instagram, Facebook, X } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 
-// Styled component para el contenedor del footer
 const FooterContainer = styled(Box)(({ theme }) => ({
   position: "relative",
   backgroundColor: "#000",
@@ -20,7 +19,6 @@ const FooterContainer = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(10),
 }));
 
-// Componente SVG para la onda con borde neón animado
 const NeonWave = () => (
   <Box
     sx={{
@@ -30,7 +28,7 @@ const NeonWave = () => (
       width: "100%",
       overflow: "hidden",
       lineHeight: 0,
-      transform: "translateY(-99%)", // Sube el SVG para que quede justo encima
+      transform: "translateY(-99%)",
       zIndex: 1,
     }}
   >
@@ -44,7 +42,6 @@ const NeonWave = () => (
       }}
     >
       <defs>
-        {/* Gradiente animado para el efecto neón */}
         <linearGradient
           id="neonGradient"
           gradientUnits="userSpaceOnUse"
@@ -59,7 +56,6 @@ const NeonWave = () => (
           <stop offset="80%" stopColor="#D4AF37" />
           <stop offset="100%" stopColor="transparent" />
 
-          {/* Animación de movimiento robusta */}
           <animate
             attributeName="x1"
             from="-100%"
@@ -76,7 +72,6 @@ const NeonWave = () => (
           />
         </linearGradient>
 
-        {/* Filtro Glow */}
         <filter id="glow">
           <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
           <feMerge>
@@ -86,10 +81,8 @@ const NeonWave = () => (
         </filter>
       </defs>
 
-      {/* Fondo negro de la onda */}
       <path d="M0,60 C320,140 880,-20 1200,60 L1200,120 L0,120 Z" fill="#000" />
 
-      {/* Borde luminoso animado */}
       <path
         d="M0,60 C320,140 880,-20 1200,60"
         fill="none"
@@ -107,14 +100,8 @@ const Footer = () => {
       <NeonWave />
 
       <Container maxWidth="lg">
-        <Grid
-          container
-          spacing={4}
-          sx={{ mb: 4 }}
-          justifyContent="center" // Centra las columnas horizontalmente
-        >
-          {/* Columna 1: Nuestras redes */}
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Grid container spacing={4} sx={{ mb: 4 }} justifyContent="center">
+          <Grid xs={12} sm={6} md={3}>
             <Typography
               variant="h6"
               gutterBottom
@@ -187,8 +174,7 @@ const Footer = () => {
             </Box>
           </Grid>
 
-          {/* Columna 2: Acerca de nosotros */}
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid xs={12} sm={6} md={3}>
             <Typography
               variant="h6"
               gutterBottom
@@ -257,8 +243,7 @@ const Footer = () => {
             </Box>
           </Grid>
 
-          {/* Columna 3: Enlaces/Links de las páginas */}
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid xs={12} sm={6} md={3}>
             <Typography
               variant="h6"
               gutterBottom
@@ -294,21 +279,7 @@ const Footer = () => {
               >
                 Inicio
               </Link>
-              <Link
-                href="/productos"
-                underline="none"
-                sx={{
-                  color: "#F5F5F5",
-                  fontSize: "0.95rem",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    color: "#D4AF37",
-                    paddingLeft: "6px",
-                  },
-                }}
-              >
-                Productos
-              </Link>
+
               <Link
                 href="/contacto"
                 underline="none"
@@ -328,7 +299,6 @@ const Footer = () => {
           </Grid>
         </Grid>
 
-        {/* Línea divisoria dorada */}
         <Box
           sx={{
             height: "2px",
@@ -339,7 +309,6 @@ const Footer = () => {
           }}
         />
 
-        {/* Copyright */}
         <Typography
           align="center"
           sx={{

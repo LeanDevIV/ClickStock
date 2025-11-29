@@ -289,7 +289,7 @@ const CarritoPage = () => {
   };
 
   const handleContinuarComprando = () => {
-    navigate("/productos");
+    navigate("/");
   };
 
   const handleCloseSnackbar = () => {
@@ -366,10 +366,10 @@ const CarritoPage = () => {
         <Button
           startIcon={<ArrowBack />}
           component={Link}
-          to="/productos"
+          to="/"
           sx={{ mb: 2, color: theme.palette.text.secondary }}
         >
-          Volver a productos
+          Volver a Inicio
         </Button>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
           <ShoppingCart

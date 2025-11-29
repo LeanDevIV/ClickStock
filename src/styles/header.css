@@ -14,7 +14,6 @@
   opacity: 0;
 }
 
-/* Transparent State (Top of page) */
 .transparent-navbar {
   background-color: transparent !important;
   backdrop-filter: blur(0px);
@@ -23,7 +22,6 @@
   padding-bottom: 10px;
 }
 
-/* Glass State (Scrolled) */
 .glass-navbar {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);

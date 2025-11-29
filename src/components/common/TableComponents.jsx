@@ -134,7 +134,6 @@ export const TableRowActions = ({
               </span>
             </Tooltip>
 
-            {/* Botón Soft Delete (solo si no está eliminado) */}
             {!isDeleted && (
               <Tooltip title="Eliminar (soft delete)">
                 <IconButton
@@ -147,7 +146,6 @@ export const TableRowActions = ({
               </Tooltip>
             )}
 
-            {/* Botón Hard Delete (solo si está eliminado) */}
             {isDeleted && (
               <Tooltip title="Eliminar permanentemente">
                 <IconButton
@@ -176,7 +174,6 @@ export const EditableCell = ({
   section,
 }) => {
   if (!isEditing) {
-    // Si hay un displayValue (ej: nombre de categoría), mostrarlo; si no, usar value
     return displayValue !== undefined ? displayValue : value;
   }
 
@@ -185,7 +182,6 @@ export const EditableCell = ({
     fieldConfig === "number" ||
     (typeof fieldConfig === "object" && fieldConfig.type === "number");
 
-  // --- SELECT ---
   const isSelect =
     fieldConfig === "select" ||
     (typeof fieldConfig === "object" && fieldConfig.type === "select");
@@ -193,11 +189,9 @@ export const EditableCell = ({
   if (isSelect) {
     let options = SELECT_OPTIONS[field] || [];
 
-    // Manejar opciones anidadas por sección (ej: estado para Pedidos vs Soporte)
     if (!Array.isArray(options) && section && options[section]) {
       options = options[section];
     } else if (!Array.isArray(options)) {
-      // Si es un objeto pero no coincide la sección, intentar usar un default o array vacío
       options = [];
     }
 
@@ -214,10 +208,8 @@ export const EditableCell = ({
     );
   }
 
-  // --- DATE ---
   const isDate = fieldConfig === "date";
   if (isDate) {
-    // Convertir el valor a formato YYYY-MM-DD para el input type="date"
     const dateValue = value ? new Date(value).toISOString().split("T")[0] : "";
     return (
       <TextField
@@ -233,7 +225,6 @@ export const EditableCell = ({
     );
   }
 
-  // --- MULTILINE ---
   const isMultilineField = fieldConfig === "multiline";
   if (isMultilineField || isMultiline) {
     return (
@@ -248,7 +239,6 @@ export const EditableCell = ({
     );
   }
 
-  // --- BOOLEAN (Checkbox) ---
   const isBoolean = fieldConfig === "boolean";
   if (isBoolean) {
     return (
@@ -267,7 +257,6 @@ export const EditableCell = ({
     );
   }
 
-  // --- TEXT / NUMBER ---
   return (
     <TextField
       value={value || ""}
@@ -323,7 +312,6 @@ export const DeletedByCell = ({ value }) => {
 
   if (!value) return "-";
 
-  // Si el valor es solo un string (ej: "Admin"), mostrarlo
   if (typeof value === "string") return value;
 
   const name =
@@ -384,10 +372,6 @@ export const DeletedByCell = ({ value }) => {
   );
 };
 
-/**
- * Componente reutilizable de controles para tablas administrativas
- * Incluye botón de refresh y toggle para mostrar eliminados
- */
 export const TableControls = ({
   onRefresh,
   showDeletedLabel = "Mostrar eliminados",

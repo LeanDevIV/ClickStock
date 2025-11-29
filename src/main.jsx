@@ -7,12 +7,9 @@ import { BrowserRouter } from "react-router-dom";
 import { GlobalErrorBoundary } from "./components/common/GlobalErrorBoundary.jsx";
 
 createRoot(document.getElementById("root")).render(
-  // <StrictMode>
   <GlobalErrorBoundary>
     <BrowserRouter>
       <App />
     </BrowserRouter>
   </GlobalErrorBoundary>
-
-  // </StrictMode>,
 );

@@ -42,7 +42,6 @@ import { UserMenu } from "../auth/MenuUsuario";
 import AuthModal from "../auth/AuthModal";
 import "../../styles/header.css";
 
-// Search Styles
 const SearchContainer = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -95,6 +94,7 @@ export const Header = ({
   const [showCarrito, setShowCarrito] = useState(false);
   const handleOpenPreview = () => setShowCarrito(true);
   const handleClosePreview = () => setShowCarrito(false);
+
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -122,12 +122,6 @@ export const Header = ({
     navigate("/");
   };
 
-  const navLinks = [
-    { title: "Inicio", path: "/" },
-    { title: "Nosotros", path: "/nosotros" },
-    { title: "Contacto", path: "/contacto" },
-  ];
-
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -145,9 +139,10 @@ export const Header = ({
           style={{
             textDecoration: "none",
             color: "inherit",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
+            fontWeight: "bold",
+            fontSize: "1.2rem",
+            fontFamily: "'Orbitron', sans-serif",
+            letterSpacing: "1px",
           }}
         >
           <img
@@ -174,21 +169,9 @@ export const Header = ({
         </Link>
       </Box>
       <Divider />
-      <List>
-        {navLinks.map((item) => (
-          <ListItem key={item.title} disablePadding>
-            <ListItemButton
-              component={Link}
-              to={item.path}
-              sx={{ textAlign: "center" }}
-            >
-              <ListItemText primary={item.title} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <List></List>
       <Divider />
-      {/* Mobile Actions in Drawer */}
+
       <List>
         <ListItem disablePadding>
           <ListItemButton onClick={handleOpenPreview}>
@@ -296,21 +279,16 @@ export const Header = ({
       >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <Box
-              sx={{
-                display: { xs: "none", md: "flex" },
-                mr: 1,
-                alignItems: "center",
-              }}
-            >
+            <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
               <Link
                 to="/"
                 style={{
                   textDecoration: "none",
                   color: "inherit",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: theme.spacing(1),
+                  fontWeight: "bold",
+                  fontSize: "1.5rem",
+                  fontFamily: "'Orbitron', sans-serif",
+                  letterSpacing: "1px",
                 }}
               >
                 <img
@@ -336,15 +314,17 @@ export const Header = ({
                 </Box>
               </Link>
             </Box>
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" }, alignItems: "center" }}>
+
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               <Link
                 to="/"
                 style={{
                   textDecoration: "none",
                   color: "inherit",
-                  display: "flex", 
-                  alignItems: "center",
-                  gap: theme.spacing(0.5), 
+                  fontWeight: "bold",
+                  fontSize: "1.2rem",
+                  fontFamily: "'Orbitron', sans-serif",
+                  letterSpacing: "1px",
                 }}
               >
                 {/* Imagen del Logo */}
@@ -373,7 +353,6 @@ export const Header = ({
               </Link>
             </Box>
 
-            {/* Desktop Nav Links */}
             <Box
               sx={{
                 flexGrow: 1,
@@ -381,24 +360,12 @@ export const Header = ({
                 justifyContent: "center",
                 gap: 2,
               }}
-            >
-              {navLinks.map((page) => (
-                <Button
-                  key={page.title}
-                  component={Link}
-                  to={page.path}
-                  sx={{ my: 2, color: "inherit", display: "block" }}
-                >
-                  {page.title}
-                </Button>
-              ))}
-            </Box>
+            ></Box>
 
-            {/* Actions (Search, Cart, etc.) - Hidden on Mobile */}
             <Box
               sx={{
                 flexGrow: 0,
-                display: { xs: "none", md: "flex" }, // Hide on mobile
+                display: { xs: "none", md: "flex" },
                 alignItems: "center",
                 gap: 1,
               }}
@@ -473,7 +440,6 @@ export const Header = ({
               )}
             </Box>
 
-            {/* Mobile Menu Button (Moved to end) */}
             <Box sx={{ display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
@@ -488,10 +454,9 @@ export const Header = ({
         </Container>
       </AppBar>
 
-      {/* Mobile Drawer */}
       <nav>
         <Drawer
-          anchor="right" // Open from right
+          anchor="right"
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}

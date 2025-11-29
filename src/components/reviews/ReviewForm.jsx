@@ -49,7 +49,6 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
         Agregar una reseña
       </Typography>
 
-      {/* Nombre */}
       <Controller
         name="user"
         control={control}
@@ -65,7 +64,6 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
         )}
       />
 
-      {/* Rating */}
       <Controller
         name="rating"
         control={control}
@@ -88,7 +86,6 @@ const ReviewForm = ({ productId, onReviewAdded }) => {
         )}
       />
 
-      {/* Comentario */}
       <Controller
         name="comment"
         control={control}
