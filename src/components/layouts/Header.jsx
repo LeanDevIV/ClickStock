@@ -29,6 +29,7 @@ import {
   BlurOn,
   BlurOff,
   AdminPanelSettings,
+  Favorite,
 } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 import { useStore } from "../../hooks/useStore";
@@ -81,12 +82,15 @@ export const Header = ({
   toggleModo,
   backgroundEnabled,
   toggleBackground,
+  showAuthModal,
+  handleOpenAuth,
+  handleCloseAuth,
 }) => {
   const theme = useTheme();
   const [showCarrito, setShowCarrito] = useState(false);
   const handleOpenPreview = () => setShowCarrito(true);
   const handleClosePreview = () => setShowCarrito(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  // const [showAuthModal, setShowAuthModal] = useState(false); // Removed local state
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -105,8 +109,8 @@ export const Header = ({
     }
   };
 
-  const handleOpenAuth = () => setShowAuthModal(true);
-  const handleCloseAuth = () => setShowAuthModal(false);
+  // const handleOpenAuth = () => setShowAuthModal(true); // Removed local handler
+  // const handleCloseAuth = () => setShowAuthModal(false); // Removed local handler
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -173,6 +177,19 @@ export const Header = ({
                 <ShoppingCart />
               </Badge>
               <ListItemText primary="Carrito" />
+            </Box>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton
+            component={Link}
+            to="/favoritos"
+            onClick={handleDrawerToggle}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", mx: "auto" }}>
+              <Favorite sx={{ mr: 1 }} />
+              <ListItemText primary="Favoritos" />
             </Box>
           </ListItemButton>
         </ListItem>
@@ -333,6 +350,12 @@ export const Header = ({
                   />
                 </SearchContainer>
               </form>
+
+              <Tooltip title="Mis Favoritos">
+                <IconButton component={Link} to="/favoritos" color="inherit">
+                  <Favorite />
+                </IconButton>
+              </Tooltip>
 
               <IconButton onClick={handleOpenPreview} color="inherit">
                 <Badge badgeContent={totalArticulos} color="error">

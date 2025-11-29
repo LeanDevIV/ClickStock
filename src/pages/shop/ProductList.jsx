@@ -1,10 +1,46 @@
-import React from "react";
-import { Container, Typography, Box, useTheme, Paper } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Typography,
+  Box,
+  useTheme,
+  Paper,
+  CircularProgress,
+} from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import Products from "../../components/products/ProductosRender";
+import ProductGrid from "../../components/products/ProductGrid";
+import clientAxios from "../../utils/clientAxios";
 
 const ProductList = () => {
   const theme = useTheme();
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const obtenerProductos = async () => {
+      try {
+        setLoading(true);
+        const { data } = await clientAxios.get("/productos");
+        const productosData = data?.productos || data;
+
+        if (Array.isArray(productosData)) {
+          const productosFiltrados = productosData.filter(
+            (producto) => producto.stock > 0 && producto.disponible === true
+          );
+          setProductos(productosFiltrados);
+        } else {
+          setProductos([]);
+        }
+      } catch (error) {
+        console.error("Error al obtener productos:", error);
+        setProductos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    obtenerProductos();
+  }, []);
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -55,7 +91,13 @@ const ProductList = () => {
         </Box>
 
         {/* Render del componente de productos */}
-        <Products />
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <ProductGrid productos={productos} />
+        )}
       </Paper>
     </Container>
   );

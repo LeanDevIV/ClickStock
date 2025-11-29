@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useStore } from "./useStore";
 import {
   obtenerFavoritos,
@@ -12,35 +12,36 @@ import toast from "react-hot-toast";
  * @returns {Object} Estado y funciones para manejar favoritos
  */
 export const useFavoritos = () => {
-  const [favoritos, setFavoritos] = useState(new Set());
+  const {
+    token,
+    favoritos: favoritosGlobal,
+    setFavoritos: setFavoritosGlobal,
+    addFavorito: addFavoritoGlobal,
+    removeFavorito: removeFavoritoGlobal,
+  } = useStore();
+
   const [loading, setLoading] = useState(false);
-  const [cargando, setCargando] = useState(true);
-  const { token } = useStore();
+  const [cargando, setCargando] = useState(false);
 
   /**
    * Carga los favoritos del usuario desde el servidor
    */
   const cargarFavoritos = useCallback(async () => {
+    if (!token) {
+      setFavoritosGlobal([]);
+      return;
+    }
+
     try {
       setCargando(true);
       const idsFavoritos = await obtenerFavoritos();
-      setFavoritos(new Set(idsFavoritos));
+      setFavoritosGlobal(idsFavoritos);
     } catch (error) {
       console.error("Error al cargar favoritos:", error);
-      toast.error("Error al cargar favoritos");
     } finally {
       setCargando(false);
     }
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      cargarFavoritos();
-    } else {
-      setFavoritos(new Set());
-      setCargando(false);
-    }
-  }, [token, cargarFavoritos]);
+  }, [token, setFavoritosGlobal]);
 
   /**
    * Agrega o elimina un producto de favoritos
@@ -54,27 +55,19 @@ export const useFavoritos = () => {
       }
 
       const productoIdStr = productoId.toString();
-      const esFavorito = favoritos.has(productoIdStr);
+      const esFavorito = favoritosGlobal.includes(productoIdStr);
 
-    //Switch para agregar o eliminar favorito
-    
       try {
         setLoading(true);
         if (esFavorito) {
+          // Optimistic update
+          removeFavoritoGlobal(productoIdStr);
           await eliminarFavorito(productoId);
-          setFavoritos((prev) => {
-            const nuevo = new Set(prev);
-            nuevo.delete(productoIdStr);
-            return nuevo;
-          });
           toast.success("Producto eliminado de favoritos");
         } else {
+          // Optimistic update
+          addFavoritoGlobal(productoIdStr);
           await agregarFavorito(productoId);
-          setFavoritos((prev) => {
-            const nuevo = new Set(prev);
-            nuevo.add(productoIdStr);
-            return nuevo;
-          });
           toast.success("Producto agregado a favoritos");
         }
       } catch (error) {
@@ -84,11 +77,19 @@ export const useFavoritos = () => {
           error.response?.data?.msg ||
           "Error al actualizar favoritos";
         toast.error(mensaje);
+
+        cargarFavoritos();
       } finally {
         setLoading(false);
       }
     },
-    [favoritos, token]
+    [
+      favoritosGlobal,
+      token,
+      addFavoritoGlobal,
+      removeFavoritoGlobal,
+      cargarFavoritos,
+    ]
   );
 
   /**
@@ -98,13 +99,13 @@ export const useFavoritos = () => {
    */
   const esFavorito = useCallback(
     (productoId) => {
-      return favoritos.has(productoId?.toString());
+      return favoritosGlobal.includes(productoId?.toString());
     },
-    [favoritos]
+    [favoritosGlobal]
   );
 
   return {
-    favoritos,
+    favoritos: new Set(favoritosGlobal),
     loading,
     cargando,
     toggleFavorito,
@@ -112,4 +113,3 @@ export const useFavoritos = () => {
     cargarFavoritos,
   };
 };
-
