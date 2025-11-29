@@ -20,6 +20,7 @@ export const TABLE_CONFIG = {
       "categoria",
       "stock",
       "disponible",
+      "destacado",
       "imagenes",
     ],
     displayFields: [
@@ -30,6 +31,7 @@ export const TABLE_CONFIG = {
       "categoria",
       "stock",
       "disponible",
+      "destacado",
       "isDeleted",
       "deletedBy",
       "deletedAt",
@@ -136,6 +138,7 @@ export const FIELD_TYPES = {
   stock: "number",
   rating: { type: "number", min: 1, max: 5 },
   disponible: "boolean",
+  destacado: "boolean",
   rol: "select",
   estado: "select",
   comentario: "multiline",
@@ -153,6 +156,10 @@ export const FIELD_TYPES = {
 };
 export const SELECT_OPTIONS = {
   disponible: [
+    { value: true, label: "Sí" },
+    { value: false, label: "No" },
+  ],
+  destacado: [
     { value: true, label: "Sí" },
     { value: false, label: "No" },
   ],

@@ -335,6 +335,7 @@ export const GenericRow = ({
         );
 
       case "activa":
+      case "destacado":
         return (
           <Chip
             label={value ? "Sí" : "No"}
