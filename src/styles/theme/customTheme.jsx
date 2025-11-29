@@ -39,7 +39,7 @@ export const getCustomTheme = (modoOscuro) =>
       },
     },
     typography: {
-      fontFamily: "'Exo 2', sans-serif", // Fuente por defecto para el cuerpo
+      fontFamily: "'Exo 2', sans-serif",
       h1: { fontFamily: "'Orbitron', sans-serif" },
       h2: { fontFamily: "'Orbitron', sans-serif" },
       h3: { fontFamily: "'Orbitron', sans-serif" },
