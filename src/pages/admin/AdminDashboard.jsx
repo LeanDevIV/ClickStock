@@ -36,6 +36,7 @@ export const AdminDashboard = () => {
     handleSoftDelete,
     handleHardDelete,
     handleCreate,
+    handleUpdateImage,
   } = useTableData(selectedSection, adminOptions);
 
   // Cargar categorías al montar el componente
@@ -100,6 +101,7 @@ export const AdminDashboard = () => {
       onRefresh: fetchData,
       categorias: categorias,
       onCreate: handleCreate,
+      onUpdateImage: handleUpdateImage,
     };
 
     // Usar GenericTable para todas las secciones
@@ -120,7 +122,7 @@ export const AdminDashboard = () => {
         flexDirection: "column",
         minHeight: "100vh",
         width: "100%",
-        bgcolor: modoOscuro ? "rgba(0,0,0,0.7)" : "background.default",
+        bgcolor: modoOscuro ? "rgba(0,0,0,0.4)" : "background.default",
         backdropFilter: modoOscuro ? "blur(4px)" : "none",
       }}
     >
@@ -128,17 +130,6 @@ export const AdminDashboard = () => {
         component="main"
         sx={{ flexGrow: 1, p: 2, width: "100%", overflow: "hidden" }}
       >
-        <Typography
-          variant="h4"
-          sx={{
-            mb: 2,
-            fontWeight: "bold",
-            fontSize: { xs: "1.5rem", sm: "2rem" },
-          }}
-        >
-          {selectedSection}
-        </Typography>
-
         {/* Contenedor Sidebar + Tabla en flex */}
         <Box
           sx={{
@@ -157,6 +148,16 @@ export const AdminDashboard = () => {
 
           {/* Main Content (Tabla) */}
           <Box sx={{ flex: 1, minWidth: 0, overflow: "auto" }}>
+            <Typography
+              variant="h4"
+              sx={{
+                mb: 2,
+                fontWeight: "bold",
+                fontSize: { xs: "1.5rem", sm: "2rem" },
+              }}
+            >
+              {selectedSection}
+            </Typography>
             {renderTable()}
 
             {!loading && !error && totalPages > 1 && (
