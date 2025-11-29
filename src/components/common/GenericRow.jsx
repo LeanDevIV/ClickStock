@@ -1,13 +1,29 @@
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import Chip from "@mui/material/Chip";
+import React, { useState } from "react";
+import {
+  TableRow,
+  TableCell,
+  Avatar,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Tabs,
+  Tab,
+  Box,
+  Button,
+  TextField,
+  Typography,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   EditableCell,
-  TableRowActions,
-  DeletedChip,
   StatusChip,
+  DeletedChip,
+  TableRowActions,
+  DeletedByCell,
 } from "./TableComponents";
-import { TABLE_CONFIG, CHIP_COLORS } from "../../config/adminConfig";
+import { TABLE_CONFIG, CHIP_COLORS, THEME } from "../../config/adminConfig";
 import { useStore } from "../../hooks/useStore";
 
 /**
@@ -26,12 +42,103 @@ export const GenericRow = ({
   onRestore,
   onSoftDelete,
   onHardDelete,
+  onUpdateImage,
   categorias = [],
 }) => {
   const isEditing = editingId === (item._id || item.id);
   const itemId = item._id || item.id;
   const itemActual = isEditing ? { ...item, ...editedData } : item;
   const config = TABLE_CONFIG[section];
+
+  const currentUser = useStore((state) => state.user);
+  const isCurrentUser =
+    section === "Usuarios" &&
+    currentUser &&
+    (currentUser._id === item._id || currentUser.id === item._id);
+
+  // Estado para edición rápida de imagen
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [imageTab, setImageTab] = useState(0);
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [editingField, setEditingField] = useState(null);
+
+  const handleImageClick = (field, currentUrl) => {
+    setEditingField(field);
+    setImageUrl(currentUrl || "");
+    setImageFile(null);
+    setImageTab(0);
+    setImageDialogOpen(true);
+  };
+
+  const handleImageSave = async () => {
+    if (!onUpdateImage) return;
+
+    const value = imageTab === 0 ? imageFile : imageUrl;
+    if (!value) return;
+
+    // Determinar directorio basado en la sección
+    const directory = section.toLowerCase();
+
+    await onUpdateImage(item._id || item.id, editingField, value, directory);
+    setImageDialogOpen(false);
+  };
+
+  const renderImageCell = (src, alt, field, isRounded = false) => {
+    const canEdit = section !== "Usuarios";
+
+    return (
+      <Box
+        sx={{
+          position: "relative",
+          width: isRounded ? 50 : 40,
+          height: isRounded ? 50 : 40,
+          "&:hover .edit-overlay": {
+            opacity: canEdit ? 1 : 0,
+          },
+        }}
+      >
+        <Avatar
+          src={src}
+          alt={alt}
+          variant={isRounded ? "rounded" : "circular"}
+          sx={{
+            width: "100%",
+            height: "100%",
+            bgcolor: "rgba(212, 175, 55, 0.1)",
+          }}
+        >
+          {alt?.charAt(0)}
+        </Avatar>
+        {canEdit && (
+          <Box
+            className="edit-overlay"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleImageClick(field, src);
+            }}
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              bgcolor: "rgba(0,0,0,0.6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              opacity: 0,
+              transition: "opacity 0.2s",
+              cursor: "pointer",
+              borderRadius: isRounded ? "4px" : "50%",
+            }}
+          >
+            <EditIcon sx={{ color: "#fff", fontSize: "1.2rem" }} />
+          </Box>
+        )}
+      </Box>
+    );
+  };
 
   // Función para obtener el nombre de la categoría por ID
   const getCategoriaNombre = (categoriaId) => {
@@ -53,17 +160,13 @@ export const GenericRow = ({
           isEditing={true}
           onChange={(newValue) => onFieldChange(field, newValue)}
           displayValue={displayValue}
+          section={section}
         />
       );
     }
 
     // Mostrar indicador de usuario actual en la tabla de Usuarios
     if (section === "Usuarios" && field === "nombre") {
-      const currentUser = useStore.getState().user;
-      const isCurrentUser =
-        currentUser &&
-        (currentUser._id === item._id || currentUser.id === item._id);
-
       return (
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span>{value}</span>
@@ -90,23 +193,47 @@ export const GenericRow = ({
 
     // Campos especiales que necesitan formato
     switch (field) {
+      case "fotoPerfil": {
+        return renderImageCell(value, itemActual.nombre, "fotoPerfil", false);
+      }
+
+      case "imagen": {
+        const imgSrc = itemActual.imagenes?.[0];
+        return renderImageCell(imgSrc, itemActual.nombre, "imagenes", true);
+      }
+
       case "precio":
         return typeof value === "number"
           ? new Intl.NumberFormat("es-AR", {
               style: "currency",
               currency: "ARS",
-              minimumFractionDigits: 2,
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
             }).format(value)
           : value;
 
-      case "stock":
-        return (
-          <Chip
-            label={value}
-            size="small"
-            color={value > 0 ? "success" : "error"}
-          />
-        );
+      case "stock": {
+        let color = "default";
+        let sx = {};
+
+        if (value <= 10) {
+          color = "error";
+        } else if (value <= 30) {
+          color = "warning";
+        } else if (value <= 50) {
+          sx = {
+            bgcolor: "#ffeb3b",
+            color: "#000",
+            "& .MuiChip-label": { fontWeight: "bold" },
+          };
+        } else if (value <= 100) {
+          color = "success";
+        } else {
+          color = "success";
+        }
+
+        return <Chip label={value} size="small" color={color} sx={sx} />;
+      }
 
       case "disponible":
         return (
@@ -171,8 +298,7 @@ export const GenericRow = ({
         }
 
       case "deletedBy":
-        if (!value) return "-";
-        return value.nombreUsuario || value.name || "Admin";
+        return <DeletedByCell value={value} />;
 
       case "usuario":
         if (!value) return "-";
@@ -181,7 +307,16 @@ export const GenericRow = ({
           : value;
 
       case "productId":
-        if (!value) return "-";
+        if (!value) {
+          return (
+            <Chip
+              label="Producto Eliminado"
+              size="small"
+              color="error"
+              variant="outlined"
+            />
+          );
+        }
         return typeof value === "object" ? value.nombre || value.name : value;
 
       case "user":
@@ -222,63 +357,177 @@ export const GenericRow = ({
   };
 
   return (
-    <TableRow
-      sx={{
-        "&:hover": { bgcolor: "action.hover" },
-        opacity: item.isDeleted ? 0.6 : 1,
-      }}
-    >
-      {tableHeader.map((header) => {
-        if (header.key === "actions") {
-          return (
-            <TableCell key={header.key} align="center">
-              <TableRowActions
-                isEditing={isEditing}
-                onEdit={() => onEdit(item)}
-                onSave={() => onSave(itemId)}
-                onCancel={onCancel}
-                onRestore={() => onRestore(itemId)}
-                onSoftDelete={() => onSoftDelete(itemId)}
-                onHardDelete={() => onHardDelete(itemId)}
-                id={itemId}
-                isDeleted={item.isDeleted}
-              />
-            </TableCell>
-          );
-        }
-
-        let value = itemActual[header.key];
-        let displayValue = undefined;
-
-        // Manejo especial para categoría
-        if (header.key === "categoria") {
-          const rawCategoria = itemActual.categoria;
-          let categoriaId = rawCategoria;
-
-          // Si es un objeto, intentar extraer el ID
-          if (rawCategoria && typeof rawCategoria === "object") {
-            categoriaId = rawCategoria._id || rawCategoria.id;
+    <>
+      <TableRow
+        sx={{
+          bgcolor: "transparent",
+          transition: "all 0.2s ease",
+          "&:hover": {
+            bgcolor: "rgba(212, 175, 55, 0.05)",
+            cursor: "pointer",
+          },
+          "& td": {
+            borderBottom: "1px solid rgba(212, 175, 55, 0.2)",
+          },
+          opacity: item.isDeleted ? 0.6 : 1,
+        }}
+      >
+        {tableHeader.map((header) => {
+          if (header.key === "actions") {
+            return (
+              <TableCell
+                key={header.key}
+                align="center"
+                sx={{ verticalAlign: "middle" }}
+              >
+                <TableRowActions
+                  isEditing={isEditing}
+                  onEdit={() => onEdit(item)}
+                  onSave={() => onSave(itemId)}
+                  onCancel={onCancel}
+                  onRestore={() => onRestore(itemId)}
+                  onSoftDelete={() => onSoftDelete(itemId)}
+                  onHardDelete={() => onHardDelete(itemId)}
+                  id={itemId}
+                  isDeleted={item.isDeleted}
+                  isCurrentUser={isCurrentUser}
+                />
+              </TableCell>
+            );
           }
 
-          value = categoriaId;
-          displayValue = getCategoriaNombre(categoriaId);
-        }
+          let value = itemActual[header.key];
+          let displayValue = undefined;
 
-        return (
-          <TableCell
-            key={header.key}
+          // Manejo especial para categoría
+          if (header.key === "categoria") {
+            const rawCategoria = itemActual.categoria;
+            let categoriaId = rawCategoria;
+
+            // Si es un objeto, intentar extraer el ID
+            if (rawCategoria && typeof rawCategoria === "object") {
+              categoriaId = rawCategoria._id || rawCategoria.id;
+            }
+
+            value = categoriaId;
+            displayValue = getCategoriaNombre(categoriaId);
+          }
+
+          return (
+            <TableCell
+              key={header.key}
+              sx={{
+                textAlign: header.align || "left",
+                padding: "16px",
+                fontSize: "0.875rem",
+                color: "text.primary",
+                wordBreak: "break-word",
+                verticalAlign: "middle",
+                whiteSpace: header.key === "precio" ? "nowrap" : "normal",
+              }}
+            >
+              {renderCellValue(header.key, value, displayValue)}
+            </TableCell>
+          );
+        })}
+      </TableRow>
+
+      {/* Dialog para edición de imagen */}
+      <Dialog
+        open={imageDialogOpen}
+        onClose={() => setImageDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            bgcolor: "#1e1e1e",
+            color: "#fff",
+            border: `1px solid ${THEME.primaryColor}`,
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: THEME.primaryColor }}>
+          Actualizar Imagen
+        </DialogTitle>
+        <DialogContent>
+          <Tabs
+            value={imageTab}
+            onChange={(e, v) => setImageTab(v)}
             sx={{
-              textAlign: header.align || "left",
-              padding: "12px 8px",
-              fontSize: "0.875rem",
-              color: "text.primary",
-              wordBreak: "break-word",
+              mb: 2,
+              "& .MuiTab-root": { color: "#888" },
+              "& .Mui-selected": { color: THEME.primaryColor },
+              "& .MuiTabs-indicator": { bgcolor: THEME.primaryColor },
             }}
           >
-            {renderCellValue(header.key, value, displayValue)}
-          </TableCell>
-        );
-      })}
-    </TableRow>
+            <Tab label="Subir Archivo" />
+            <Tab label="URL" />
+          </Tabs>
+
+          {imageTab === 0 ? (
+            <Box sx={{ mt: 2, textAlign: "center" }}>
+              <Button
+                variant="outlined"
+                component="label"
+                sx={{
+                  color: THEME.primaryColor,
+                  borderColor: THEME.primaryColor,
+                  "&:hover": {
+                    borderColor: "#fff",
+                    bgcolor: "rgba(212, 175, 55, 0.1)",
+                  },
+                }}
+              >
+                Seleccionar Archivo
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files[0])}
+                />
+              </Button>
+              {imageFile && (
+                <Typography sx={{ mt: 1, fontSize: "0.9rem" }}>
+                  Archivo seleccionado: {imageFile.name}
+                </Typography>
+              )}
+            </Box>
+          ) : (
+            <TextField
+              fullWidth
+              label="URL de la imagen"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              sx={{
+                mt: 2,
+                "& .MuiOutlinedInput-root": {
+                  color: "#fff",
+                  "& fieldset": { borderColor: "rgba(255, 255, 255, 0.23)" },
+                  "&:hover fieldset": { borderColor: "#fff" },
+                  "&.Mui-focused fieldset": { borderColor: THEME.primaryColor },
+                },
+                "& .MuiInputLabel-root": { color: "#888" },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: THEME.primaryColor,
+                },
+              }}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setImageDialogOpen(false)}
+            sx={{ color: "#888" }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleImageSave}
+            sx={{ color: THEME.primaryColor }}
+            disabled={imageTab === 0 ? !imageFile : !imageUrl}
+          >
+            Guardar
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };

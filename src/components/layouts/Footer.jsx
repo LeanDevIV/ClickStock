@@ -11,12 +11,13 @@ import { Instagram, Facebook, X } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 
 // Styled component para el contenedor del footer
-const FooterContainer = styled(Box)(() => ({
+const FooterContainer = styled(Box)(({ theme }) => ({
   position: "relative",
   backgroundColor: "#000",
   color: "#fff",
   paddingTop: "40px",
   paddingBottom: "40px",
+  marginTop: theme.spacing(10),
 }));
 
 // Componente SVG para la onda con borde neón animado

@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import AppRoutes from "./routes/Indexroutes.jsx";
-import { ThemeProvider, CssBaseline } from "@mui/material";
+import { ThemeProvider, CssBaseline, Box } from "@mui/material";
 import { Toaster } from "react-hot-toast";
 import Footer from "./components/layouts/Footer.jsx";
 import { getCustomTheme } from "./styles/theme/customTheme.jsx";
@@ -94,14 +94,27 @@ function App() {
         </div>
       )}
       <WelcomeScreen />
-      <AppRoutes
-        modoOscuro={modoOscuro}
-        toggleModo={toggleModo}
-        backgroundEnabled={backgroundEnabled}
-        toggleBackground={toggleBackground}
-      />
-      <FloatingChat />
-      {/* <Footer /> */}
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
+        <Box sx={{ flexGrow: 1 }}>
+          <AppRoutes
+            modoOscuro={modoOscuro}
+            toggleModo={toggleModo}
+            backgroundEnabled={backgroundEnabled}
+            toggleBackground={toggleBackground}
+          />
+        </Box>
+        <FloatingChat />
+        <Footer />
+      </Box>
     </ThemeProvider>
   );
 }

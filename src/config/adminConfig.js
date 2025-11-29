@@ -23,6 +23,7 @@ export const TABLE_CONFIG = {
       "imagenes",
     ],
     displayFields: [
+      "imagen",
       "nombre",
       "descripcion",
       "precio",
@@ -41,7 +42,14 @@ export const TABLE_CONFIG = {
     deleteEndpoint: "/usuarios/permanent/:id",
     softDeleteEndpoint: "/usuarios/:id",
     editableFields: ["nombre", "rol"],
-    displayFields: ["nombre", "correo", "rol", "createdAt", "isDeleted"],
+    displayFields: [
+      "fotoPerfil",
+      "nombre",
+      "correo",
+      "rol",
+      "createdAt",
+      "isDeleted",
+    ],
   },
   Pedidos: {
     endpoint: "/pedidos",
@@ -71,6 +79,7 @@ export const TABLE_CONFIG = {
     endpoint: "/reviews",
     restoreEndpoint: "/reviews/restore/:id",
     softDeleteEndpoint: "/reviews/:id",
+    deleteEndpoint: "/reviews/permanent/:id",
     editableFields: [],
     displayFields: [
       "productId",
@@ -126,7 +135,7 @@ export const FIELD_TYPES = {
   precio: "number",
   stock: "number",
   rating: { type: "number", min: 1, max: 5 },
-  disponible: "select",
+  disponible: "boolean",
   rol: "select",
   estado: "select",
   comentario: "multiline",
@@ -192,5 +201,5 @@ export const THEME = {
   primaryColor: "#D4AF37",
   darkColor: "#000",
   drawerWidth: 240,
-  itemsPerPage: 5,
+  itemsPerPage: 10,
 };

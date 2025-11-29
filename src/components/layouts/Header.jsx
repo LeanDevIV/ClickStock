@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CarritoPreview from "../cart/CarritoPreview";
 import {
   AppBar,
@@ -15,6 +15,8 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Divider,
+  useTheme,
 } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
 import {
@@ -26,6 +28,7 @@ import {
   Brightness7,
   BlurOn,
   BlurOff,
+  AdminPanelSettings,
 } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 import { useStore } from "../../hooks/useStore";
@@ -79,6 +82,7 @@ export const Header = ({
   backgroundEnabled,
   toggleBackground,
 }) => {
+  const theme = useTheme();
   const [showCarrito, setShowCarrito] = useState(false);
   const handleOpenPreview = () => setShowCarrito(true);
   const handleClosePreview = () => setShowCarrito(false);
@@ -145,6 +149,7 @@ export const Header = ({
           ClickStock
         </Link>
       </Box>
+      <Divider />
       <List>
         {navLinks.map((item) => (
           <ListItem key={item.title} disablePadding>
@@ -158,28 +163,98 @@ export const Header = ({
           </ListItem>
         ))}
       </List>
+      <Divider />
+      {/* Mobile Actions in Drawer */}
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton onClick={handleOpenPreview}>
+            <Box sx={{ display: "flex", alignItems: "center", mx: "auto" }}>
+              <Badge badgeContent={totalArticulos} color="error" sx={{ mr: 1 }}>
+                <ShoppingCart />
+              </Badge>
+              <ListItemText primary="Carrito" />
+            </Box>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton onClick={toggleBackground}>
+            <Box sx={{ display: "flex", alignItems: "center", mx: "auto" }}>
+              {backgroundEnabled ? (
+                <BlurOn sx={{ mr: 1 }} />
+              ) : (
+                <BlurOff sx={{ mr: 1 }} />
+              )}
+              <ListItemText
+                primary={backgroundEnabled ? "Fondo On" : "Fondo Off"}
+              />
+            </Box>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
+          <ListItemButton onClick={toggleModo}>
+            <Box sx={{ display: "flex", alignItems: "center", mx: "auto" }}>
+              {modoOscuro ? (
+                <Brightness7 sx={{ mr: 1 }} />
+              ) : (
+                <Brightness4 sx={{ mr: 1 }} />
+              )}
+              <ListItemText primary={modoOscuro ? "Claro" : "Oscuro"} />
+            </Box>
+          </ListItemButton>
+        </ListItem>
+
+        {user?.rol === "admin" && (
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/admin">
+              <Box sx={{ display: "flex", alignItems: "center", mx: "auto" }}>
+                <AdminPanelSettings
+                  sx={{ mr: 1, color: theme.palette.warning.main }}
+                />
+                <ListItemText primary="Panel Admin" />
+              </Box>
+            </ListItemButton>
+          </ListItem>
+        )}
+
+        <ListItem disablePadding>
+          {user ? (
+            <ListItemButton onClick={handleLogout}>
+              <Box sx={{ display: "flex", alignItems: "center", mx: "auto" }}>
+                <Person sx={{ mr: 1 }} />
+                <ListItemText primary="Cerrar Sesión" />
+              </Box>
+            </ListItemButton>
+          ) : (
+            <ListItemButton onClick={handleOpenAuth}>
+              <Box sx={{ display: "flex", alignItems: "center", mx: "auto" }}>
+                <Person sx={{ mr: 1 }} />
+                <ListItemText primary="Ingresar" />
+              </Box>
+            </ListItemButton>
+          )}
+        </ListItem>
+      </List>
     </Box>
   );
-
-  const location = useLocation();
-  const isHome = location.pathname === "/";
 
   return (
     <>
       <AppBar
-        position="fixed" // Changed to fixed for better glass effect overlay
-        color="transparent" // Transparent base
+        position="fixed"
+        color="transparent"
         elevation={isScrolled ? 4 : 0}
         className={`navbar-transition ${
           showNavbar ? "navbar-visible" : "navbar-hidden"
         } ${isScrolled ? "glass-navbar" : "transparent-navbar"}`}
         sx={{
-          color: isHome && !isScrolled ? "#FFFFFF" : "text.primary",
+          color: "text.primary",
           transition: "all 0.3s ease",
           bgcolor: isScrolled
             ? modoOscuro
-              ? "rgba(18, 18, 18, 0.7)"
-              : "rgba(255, 255, 255, 0.7)"
+              ? "rgba(18, 18, 18, 0.8)"
+              : "rgba(255, 255, 255, 0.8)"
             : "transparent",
         }}
       >
@@ -200,19 +275,7 @@ export const Header = ({
               </Link>
             </Box>
 
-            {/* Mobile Menu Button */}
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-              <IconButton
-                size="large"
-                aria-label="menu"
-                onClick={handleDrawerToggle}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-            </Box>
-
-            {/* Logo Mobile */}
+            {/* Logo Mobile (Moved to start) */}
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               <Link
                 to="/"
@@ -248,11 +311,11 @@ export const Header = ({
               ))}
             </Box>
 
-            {/* Search, Cart, Dark Mode, User */}
+            {/* Actions (Search, Cart, etc.) - Hidden on Mobile */}
             <Box
               sx={{
                 flexGrow: 0,
-                display: "flex",
+                display: { xs: "none", md: "flex" }, // Hide on mobile
                 alignItems: "center",
                 gap: 1,
               }}
@@ -289,6 +352,19 @@ export const Header = ({
                 {modoOscuro ? <Brightness7 /> : <Brightness4 />}
               </IconButton>
 
+              {user?.rol === "admin" && (
+                <Tooltip title="Panel de Administración">
+                  <IconButton
+                    component={Link}
+                    to="/admin"
+                    color="inherit"
+                    sx={{ color: theme.palette.warning.main }}
+                  >
+                    <AdminPanelSettings />
+                  </IconButton>
+                </Tooltip>
+              )}
+
               {user ? (
                 <UserMenu
                   user={user}
@@ -307,6 +383,18 @@ export const Header = ({
                 </Button>
               )}
             </Box>
+
+            {/* Mobile Menu Button (Moved to end) */}
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+              <IconButton
+                size="large"
+                aria-label="menu"
+                onClick={handleDrawerToggle}
+                color="inherit"
+              >
+                <MenuIcon />
+              </IconButton>
+            </Box>
           </Toolbar>
         </Container>
       </AppBar>
@@ -314,6 +402,7 @@ export const Header = ({
       {/* Mobile Drawer */}
       <nav>
         <Drawer
+          anchor="right" // Open from right
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}

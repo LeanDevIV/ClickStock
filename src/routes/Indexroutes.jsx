@@ -13,6 +13,7 @@ import PromocionesPage from "../pages/admin/PromocionesPage.jsx";
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
 import CarritoPage from "../pages/checkout/CarritoPage.jsx";
 import SearchResults from "../pages/shop/SearchResults.jsx";
+import AdminHome from "../pages/admin/AdminHome.jsx";
 
 function IndexRoutes({
   modoOscuro,
@@ -47,6 +48,7 @@ function IndexRoutes({
           {/* ✅ Dinámica */}
           {/* Layout administrativo */}
           <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminHome />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="pedidos" element={<PedidosPage />} />
             <Route path="promociones" element={<PromocionesPage />} />

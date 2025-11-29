@@ -38,7 +38,7 @@ export const AdminSidebar = ({ selectedSection, onSelectSection }) => {
         width: 200,
         justifyContent: "flex-start",
         alignItems: "stretch",
-        backgroundColor: muiTheme.palette.background.paper,
+        backgroundColor: "transparent",
         overflowY: "auto",
         maxHeight: "calc(100vh - 200px)",
       }}
@@ -60,12 +60,10 @@ export const AdminSidebar = ({ selectedSection, onSelectSection }) => {
           <Button
             key={item.section}
             onClick={() => onSelectSection(item.section)}
-            variant={isSelected ? "contained" : "outlined"}
+            variant={isSelected ? "contained" : "text"}
             sx={{
               bgcolor: isSelected ? primary : "transparent",
               color: isSelected ? contrast : primary,
-              borderColor: primary,
-              borderWidth: "2px",
               fontWeight: "bold",
               textTransform: "none",
               fontSize: "0.9rem",
@@ -75,7 +73,10 @@ export const AdminSidebar = ({ selectedSection, onSelectSection }) => {
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-start",
-              "&:hover": { transform: "scale(1.02)" },
+              "&:hover": {
+                transform: "scale(1.02)",
+                bgcolor: isSelected ? primary : "rgba(255, 255, 255, 0.05)",
+              },
             }}
           >
             {buttonContent}

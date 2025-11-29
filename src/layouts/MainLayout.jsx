@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { Header } from "../components/layouts/Header";
+import { Toolbar, Box } from "@mui/material";
 
 export const MainLayout = ({
   modoOscuro,
@@ -15,9 +16,12 @@ export const MainLayout = ({
         backgroundEnabled={backgroundEnabled}
         toggleBackground={toggleBackground}
       />
-      <main className="p-4">
-        <Outlet />
-      </main>
+      <Toolbar />
+      <Box sx={{ mt: 3 }}>
+        <main className="p-4">
+          <Outlet />
+        </main>
+      </Box>
     </>
   );
 };

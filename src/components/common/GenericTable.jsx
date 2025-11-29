@@ -30,6 +30,7 @@ export const GenericTable = ({
   onRefresh,
   onCreate,
   categorias = [],
+  onUpdateImage,
 }) => {
   const [showDeleted, setShowDeleted] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -48,6 +49,8 @@ export const GenericTable = ({
   // Construir headers basado en displayFields
   const tableHeader = config.displayFields.map((field) => {
     const labels = {
+      fotoPerfil: "Foto",
+      imagen: "Imagen",
       nombre: "Nombre",
       nombreUsuario: "Usuario",
       descripcion: "Descripción",
@@ -98,24 +101,6 @@ export const GenericTable = ({
 
   return (
     <Box sx={{ width: "100%", overflow: "hidden" }}>
-      <TableControls
-        onRefresh={onRefresh}
-        showDeletedLabel="Mostrar eliminados"
-        showDeletedInitial={true}
-        onShowDeletedChange={setShowDeleted}
-        onAdd={() => setShowCreateModal(true)}
-        showDeletedSwitch={shouldShowDeleted}
-      />
-
-      {/* Modal de Creación */}
-      <CreateItemModal
-        open={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onCreate={onCreate}
-        section={section}
-        config={config}
-      />
-
       {/* Tabla con scroll horizontal solo si es necesario */}
       <TableContainer
         component={Paper}
@@ -123,21 +108,31 @@ export const GenericTable = ({
           width: "100%",
           overflowX: "auto",
           WebkitOverflowScrolling: "touch",
+          backgroundColor: "transparent",
+          backgroundImage: "none",
+          boxShadow: "none",
         }}
       >
-        <Table sx={{ minWidth: { xs: 320, sm: 500 } }}>
+        <Table
+          sx={{
+            minWidth: { xs: 320, sm: 500 },
+          }}
+        >
           <TableHead>
-            <TableRow sx={{ bgcolor: THEME.primaryColor }}>
+            <TableRow>
               {tableHeader.map((cell) => (
                 <TableCell
                   key={cell.key}
                   sx={{
-                    color: THEME.darkColor,
+                    color: THEME.primaryColor,
                     fontWeight: "bold",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.1em",
+                    borderBottom: `1px solid ${THEME.primaryColor}`,
                     textAlign: cell.align || "left",
                     minWidth: cell.key === "actions" ? "100px" : "80px",
                     padding: { xs: "8px 4px", sm: "16px" },
-                    fontSize: { xs: "0.7rem", sm: "0.875rem" },
+                    fontSize: { xs: "0.7rem", sm: "0.75rem" },
                   }}
                 >
                   {cell.label}
@@ -163,6 +158,7 @@ export const GenericTable = ({
                   onSoftDelete={onSoftDelete}
                   onHardDelete={onHardDelete}
                   categorias={categorias}
+                  onUpdateImage={onUpdateImage}
                 />
               ))
             ) : (
@@ -185,6 +181,36 @@ export const GenericTable = ({
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Box sx={{ mt: 2 }}>
+        <TableControls
+          onRefresh={onRefresh}
+          showDeletedLabel="Mostrar eliminados"
+          showDeletedInitial={true}
+          onShowDeletedChange={setShowDeleted}
+          onAdd={
+            [
+              "Promociones",
+              "Reseñas",
+              "Soporte",
+              "Pedidos",
+              "Usuarios",
+            ].includes(section)
+              ? undefined
+              : () => setShowCreateModal(true)
+          }
+          showDeletedSwitch={shouldShowDeleted}
+        />
+      </Box>
+
+      {/* Modal de Creación */}
+      <CreateItemModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={onCreate}
+        section={section}
+        config={config}
+      />
     </Box>
   );
 };

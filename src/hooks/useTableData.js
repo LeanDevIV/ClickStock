@@ -75,7 +75,23 @@ export const useTableData = (section, options = {}) => {
         }
 
         const endpoint = config.updateEndpoint.replace(":id", id);
-        await clientAxios.put(endpoint, editedData);
+
+        // Sanitizar datos antes de enviar (convertir objetos poblados a IDs)
+        const dataToSend = { ...editedData };
+        Object.keys(dataToSend).forEach((key) => {
+          const value = dataToSend[key];
+          if (
+            value &&
+            typeof value === "object" &&
+            !Array.isArray(value) &&
+            !(value instanceof File) &&
+            (value._id || value.id)
+          ) {
+            dataToSend[key] = value._id || value.id;
+          }
+        });
+
+        await clientAxios.put(endpoint, dataToSend);
 
         setData((prev) =>
           prev.map((item) => {
@@ -145,7 +161,6 @@ export const useTableData = (section, options = {}) => {
         background: "#1e1e1e",
         color: "#fff",
       });
-
       if (!result.isConfirmed) {
         return;
       }
@@ -241,6 +256,9 @@ export const useTableData = (section, options = {}) => {
           endpoint
         );
 
+        // Obtener usuario actual para actualización optimista
+        const currentUser = useStore.getState().user;
+
         // Usar la respuesta del servidor que incluye deletedBy y deletedAt
         setData((prev) =>
           prev.map((item) =>
@@ -248,6 +266,8 @@ export const useTableData = (section, options = {}) => {
               ? productoActualizado.producto || {
                   ...item,
                   isDeleted: true,
+                  deletedBy: currentUser, // Inyectar usuario actual
+                  deletedAt: new Date(),
                   ...(section === "Productos" ? { disponible: false } : {}),
                 }
               : item
@@ -420,6 +440,66 @@ export const useTableData = (section, options = {}) => {
           });
         }
         console.error("Error creating item:", err);
+      }
+    },
+    handleUpdateImage: async (id, field, value, directory) => {
+      try {
+        let url = value;
+
+        // Si es un archivo, subirlo primero
+        if (value instanceof File) {
+          Swal.fire({
+            title: "Subiendo imagen...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+            background: "#1e1e1e",
+            color: "#fff",
+          });
+
+          url = await subirArchivo(value, directory);
+        }
+
+        // Preparar datos para actualizar
+        const dataToUpdate = {};
+        if (field === "imagenes") {
+          dataToUpdate[field] = [url];
+        } else {
+          dataToUpdate[field] = url;
+        }
+
+        const endpoint = config.updateEndpoint.replace(":id", id);
+        await clientAxios.put(endpoint, dataToUpdate);
+
+        // Actualizar estado local
+        setData((prev) =>
+          prev.map((item) => {
+            if (item._id === id) {
+              return { ...item, ...dataToUpdate };
+            }
+            return item;
+          })
+        );
+
+        Swal.fire({
+          icon: "success",
+          title: "¡Imagen actualizada!",
+          showConfirmButton: false,
+          timer: 1500,
+          background: "#1e1e1e",
+          color: "#fff",
+        });
+      } catch (err) {
+        console.error("Error updating image:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo actualizar la imagen",
+          confirmButtonColor: "#D4AF37",
+          background: "#1e1e1e",
+          color: "#fff",
+        });
       }
     },
     setEditingId,
