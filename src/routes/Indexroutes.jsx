@@ -8,12 +8,13 @@ import ProductDetail from "../pages/shop/ProductDetail.jsx";
 import AdminLayout from "../layouts/AdminLayout";
 import PedidosPage from "../pages/admin/PedidosPage.jsx";
 import ScrollToTop from "../components/layouts/ScrollToTop.jsx";
-import ProductList from "../pages/shop/ProductList.jsx"; // ✅ Importamos la página de productos
+import ProductList from "../pages/shop/ProductList.jsx";
 import PromocionesPage from "../pages/admin/PromocionesPage.jsx";
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
 import CarritoPage from "../pages/checkout/CarritoPage.jsx";
 import SearchResults from "../pages/shop/SearchResults.jsx";
 import AdminHome from "../pages/admin/AdminHome.jsx";
+import FavoritosPage from "../pages/user/FavoritosPage.jsx";
 
 function IndexRoutes({
   modoOscuro,
@@ -42,6 +43,7 @@ function IndexRoutes({
           <Route path="/contacto" element={<Contact />} />
           <Route path="/productos" element={<ProductList />} />
           <Route path="/buscar" element={<SearchResults />} />
+          <Route path="/favoritos" element={<FavoritosPage />} />
 
           {/* ✅ Página de productos */}
           <Route path="/producto/detalle/:id" element={<ProductDetail />} />
