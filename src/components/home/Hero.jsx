@@ -12,18 +12,18 @@ const HeroHomePage = () => {
   const slides = [
     {
       image: "https://i.imgur.com/WQCfEbH.jpeg",
-      link: "/productos",
+      link: "/nosotros",
     },
     {
       image: "https://i.imgur.com/27tgbdE.jpeg",
-      link: "/productos",
+      link: "/contacto",
     },
     {
       image: "https://i.imgur.com/Db3z0Pj.jpeg",
       title: "Control Total",
       description: "Gestiona cada aspecto de tu inventario con precisión.",
       buttonText: "Empezar Ahora",
-      link: "/productos",
+      link: "/contacto",
     },
     {
       image: "https://i.imgur.com/ZBRU7yI.jpeg",

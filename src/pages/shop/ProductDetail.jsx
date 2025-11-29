@@ -114,10 +114,10 @@ const ProductDetail = () => {
         </Alert>
         <Button
           variant="contained"
-          onClick={() => navigate("/productos")}
+          onClick={() => navigate("/")}
           startIcon={<ArrowBack />}
         >
-          Volver a Productos
+          Volver a Inicio
         </Button>
       </Container>
     );
@@ -131,10 +131,10 @@ const ProductDetail = () => {
         </Alert>
         <Button
           variant="contained"
-          onClick={() => navigate("/productos")}
+          onClick={() => navigate("/")}
           startIcon={<ArrowBack />}
         >
-          Volver a Productos
+          Volver a Inicio
         </Button>
       </Container>
     );
@@ -150,7 +150,7 @@ const ProductDetail = () => {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Button
           startIcon={<ArrowBack />}
-          onClick={() => navigate("/productos")}
+          onClick={() => navigate("/")}
           sx={{
             mb: 3,
             color: "text.secondary",
@@ -159,7 +159,7 @@ const ProductDetail = () => {
             },
           }}
         >
-          Volver a productos
+          Volver a Inicio
         </Button>
 
         <Grid container spacing={4}>
@@ -355,7 +355,7 @@ const ProductDetail = () => {
 
               <Button
                 variant="outlined"
-                onClick={() => navigate("/productos")}
+                onClick={() => navigate("/")}
                 sx={{
                   py: 1.5,
                   borderRadius: 2,

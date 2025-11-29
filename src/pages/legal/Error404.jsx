@@ -91,7 +91,7 @@ export default function NotFound404() {
 
               <Button
                 component={Link}
-                to="/productos"
+                to="/"
                 variant="outlined"
                 sx={{
                   borderColor: colors.cornellRed,
