@@ -9,6 +9,7 @@ import FloatingChat from "./components/home/Chatbot.jsx";
 import { getItem, setItem } from "./utils/localStorageHelper";
 import LiquidEther from "./styles/liquid-ether/LiquidEther.jsx";
 import WelcomeScreen from "./styles/welcome-screen/WelcomeScreen.jsx";
+import BannerPromocional from "./components/common/BannerPromocional.jsx";
 
 function App() {
   const [modoOscuro, setModoOscuro] = useState(() => {
@@ -40,6 +41,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <BannerPromocional />
       {globalStyles(theme, modoOscuro)}
       <Toaster
         position="top-right"

@@ -38,32 +38,45 @@ function BannerPromocional() {
   if (!visible) return null;
 
   return (
-    <Slide direction="down" in={!cerrado} mountOnEnter unmountOnExit>
+    <Slide direction="right" in={!cerrado} mountOnEnter unmountOnExit>
       <Box
         sx={{
-          width: "100%",
-          bgcolor: "primary.main",
-          color: "white",
-          textAlign: "center",
-          p: 1.5,
           position: "fixed",
-          top: 0,
-          left: 0,
+          bottom: 24,
+          left: 24,
           zIndex: 1300,
+          bgcolor: "background.paper", // Usar color de fondo del tema para mejor contraste
+          color: "text.primary",
+          boxShadow: 6,
+          borderRadius: 50, // Forma de píldora
+          px: 3,
+          py: 1,
           display: "flex",
-          justifyContent: "center",
           alignItems: "center",
+          gap: 2,
+          border: "1px solid",
+          borderColor: "divider",
+          maxWidth: "90%",
+          width: "auto",
         }}
       >
-        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: 600, fontSize: "0.9rem" }}
+        >
           {mensajes[indice]}
         </Typography>
         <IconButton
           onClick={handleCerrar}
-          sx={{ position: "absolute", right: 10, color: "white" }}
           size="small"
+          sx={{
+            color: "text.secondary",
+            p: 0.5,
+            ml: 1,
+            "&:hover": { color: "error.main" },
+          }}
         >
-          <CloseIcon />
+          <CloseIcon fontSize="small" />
         </IconButton>
       </Box>
     </Slide>
