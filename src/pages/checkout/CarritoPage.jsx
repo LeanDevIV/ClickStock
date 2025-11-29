@@ -147,9 +147,6 @@ const CarritoPage = () => {
 
   const [tempQuantities, setTempQuantities] = useState({});
 
-  /**
-   * Lógica para los botones de incremento (+) y decremento (-).
-   */
   const handleStepChange = useCallback(
     async (idProducto, delta, stockReal) => {
       const productoActual = articulos.find((p) => p.idProducto === idProducto);
@@ -173,18 +170,9 @@ const CarritoPage = () => {
     },
     [articulos, loading, actualizarCantidad]
   );
-
-  /**
-   * Función que maneja la escritura en el TextField (solo actualiza el estado local).
-   */
   const handleManualChange = useCallback((idProducto, e) => {
     setTempQuantities((prev) => ({ ...prev, [idProducto]: e.target.value }));
   }, []);
-
-  /**
-   * Función que se ejecuta cuando el usuario sale del input (pierde el foco).
-   * Aquí se aplica la validación, corrección a 1 si es inválido, y se actualiza el estado global.
-   */
   const handleBlur = useCallback(
     async (idProducto, e, stockReal, productoActual) => {
       let valorInput = e.target.value;
@@ -220,10 +208,6 @@ const CarritoPage = () => {
     },
     [actualizarCantidad]
   );
-
-  /**
-   * Función que renderiza el control de cantidad usando TextField y botones.
-   */
   const renderQuantityControl = (producto) => {
     const { idProducto, cantidad } = producto;
     const stockReal = producto.stock || 0;
@@ -252,7 +236,6 @@ const CarritoPage = () => {
         alignItems="center"
         sx={{ minWidth: 120 }}
       >
-        {/* Botón de Decremento (-) */}
         <IconButton
           size="small"
           onClick={() => handleStepChange(idProducto, -1, stockReal)}
@@ -261,8 +244,6 @@ const CarritoPage = () => {
         >
           <Remove fontSize="small" />
         </IconButton>
-
-        {/* TextField para entrada manual */}
         <TextField
           type="number"
           value={inputValue}
@@ -539,7 +520,6 @@ const CarritoPage = () => {
                         <Box
                           sx={{ display: "flex", alignItems: "center", gap: 2 }}
                         >
-                          {/* Detalles del producto (Imagen, Nombre, Precios) */}
                           <Badge
                             badgeContent={producto.cantidad}
                             color={hayErrorStock ? "warning" : "error"}
@@ -613,7 +593,6 @@ const CarritoPage = () => {
                                 producto.precio * producto.cantidad
                               ).toLocaleString()}
                             </Typography>
-                            {/* --- STOCK DISPONIBLE --- */}
                             <Typography
                               variant="caption"
                               fontWeight="bold"
@@ -623,14 +602,10 @@ const CarritoPage = () => {
                               {stockText}
                             </Typography>
                           </Box>
-
-                          {/* CONTROL DE CANTIDAD CON TEXTFIELD Y BOTONES */}
                           <Stack spacing={1} alignItems="flex-end">
                             <Box sx={{ minWidth: 120, maxWidth: 140 }}>
                               {renderQuantityControl(producto)}
                             </Box>
-
-                            {/* Mensajes de error por cantidad máxima */}
                             {stockReal > 0 &&
                               producto.cantidad >= limiteMaximo && (
                                 <Typography
@@ -645,8 +620,6 @@ const CarritoPage = () => {
                                   Máximo alcanzado ({limiteMaximo} uds.)
                                 </Typography>
                               )}
-
-                            {/* Botón de Eliminar (ÚNICA FORMA DE ELIMINAR) */}
                             <IconButton
                               size="small"
                               onClick={() => handleEliminar(producto)}
@@ -669,8 +642,6 @@ const CarritoPage = () => {
             </Stack>
           )}
         </Box>
-
-        {/* Resumen del Pedido (Sidebar) */}
         {articulos.length > 0 && user && (
           <Box sx={{ width: { xs: "100%", md: 400 } }}>
             {loading ? (
@@ -798,8 +769,6 @@ const CarritoPage = () => {
           </Box>
         )}
       </Box>
-
-      {/* Snackbar de redirección */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={4000}
@@ -814,8 +783,6 @@ const CarritoPage = () => {
           Redirigiendo a Mercado Pago... Se abrirá en una nueva pestaña
         </Alert>
       </Snackbar>
-
-      {/* Modal de autenticación */}
       <AuthModal
         show={showAuthModal}
         handleClose={() => setShowAuthModal(false)}

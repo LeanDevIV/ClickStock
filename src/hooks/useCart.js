@@ -11,10 +11,6 @@ import toast from "react-hot-toast";
 
 export const useCart = () => {
   const { cart, setCart, cartLoading, setCartLoading, token } = useStore();
-
-  /**
-   * Carga el carrito del usuario desde el servidor
-   */
   const cargarCarrito = useCallback(async () => {
     if (!token) {
       setCart({ productos: [], total: 0, totalArticulos: 0 });
