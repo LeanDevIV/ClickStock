@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Box,
   Card,
@@ -21,18 +20,25 @@ import {
   Paper,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import {
   AddCircle as AddCircleIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   LocalShipping as LocalShippingIcon,
+  Warning as WarningIcon, 
 } from "@mui/icons-material";
 import CrearPedidosModal from "./CrearPedidosModal.jsx";
 import EditarPedidosModal from "./EditarPedidosModal.jsx";
 import "../../styles/tablaPedidos.css";
 import clientaxios from "../../utils/clientAxios.js";
 import { Toaster, toast } from "react-hot-toast";
+
 const TablaPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -40,13 +46,24 @@ const TablaPedidos = () => {
   const [pedidoEditando, setPedidoEditando] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState("todos");
 
+  const [confirmarBorrado, setConfirmarBorrado] = useState(false);
+  const [pedidoAEliminar, setPedidoAEliminar] = useState(null);
+  const [cargandoEliminar, setCargandoEliminar] = useState(false);
+
   const obtenerPedidos = async () => {
     try {
       setCargando(true);
-      const { data } = await axios.get("http://localhost:5000/api/pedidos");
+      const { data } = await clientaxios.get("/pedidos");
       setPedidos(data.pedidos || data);
     } catch (error) {
       console.error("Error al obtener los pedidos:", error);
+      if (error.response && error.response.status === 401) {
+        toast.error(
+          "No autorizado. Necesitas iniciar sesión como administrador."
+        );
+      } else {
+        toast.error("Error al cargar los pedidos.");
+      }
     } finally {
       setCargando(false);
     }
@@ -61,33 +78,40 @@ const TablaPedidos = () => {
     setModalCrearAbierto(false);
   };
 
-  const manejarEditarPedido = async (pedidoActualizado) => {
-    try {
-      await axios.put(
-        `http://localhost:5000/api/pedidos/${pedidoActualizado._id}`,
-        pedidoActualizado,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setPedidoEditando(null);
-    } catch (err) {
-      alert("Error al editar pedido: " + err.message);
-    }
+  const manejarPedidoEditado = (pedidoActualizado) => {
+    setPedidos((prev) =>
+      prev.map((p) => (p._id === pedidoActualizado._id ? pedidoActualizado : p))
+    );
+    setPedidoEditando(null);
   };
+  const iniciarEliminarPedido = (pedido) => {
+    setPedidoAEliminar(pedido);
+    setConfirmarBorrado(true);
+  };
+  const ejecutarEliminarPedido = async () => {
+    if (!pedidoAEliminar) return;
 
-  const manejarEliminarPedido = async (pedidoId) => {
-    if (!window.confirm("¿Seguro que deseas eliminar este pedido?")) return;
+    setCargandoEliminar(true);
+    const toastId = toast.loading("Eliminando pedido y restaurando stock...");
+
     try {
-      setPedidos((prev) => prev.filter((p) => p._id !== pedidoId));
+      await clientaxios.delete(`/pedidos/${pedidoAEliminar._id}`);
+      setPedidos((prev) => prev.filter((p) => p._id !== pedidoAEliminar._id));
 
-      await axios.delete(`http://localhost:5000/api/pedidos/${pedidoId}`);
-
-      toast.success("Pedido eliminado correctamente");
+      toast.success("Pedido eliminado correctamente y stock restaurado", {
+        id: toastId,
+      });
+      setConfirmarBorrado(false);
+      setPedidoAEliminar(null);
     } catch (err) {
-      alert("Error al eliminar pedido: " + err.message);
+      console.error("Error al eliminar pedido:", err);
+      toast.error(
+        "Error al eliminar pedido: " +
+          (err.response?.data?.error || err.message),
+        { id: toastId }
+      );
+    } finally {
+      setCargandoEliminar(false);
     }
   };
 
@@ -118,6 +142,7 @@ const TablaPedidos = () => {
 
   return (
     <Box className="contenedor-principal">
+      <Toaster />
       <Grid
         container
         justifyContent="space-between"
@@ -213,22 +238,40 @@ const TablaPedidos = () => {
                   <TableCell className="tabla-celda-cabecera tabla-celda-cliente">
                     Cliente
                   </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-productos">
+                  <TableCell
+                    className="tabla-celda-cabecera tabla-celda-productos"
+                    sx={{ width: "30%" }}
+                  >
                     Productos
                   </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-productos">
+                  <TableCell
+                    className="tabla-celda-cabecera tabla-celda-productos"
+                    sx={{ width: "20%" }}
+                  >
                     Dirección de Envío
                   </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-total">
+                  <TableCell
+                    className="tabla-celda-cabecera tabla-celda-total"
+                    sx={{ width: "10%" }}
+                  >
                     Total
                   </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-estado">
+                  <TableCell
+                    className="tabla-celda-cabecera tabla-celda-estado"
+                    sx={{ width: "10%" }}
+                  >
                     Estado
                   </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-fecha">
+                  <TableCell
+                    className="tabla-celda-cabecera tabla-celda-fecha"
+                    sx={{ width: "15%" }}
+                  >
                     Fecha
                   </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-acciones">
+                  <TableCell
+                    className="tabla-celda-cabecera tabla-celda-acciones"
+                    sx={{ width: "5%" }}
+                  >
                     Acciones
                   </TableCell>
                 </TableRow>
@@ -268,20 +311,37 @@ const TablaPedidos = () => {
                       <TableCell className="tabla-celda tabla-celda-cliente">
                         <Typography className="texto-cliente">
                           {pedido.usuario?.nombre || "Cliente no disponible"}
-                          {pedido.usuario?.correo || "Email no disponible"}
                         </Typography>
                         <Typography
                           className="texto-email"
                           title={
                             pedido.usuario?.correo || "Email no disponible"
                           }
+                          variant="caption"
+                          color="text.secondary"
                         >
                           {pedido.usuario?.correo || "Email no disponible"}
                         </Typography>
                       </TableCell>
 
-                      <TableCell className="tabla-celda tabla-celda-productos">
-                        <Box className="contenedor-chips">
+                      <TableCell
+                        className="tabla-celda tabla-celda-productos"
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 0.5,
+                          py: 1,
+                          alignItems: "center",
+                        }}
+                      >
+                        <Box
+                          className="contenedor-chips"
+                          sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 0.5,
+                          }}
+                        >
                           {pedido.productos.map((item, idx) => (
                             <Chip
                               key={idx}
@@ -302,7 +362,7 @@ const TablaPedidos = () => {
                       </TableCell>
 
                       <TableCell className="tabla-celda">
-                        <Typography className="texto-cliente">
+                        <Typography variant="body2" className="texto-cliente">
                           {pedido.direccion || "Dirección no disponible"}
                         </Typography>
                       </TableCell>
@@ -361,7 +421,7 @@ const TablaPedidos = () => {
                           <Tooltip title="Eliminar pedido">
                             <IconButton
                               size="small"
-                              onClick={() => manejarEliminarPedido(pedido._id)}
+                              onClick={() => iniciarEliminarPedido(pedido)}
                               className="boton-accion"
                               color="error"
                             >
@@ -410,9 +470,52 @@ const TablaPedidos = () => {
         show={!!pedidoEditando}
         onHide={() => setPedidoEditando(null)}
         pedido={pedidoEditando}
-        onPedidoEditado={manejarEditarPedido}
+        onPedidoEditado={manejarPedidoEditado}
         setPedidos={setPedidos}
       />
+      
+      {/* 🆕 MODAL DE CONFIRMACIÓN DE ELIMINACIÓN (MUI Dialog) */}
+      <Dialog
+        open={confirmarBorrado}
+        onClose={() => setConfirmarBorrado(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', alignItems: 'center', color: 'red' }}>
+          <WarningIcon sx={{ mr: 1, fontSize: 30 }} />
+          {"Confirmar Eliminación de Pedido"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Estás a punto de **eliminar permanentemente el Pedido # {pedidoAEliminar?._id?.slice(-6)}**. 
+            
+            Esta acción no se puede deshacer y el stock de los productos será restaurado. ¿Estás seguro de que deseas proceder?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => {
+                setConfirmarBorrado(false);
+                setPedidoAEliminar(null);
+            }} 
+            color="primary"
+            variant="outlined"
+            disabled={cargandoEliminar}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={ejecutarEliminarPedido} 
+            color="error" 
+            variant="contained"
+            autoFocus
+            startIcon={cargandoEliminar ? <CircularProgress size={16} color="inherit" /> : <DeleteIcon />}
+            disabled={cargandoEliminar}
+          >
+            {cargandoEliminar ? "Eliminando..." : "Sí, Eliminar"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
