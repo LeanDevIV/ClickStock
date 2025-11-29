@@ -148,7 +148,7 @@ const EditarPedidosModal = ({
     const toastId = toast.loading("Eliminando pedido y restaurando stock...");
 
     try {
-      await clientaxios.delete(`/pedidos/${pedido._id}`);
+      await clientaxios.delete(`/pedidos/permanent/${pedido._id}`);
       
       setPedidos((prev) => prev.filter((p) => p._id !== pedido._id));
       

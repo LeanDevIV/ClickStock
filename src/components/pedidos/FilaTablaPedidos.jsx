@@ -7,15 +7,17 @@ import {
   IconButton,
   Tooltip,
   Box,
+  useTheme,
 } from "@mui/material";
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   LocationOn as LocationIcon,
 } from "@mui/icons-material";
-import "../../styles/filaTablaPedidos.css";
 
 const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
+  const theme = useTheme();
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("es-AR", {
       style: "currency",
@@ -31,8 +33,15 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
     });
   };
 
-  const getEstadoClass = (estado) => {
-    return `estado-chip estado-${estado}`;
+  const getEstadoColor = (estado) => {
+    const map = {
+      pendiente: "warning",
+      procesando: "info",
+      enviado: "primary",
+      entregado: "success",
+      cancelado: "error",
+    };
+    return map[estado] || "default";
   };
 
   const getEstadoText = (estado) => {
@@ -47,52 +56,76 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
   };
 
   return (
-    <TableRow className="fila-pedido">
-      <TableCell className="celda-numero">{index + 1}</TableCell>
-      <TableCell className="celda-cliente">
-        <Box>
-          <Typography className="texto-cliente" variant="body2">
-            {pedido.usuario?.nombre || "Cliente"}
-          </Typography>
-          <Typography className="texto-email" variant="caption">
-            {pedido.usuario?.correo || "N/A"}
-          </Typography>
-        </Box>
+    <TableRow
+      hover
+      sx={{
+        transition: "0.2s ease",
+        "&:hover": {
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? "rgba(255,255,255,0.05)"
+              : "rgba(0,0,0,0.04)",
+        },
+      }}
+    >
+      {/* Número */}
+      <TableCell sx={{ fontWeight: "bold", width: 50 }}>{index + 1}</TableCell>
+
+      {/* Cliente */}
+      <TableCell>
+        <Typography variant="body2" fontWeight="600">
+          {pedido.usuario?.nombre || "Cliente"}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          {pedido.usuario?.correo || "N/A"}
+        </Typography>
       </TableCell>
-      <TableCell className="celda-productos">
-        <Box className="contenedor-productos">
+
+      {/* Productos */}
+      <TableCell sx={{ maxWidth: 250 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 0.5,
+          }}
+        >
           {pedido.productos?.slice(0, 3).map((item, idx) => (
-            <Box key={idx} className="producto-item">
-              <Typography
-                className="nombre-producto"
-                variant="body2"
-                title={item.producto?.nombre || "Producto"}
-              >
-                {item.producto?.nombre || "Producto"}
-              </Typography>
-              <Typography className="cantidad-producto" variant="caption">
-                x{item.cantidad}
-              </Typography>
-            </Box>
+            <Chip
+              key={idx}
+              size="small"
+              variant="outlined"
+              label={`${item.producto?.nombre || "Producto"} (x${item.cantidad})`}
+              sx={{
+                maxWidth: "100%",
+                fontSize: "0.7rem",
+              }}
+            />
           ))}
+
           {pedido.productos && pedido.productos.length > 3 && (
-            <Typography className="mas-productos" variant="caption">
-              +{pedido.productos.length - 3} más...
-            </Typography>
+            <Chip
+              label={`+${pedido.productos.length - 3} más...`}
+              size="small"
+              variant="outlined"
+              sx={{
+                fontSize: "0.7rem",
+                opacity: 0.7,
+              }}
+            />
           )}
         </Box>
       </TableCell>
-      <TableCell className="celda-direccion">
-        <Box display="flex" alignItems="flex-start" gap={1}>
-          <LocationIcon
-            fontSize="small"
-            color="action"
-            sx={{ mt: 0.2, flexShrink: 0 }}
-          />
+
+      {/* Dirección */}
+      <TableCell sx={{ minWidth: 200 }}>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <LocationIcon fontSize="small" color="action" />
           <Typography
-            className="texto-direccion"
             variant="body2"
-            title={pedido.direccionEnvio || pedido.direccion || "Sin dirección"}
+            sx={{
+              wordBreak: "break-word",
+            }}
           >
             {pedido.direccionEnvio ||
               pedido.direccion ||
@@ -100,42 +133,42 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
           </Typography>
         </Box>
       </TableCell>
-      <TableCell className="celda-total">
-        <Typography variant="body2" color="black !important " fontWeight="bold">
-          {formatCurrency(pedido.total)}
-        </Typography>
+
+      {/* Total */}
+      <TableCell sx={{ fontWeight: "bold", color: theme.palette.primary.main }}>
+        {formatCurrency(pedido.total)}
       </TableCell>
-      <TableCell className="celda-estado">
+
+      {/* Estado */}
+      <TableCell>
         <Chip
           label={getEstadoText(pedido.estado)}
-          className={getEstadoClass(pedido.estado)}
+          color={getEstadoColor(pedido.estado)}
           size="small"
-          variant="filled"
+          sx={{ fontWeight: "bold" }}
         />
       </TableCell>
-      <TableCell className="celda-fecha">
+
+      {/* Fecha */}
+      <TableCell>
         <Typography variant="body2" color="text.secondary">
           {formatDate(pedido.fechaCreacion)}
         </Typography>
       </TableCell>
-      <TableCell className="celda-acciones">
-        <Box className="contenedor-botones">
+
+      {/* Acciones */}
+      <TableCell sx={{ width: 110 }}>
+        <Box sx={{ display: "flex", gap: 1 }}>
           <Tooltip title="Editar pedido">
-            <IconButton
-              size="small"
-              onClick={onEditar}
-              className="boton-accion"
-              color="primary"
-            >
+            <IconButton color="primary" size="small" onClick={onEditar}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title="Eliminar pedido">
             <IconButton
+              color="error"
               size="small"
               onClick={() => onEliminar(pedido._id)}
-              className="boton-accion"
-              color="error"
             >
               <DeleteIcon fontSize="small" />
             </IconButton>

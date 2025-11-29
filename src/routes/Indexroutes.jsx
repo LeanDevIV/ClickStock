@@ -15,6 +15,7 @@ import CarritoPage from "../pages/checkout/CarritoPage.jsx";
 import SearchResults from "../pages/shop/SearchResults.jsx";
 import AdminHome from "../pages/admin/AdminHome.jsx";
 import FavoritosPage from "../pages/user/FavoritosPage.jsx";
+import MisPedidos from "../pages/user/MisPedidos.jsx";
 
 function IndexRoutes({
   modoOscuro,
@@ -44,6 +45,7 @@ function IndexRoutes({
           <Route path="/productos" element={<ProductList />} />
           <Route path="/buscar" element={<SearchResults />} />
           <Route path="/favoritos" element={<FavoritosPage />} />
+          <Route path="/mis-pedidos" element={<MisPedidos />} />
 
           {/* ✅ Página de productos */}
           <Route path="/producto/detalle/:id" element={<ProductDetail />} />
