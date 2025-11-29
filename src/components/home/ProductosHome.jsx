@@ -16,14 +16,22 @@ import {
   Fade,
   IconButton,
   Tooltip,
+  Stack,
+  alpha,
 } from "@mui/material";
-import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Favorite,
+  FavoriteBorder,
+} from "@mui/icons-material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import { useNavigate } from "react-router-dom";
 import { useProductosFiltrados } from "../../hooks/useProductosFiltrados";
 import { useCart } from "../../hooks/useCart";
+import { useFavoritos } from "../../hooks/useFavoritos";
 
 const placeholder = () => `https://picsum.photos/id/66/300/200`;
 
@@ -37,6 +45,8 @@ function ProductosHome() {
     cargando: cargandoCarrito,
     articulos,
   } = useCart();
+
+  const { toggleFavorito, esFavorito } = useFavoritos();
 
   const scrollSuaveCategorias = () => {
     const el = document.getElementById("categorias-section");
@@ -83,6 +93,11 @@ function ProductosHome() {
     } catch (error) {
       console.error("Error al modificar el carrito:", error);
     }
+  };
+
+  const handleToggleFavorito = async (productoId, event) => {
+    event.stopPropagation();
+    await toggleFavorito(productoId);
   };
 
   useEffect(() => {
@@ -236,6 +251,7 @@ function ProductosHome() {
             {lista.map((producto) => {
               const img = obtenerUrlImagen(producto) || placeholder();
               const enCarrito = estaEnCarrito(producto._id);
+              const enFavoritos = esFavorito(producto._id);
 
               return (
                 <Card
@@ -246,7 +262,7 @@ function ProductosHome() {
                   sx={{
                     width: "100%",
                     maxWidth: 260,
-                    height: { xs: 300, sm: 320, md: 340 },
+                    height: { xs: 380, sm: 400, md: 420 }, // Increased height for name
                     borderRadius: 2,
                     border: `1px solid ${theme.palette.divider}`,
                     overflow: "hidden",
@@ -275,37 +291,102 @@ function ProductosHome() {
                       }}
                     />
 
-                    {/* BOTÓN DE CARRITO - Siempre visible */}
-                    <Tooltip
-                      title={
-                        enCarrito ? "Quitar del carrito" : "Agregar al carrito"
-                      }
-                    >
+                    {/* DESKTOP: Hover Overlay */}
+                    <Box sx={{ display: { xs: "none", md: "block" } }}>
+                      <Fade in={hoverId === producto._id} timeout={200}>
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            background: "rgba(0,0,0,0.4)",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: 2,
+                            backdropFilter: "blur(2px)",
+                          }}
+                        >
+                          <Tooltip
+                            title={
+                              enCarrito
+                                ? "Quitar del carrito"
+                                : "Agregar al carrito"
+                            }
+                          >
+                            <IconButton
+                              onClick={(e) => handleToggleCarrito(producto, e)}
+                              disabled={cargandoCarrito}
+                              sx={{
+                                backgroundColor: "white",
+                                color: theme.palette.primary.main,
+                                "&:hover": {
+                                  backgroundColor: theme.palette.primary.main,
+                                  color: "white",
+                                },
+                              }}
+                            >
+                              {enCarrito ? (
+                                <ShoppingCartCheckoutIcon />
+                              ) : (
+                                <AddShoppingCartIcon />
+                              )}
+                            </IconButton>
+                          </Tooltip>
+
+                          <Tooltip
+                            title={
+                              enFavoritos
+                                ? "Quitar de favoritos"
+                                : "Agregar a favoritos"
+                            }
+                          >
+                            <IconButton
+                              onClick={(e) =>
+                                handleToggleFavorito(producto._id, e)
+                              }
+                              sx={{
+                                backgroundColor: "white",
+                                color: enFavoritos
+                                  ? theme.palette.error.main
+                                  : theme.palette.text.secondary,
+                                "&:hover": {
+                                  backgroundColor: theme.palette.error.main,
+                                  color: "white",
+                                },
+                              }}
+                            >
+                              {enFavoritos ? <Favorite /> : <FavoriteBorder />}
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </Fade>
+                    </Box>
+
+                    {/* MOBILE: Always Visible Buttons */}
+                    <Box sx={{ display: { xs: "block", md: "none" } }}>
+                      {/* Cart Button (Top Right) */}
                       <IconButton
                         onClick={(e) => handleToggleCarrito(producto, e)}
                         disabled={cargandoCarrito}
+                        size="small"
                         sx={{
                           position: "absolute",
                           top: 8,
                           right: 8,
+                          backgroundColor: "rgba(255, 255, 255, 0.9)",
                           color: enCarrito
                             ? theme.palette.success.main
                             : theme.palette.primary.main,
-                          backgroundColor:
-                            theme.palette.mode === "dark"
-                              ? "rgba(0,0,0,0.7)"
-                              : "rgba(255,255,255,0.9)",
-                          backdropFilter: "blur(10px)",
+                          backdropFilter: "blur(4px)",
+                          boxShadow: 1,
                           "&:hover": {
-                            backgroundColor:
-                              theme.palette.mode === "dark"
-                                ? "rgba(0,0,0,0.9)"
-                                : "white",
-                            transform: "scale(1.1)",
+                            backgroundColor: "white",
                           },
-                          transition: "all 0.3s ease",
-                          width: 32,
-                          height: 32,
+                          width: 36,
+                          height: 36,
                         }}
                       >
                         {enCarrito ? (
@@ -314,28 +395,35 @@ function ProductosHome() {
                           <AddShoppingCartIcon fontSize="small" />
                         )}
                       </IconButton>
-                    </Tooltip>
 
-                    {/* HOVER: nombre sobre la imagen */}
-                    <Fade in={hoverId === producto._id} timeout={200}>
-                      <Box
+                      {/* Favorite Button (Top Left) */}
+                      <IconButton
+                        onClick={(e) => handleToggleFavorito(producto._id, e)}
+                        size="small"
                         sx={{
                           position: "absolute",
-                          bottom: 0,
-                          left: 0,
-                          width: "100%",
-                          background: "rgba(0,0,0,0.55)",
-                          color: "white",
-                          py: 1,
-                          px: 1.5,
-                          textAlign: "center",
+                          top: 8,
+                          left: 8,
+                          backgroundColor: "rgba(255, 255, 255, 0.9)",
+                          color: enFavoritos
+                            ? theme.palette.error.main
+                            : theme.palette.text.secondary,
+                          backdropFilter: "blur(4px)",
+                          boxShadow: 1,
+                          "&:hover": {
+                            backgroundColor: "white",
+                          },
+                          width: 36,
+                          height: 36,
                         }}
                       >
-                        <Typography sx={{ fontWeight: 700, fontSize: "0.95rem" }}>
-                          {producto.nombre}
-                        </Typography>
-                      </Box>
-                    </Fade>
+                        {enFavoritos ? (
+                          <Favorite fontSize="small" />
+                        ) : (
+                          <FavoriteBorder fontSize="small" />
+                        )}
+                      </IconButton>
+                    </Box>
                   </Box>
 
                   <CardContent
@@ -344,68 +432,103 @@ function ProductosHome() {
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
-                      py: 1,
+                      py: 2,
+                      px: 2,
                     }}
                   >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
+                    <Box>
+                      {/* Nombre siempre visible */}
                       <Typography
-                        sx={{ fontWeight: 800, color: theme.palette.primary.main }}
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: 700,
+                          lineHeight: 1.2,
+                          mb: 1,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          height: "2.4em", // Fixed height for alignment
+                        }}
                       >
-                        ${producto.precio?.toLocaleString()}
+                        {producto.nombre}
                       </Typography>
+
+                      <Chip
+                        label={producto.categoria?.nombre}
+                        size="small"
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontWeight: 600,
+                          backgroundColor: alpha(
+                            theme.palette.primary.main,
+                            0.1
+                          ),
+                          border: "none",
+                          mb: 2,
+                        }}
+                      />
                     </Box>
-                    <Chip
-                      label={producto.categoria?.nombre}
-                      size="small"
-                      sx={{
-                        color: theme.palette.primary.main,
-                        fontWeight: 600,
-                        backgroundColor: "transparent",
-                        border: `1px solid ${theme.palette.primary.main}10`,
-                      }}
-                    />
-                    <Box
-                      textAlign="center"
-                      sx={{
-                        borderTop: `1px solid ${theme.palette.divider}`,
-                        pt: 1,
-                        mt: 1,
-                      }}
-                    >
+
+                    <Box>
                       <Box
                         sx={{
                           display: "flex",
-                          justifyContent: "center",
+                          justifyContent: "space-between",
                           alignItems: "center",
-                          gap: 1,
+                          mb: 1,
                         }}
                       >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 800,
+                            color: theme.palette.primary.main,
+                          }}
+                        >
+                          ${producto.precio?.toLocaleString()}
+                        </Typography>
+                      </Box>
+
+                      {/* Stock explícito */}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          mt: 1,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            backgroundColor:
+                              producto.stock > 5
+                                ? theme.palette.success.main
+                                : producto.stock > 0
+                                ? theme.palette.warning.main
+                                : theme.palette.error.main,
+                          }}
+                        />
                         <Typography
                           variant="caption"
                           sx={{
                             fontWeight: 600,
-                            color: theme.palette.text.secondary,
-                          }}
-                        >
-                          {producto.stock}
-                        </Typography>
-                        <Box
-                          sx={{
-                            width: 10,
-                            height: 10,
-                            borderRadius: "50%",
-                            backgroundColor:
-                              producto.stock > 0
+                            color:
+                              producto.stock > 5
                                 ? theme.palette.success.main
+                                : producto.stock > 0
+                                ? theme.palette.warning.main
                                 : theme.palette.error.main,
                           }}
-                        />
+                        >
+                          {producto.stock > 0
+                            ? `Stock: ${producto.stock} u.`
+                            : "Sin Stock"}
+                        </Typography>
                       </Box>
                     </Box>
                   </CardContent>
