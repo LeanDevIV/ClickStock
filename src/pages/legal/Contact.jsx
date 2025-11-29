@@ -39,7 +39,6 @@ const Contacto = () => {
 
       <Container className="contact-wrapper">
         <div className="contact-grid">
-          {/* INFO IZQUIERDA */}
           <div className="contact-info-box">
             <h2 className="contact-title">
               CONTÁCTATE CON
@@ -63,13 +62,11 @@ const Contacto = () => {
             </div>
           </div>
 
-          {/* FORMULARIO */}
           <div className="contact-form-box">
             <Box
               component="form"
               onSubmit={handleSubmit(onSubmit, showValidationErrors)}
             >
-              {/* Nombre */}
               <Controller
                 name="nombre"
                 control={control}
@@ -94,7 +91,6 @@ const Contacto = () => {
                 )}
               />
 
-              {/* Email */}
               <Controller
                 name="email"
                 control={control}
@@ -119,7 +115,6 @@ const Contacto = () => {
                 )}
               />
 
-              {/* Asunto */}
               <Controller
                 name="asunto"
                 control={control}
@@ -144,7 +139,6 @@ const Contacto = () => {
                 )}
               />
 
-              {/* Mensaje */}
               <Controller
                 name="mensaje"
                 control={control}
@@ -196,7 +190,6 @@ const Contacto = () => {
             </Box>
           </div>
 
-          {/* Mapa */}
           <div className="map-container">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3560.6624139487996!2d-65.20670382466937!3d-26.83668829001595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94225c1eaa92d1d3%3A0x8d1f5b9e0ee1d3e2!2sGral.%20Paz%20234%2C%20San%20Miguel%20de%20Tucum%C3%A1n%2C%20Tucum%C3%A1n!5e0!3m2!1ses!2sar!4v1732400000000!5m2!1ses!2sar"

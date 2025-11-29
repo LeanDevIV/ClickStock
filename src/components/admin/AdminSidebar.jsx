@@ -20,7 +20,11 @@ const iconMap = {
   Promociones: PromocionesIcon,
 };
 
-export const AdminSidebar = ({ selectedSection, onSelectSection }) => {
+export const AdminSidebar = ({
+  selectedSection,
+  onSelectSection,
+  isMobile,
+}) => {
   const muiTheme = useTheme();
   const primary = muiTheme.palette.primary.main;
   const contrast =
@@ -33,14 +37,14 @@ export const AdminSidebar = ({ selectedSection, onSelectSection }) => {
         flexDirection: "column",
         gap: 1,
         p: 2,
-        borderRight: `2px solid ${primary}`,
-        minWidth: 200,
-        width: 200,
+        borderRight: isMobile ? "none" : `2px solid ${primary}`,
+        minWidth: isMobile ? "100%" : 200,
+        width: isMobile ? "100%" : 200,
         justifyContent: "flex-start",
         alignItems: "stretch",
         backgroundColor: "transparent",
         overflowY: "auto",
-        maxHeight: "calc(100vh - 200px)",
+        maxHeight: isMobile ? "100%" : "calc(100vh - 200px)",
       }}
     >
       {MENU_ITEMS.map((item) => {

@@ -1,7 +1,19 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { TextField, Button, Box, InputAdornment } from "@mui/material";
-import { Person, Email, Lock } from "@mui/icons-material";
+import {
+  TextField,
+  Button,
+  Box,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import {
+  Person,
+  Email,
+  Lock,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
 import { useStore } from "../../hooks/useStore";
 import { registroService } from "../../services/RegistroService";
 import { z } from "zod";
@@ -43,7 +55,17 @@ function RegistroForm({ setMensaje, onSuccess }) {
     resolver: zodResolver(registerSchema),
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [cargando, setCargando] = useState(false);
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowConfirmPassword = () =>
+    setShowConfirmPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -189,7 +211,7 @@ function RegistroForm({ setMensaje, onSuccess }) {
       <TextField
         fullWidth
         label="Contraseña"
-        type="password"
+        type={showPassword ? "text" : "password"}
         margin="dense"
         size="small"
         {...register("contrasenia")}
@@ -199,6 +221,19 @@ function RegistroForm({ setMensaje, onSuccess }) {
           startAdornment: (
             <InputAdornment position="start">
               <Lock />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+                sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
             </InputAdornment>
           ),
         }}
@@ -217,7 +252,7 @@ function RegistroForm({ setMensaje, onSuccess }) {
       <TextField
         fullWidth
         label="Confirmar contraseña"
-        type="password"
+        type={showConfirmPassword ? "text" : "password"}
         margin="dense"
         size="small"
         {...register("confirmarContrasenia")}
@@ -227,6 +262,19 @@ function RegistroForm({ setMensaje, onSuccess }) {
           startAdornment: (
             <InputAdornment position="start">
               <Lock />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowConfirmPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+                sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+              >
+                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
             </InputAdornment>
           ),
         }}

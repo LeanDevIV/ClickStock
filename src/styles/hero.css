@@ -1,6 +1,6 @@
 .carousel-container {
   width: 100%;
-  max-width: 100%; /* Full width */
+  max-width: 100%;
   margin: 0 auto;
   padding: 0;
   position: relative;
@@ -16,7 +16,7 @@
 
 .slide-content {
   position: relative;
-  height: 600px; /* Taller hero section */
+  height: 600px;
   overflow: hidden;
   background-color: #000;
   cursor: pointer;
@@ -27,15 +27,14 @@
   height: 100%;
   object-fit: contain;
   transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  filter: brightness(0.7) contrast(1.1); /* Darker, more contrast */
+  filter: brightness(0.7) contrast(1.1);
 }
 
 .slide-content:hover .slide-image {
   transform: scale(1.05);
-  filter: brightness(0.5); /* Darken on hover for text readability */
+  filter: brightness(0.5);
 }
 
-/* Glassmorphism Overlay */
 .slide-overlay {
   position: absolute;
   bottom: 10%;
@@ -52,7 +51,7 @@
   opacity: 0;
   transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  pointer-events: none; /* Let clicks pass through to container */
+  pointer-events: none;
 }
 
 .slide-content:hover .slide-overlay,
@@ -80,7 +79,6 @@
   color: #f0f0f0;
 }
 
-/* Minimalist Progress Bar */
 .custom-progress {
   width: 100%;
   height: 3px;
@@ -93,22 +91,16 @@
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    #d32f2f,
-    #ffd700,
-    #d32f2f
-  ); /* Red and Gold gradient */
+  background: linear-gradient(90deg, #d32f2f, #ffd700, #d32f2f);
   transition: width 0.4s ease;
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
-/* Custom Arrows */
 .splide__arrow {
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   border: 1px solid rgba(255, 215, 0, 0.2);
-  opacity: 0; /* Hidden by default */
+  opacity: 0;
   transition: all 0.3s ease;
   width: 60px;
   height: 60px;
@@ -139,7 +131,6 @@
   right: 30px;
 }
 
-/* Pagination Dots */
 .splide__pagination {
   bottom: 20px;
 }
@@ -153,7 +144,7 @@
 }
 
 .splide__pagination__page.is-active {
-  background: #d32f2f; /* Red active dot */
+  background: #d32f2f;
   transform: scale(1.4);
   box-shadow: 0 0 10px rgba(211, 47, 47, 0.8);
   border: 1px solid #ffd700;

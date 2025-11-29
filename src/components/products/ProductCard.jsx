@@ -108,7 +108,6 @@ const ProductCard = ({ producto }) => {
           }}
         />
 
-        {/* DESKTOP: Hover Overlay */}
         <Box sx={{ display: { xs: "none", md: "block" } }}>
           <Fade in={hoverId === producto._id} timeout={200}>
             <Box
@@ -174,7 +173,6 @@ const ProductCard = ({ producto }) => {
           </Fade>
         </Box>
 
-        {/* MOBILE: Always Visible Buttons */}
         <Box sx={{ display: { xs: "block", md: "none" } }}>
           <IconButton
             onClick={handleToggleCarrito}

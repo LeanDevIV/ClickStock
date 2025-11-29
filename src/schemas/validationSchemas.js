@@ -1,12 +1,10 @@
 import { z } from "zod";
 
-// Helper para validar archivos (opcional)
 export const fileSchema = z.any().refine((file) => {
-  if (!file) return true; // Opcional
+  if (!file) return true;
   return file instanceof FileList || file instanceof File;
 }, "Debe ser un archivo válido");
 
-// --- PRODUCTOS ---
 export const productoSchema = z.object({
   nombre: z
     .string()
@@ -30,12 +28,11 @@ export const productoSchema = z.object({
     .min(0, "El stock no puede ser negativo")
     .max(2500, "El stock no puede exceder los 2500")
     .default(0),
-  // Para la creación/edición en frontend, la imagen suele manejarse aparte o como File
+
   imagen: fileSchema,
   disponible: z.boolean().optional().default(true),
 });
 
-// --- PROMOCIONES ---
 export const promocionSchema = z
   .object({
     titulo: z.string().min(1, "El título es requerido").trim(),
@@ -59,11 +56,10 @@ export const promocionSchema = z
     }
   );
 
-// --- REVIEWS ---
 const onlyValidCharsRegex = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ.,!?\s-]+$/;
 const noEmojiRegex = /^[^\p{Emoji}]+$/u;
 const noRepetitionsRegex = /(.)\1{3,}/;
-const badWords = ["puta", "puto", "mierda", "fuck", "pedo"]; // Lista básica ejemplo
+const badWords = ["puta", "puto", "mierda", "fuck", "pedo"];
 
 export const reviewSchema = z.object({
   user: z
