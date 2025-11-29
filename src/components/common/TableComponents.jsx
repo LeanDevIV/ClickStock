@@ -11,6 +11,8 @@ import {
   FormControlLabel,
   Switch,
   Button,
+  Checkbox,
+  Typography,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -20,6 +22,8 @@ import {
   Delete as DeleteIcon,
   DeleteForever as DeleteForeverIcon,
   AddCircle as AddCircleIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import {
@@ -39,6 +43,7 @@ export const TableRowActions = ({
   onRestore,
   onSoftDelete,
   onHardDelete,
+  isCurrentUser,
 }) => {
   const showRestoreButton = isDeleted !== undefined;
 
@@ -112,14 +117,21 @@ export const TableRowActions = ({
           </>
         ) : (
           <>
-            <Tooltip title="Editar">
-              <IconButton
-                onClick={() => onEdit(id)}
-                sx={{ color: THEME.primaryColor }}
-                size="small"
-              >
-                <EditIcon />
-              </IconButton>
+            <Tooltip
+              title={
+                isCurrentUser ? "No puedes editar tu propio usuario" : "Editar"
+              }
+            >
+              <span>
+                <IconButton
+                  onClick={() => onEdit(id)}
+                  sx={{ color: THEME.primaryColor }}
+                  size="small"
+                  disabled={isCurrentUser}
+                >
+                  <EditIcon />
+                </IconButton>
+              </span>
             </Tooltip>
 
             {/* Botón Soft Delete (solo si no está eliminado) */}
@@ -161,6 +173,7 @@ export const EditableCell = ({
   onChange,
   isMultiline = false,
   displayValue,
+  section,
 }) => {
   if (!isEditing) {
     // Si hay un displayValue (ej: nombre de categoría), mostrarlo; si no, usar value
@@ -178,7 +191,16 @@ export const EditableCell = ({
     (typeof fieldConfig === "object" && fieldConfig.type === "select");
 
   if (isSelect) {
-    const options = SELECT_OPTIONS[field] || [];
+    let options = SELECT_OPTIONS[field] || [];
+
+    // Manejar opciones anidadas por sección (ej: estado para Pedidos vs Soporte)
+    if (!Array.isArray(options) && section && options[section]) {
+      options = options[section];
+    } else if (!Array.isArray(options)) {
+      // Si es un objeto pero no coincide la sección, intentar usar un default o array vacío
+      options = [];
+    }
+
     return (
       <FormControl size="small" fullWidth>
         <Select value={value || ""} onChange={(e) => onChange(e.target.value)}>
@@ -223,6 +245,25 @@ export const EditableCell = ({
         multiline
         rows={2}
       />
+    );
+  }
+
+  // --- BOOLEAN (Checkbox) ---
+  const isBoolean = fieldConfig === "boolean";
+  if (isBoolean) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Checkbox
+          checked={!!value}
+          onChange={(e) => onChange(e.target.checked)}
+          sx={{
+            color: THEME.primaryColor,
+            "&.Mui-checked": {
+              color: THEME.primaryColor,
+            },
+          }}
+        />
+      </Box>
     );
   }
 
@@ -277,6 +318,72 @@ export const DeletedChip = ({ isDeleted }) => (
   />
 );
 
+export const DeletedByCell = ({ value }) => {
+  const [showUid, setShowUid] = React.useState(false);
+
+  if (!value) return "-";
+
+  // Si el valor es solo un string (ej: "Admin"), mostrarlo
+  if (typeof value === "string") return value;
+
+  const name =
+    value.nombre && value.apellido
+      ? `${value.nombre} ${value.apellido}`
+      : value.nombre || value.nombreUsuario || value.name || "Admin";
+  const email = value.correo || value.emailUsuario || value.email;
+  const uid = value._id || value.id;
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+      }}
+    >
+      <Typography variant="body2" sx={{ fontSize: "0.875rem" }}>
+        {name}{" "}
+        {email && (
+          <span style={{ opacity: 0.7, fontSize: "0.8rem" }}>({email})</span>
+        )}
+      </Typography>
+      {uid && (
+        <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
+          <IconButton
+            size="small"
+            onClick={() => setShowUid(!showUid)}
+            sx={{
+              padding: 0,
+              mr: 1,
+              color: THEME.primaryColor,
+              "&:hover": { backgroundColor: "rgba(212, 175, 55, 0.1)" },
+            }}
+            title={showUid ? "Ocultar ID" : "Ver ID"}
+          >
+            {showUid ? (
+              <VisibilityOffIcon sx={{ fontSize: 16 }} />
+            ) : (
+              <VisibilityIcon sx={{ fontSize: 16 }} />
+            )}
+          </IconButton>
+          {showUid && (
+            <Typography
+              variant="caption"
+              sx={{
+                fontFamily: "monospace",
+                fontSize: "0.75rem",
+                opacity: 0.8,
+              }}
+            >
+              {uid}
+            </Typography>
+          )}
+        </Box>
+      )}
+    </Box>
+  );
+};
+
 /**
  * Componente reutilizable de controles para tablas administrativas
  * Incluye botón de refresh y toggle para mostrar eliminados
@@ -324,19 +431,21 @@ export const TableControls = ({
         Actualizar
       </Button>
 
-      <Button
-        variant="contained"
-        startIcon={<AddCircleIcon />}
-        onClick={onAdd}
-        sx={{
-          bgcolor: "success.main",
-          color: "white",
-          fontWeight: "bold",
-          "&:hover": { bgcolor: "success.dark" },
-        }}
-      >
-        Agregar
-      </Button>
+      {onAdd && (
+        <Button
+          variant="contained"
+          startIcon={<AddCircleIcon />}
+          onClick={onAdd}
+          sx={{
+            bgcolor: "success.main",
+            color: "white",
+            fontWeight: "bold",
+            "&:hover": { bgcolor: "success.dark" },
+          }}
+        >
+          Agregar
+        </Button>
+      )}
 
       {showDeletedSwitch && (
         <FormControlLabel
