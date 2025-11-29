@@ -4,7 +4,6 @@ import { LocalShipping, Dashboard, LocalOffer } from "@mui/icons-material";
 import { styled, keyframes } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 
-// Keyframe para el efecto de luz neón recorriendo los bordes
 const neonBorder = keyframes`
   0% {
     background-position: 0% 50%;
@@ -14,7 +13,6 @@ const neonBorder = keyframes`
   }
 `;
 
-// Styled Card (Contenedor Principal)
 const NeonCard = styled(Card)(({ theme }) => ({
   height: "100%",
   minHeight: "200px",
@@ -32,7 +30,6 @@ const NeonCard = styled(Card)(({ theme }) => ({
     transition: "transform 0.3s ease",
   },
 
-  // Capa del Borde Gradiente (Detrás)
   "&::before": {
     content: '""',
     position: "absolute",
@@ -57,13 +54,12 @@ const NeonCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-// Capa de Superficie (Frente - Tapa el centro del gradiente)
 const CardSurface = styled(Box)(({ theme }) => ({
   position: "relative",
   zIndex: 1,
   height: "100%",
   width: "100%",
-  // Color sólido explícito según modo
+
   backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#ffffff",
   borderRadius: "16px",
   display: "flex",
