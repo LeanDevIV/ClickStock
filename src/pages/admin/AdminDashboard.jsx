@@ -2,7 +2,17 @@ import { useState, useEffect, useMemo } from "react";
 import { useTableData } from "../../hooks/useTableData";
 import { TABLE_CONFIG, THEME, SELECT_OPTIONS } from "../../config/adminConfig";
 import { useCategoriesStore } from "../../hooks/useCategoriesStore";
-import { Box, Pagination, Typography, Button, useTheme } from "@mui/material";
+import {
+  Box,
+  Pagination,
+  Typography,
+  Button,
+  useTheme,
+  Drawer,
+  IconButton,
+  useMediaQuery,
+} from "@mui/material";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { AdminSidebar } from "../../components/admin/AdminSidebar";
 import { GenericTable } from "../../components/common/GenericTable";
 
@@ -111,6 +121,20 @@ export const AdminDashboard = () => {
     );
   };
 
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleSectionChange = (section) => {
+    setSelectedSection(section);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -135,22 +159,78 @@ export const AdminDashboard = () => {
             overflow: "hidden",
           }}
         >
-          <AdminSidebar
-            selectedSection={selectedSection}
-            onSelectSection={setSelectedSection}
-          />
-
-          <Box sx={{ flex: 1, minWidth: 0, overflow: "auto" }}>
-            <Typography
-              variant="h4"
+          {isMobile ? (
+            <Drawer
+              variant="temporary"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              ModalProps={{
+                keepMounted: true,
+              }}
               sx={{
-                mb: 2,
-                fontWeight: "bold",
-                fontSize: { xs: "1.5rem", sm: "2rem" },
+                display: { xs: "block", md: "none" },
+                "& .MuiDrawer-paper": {
+                  boxSizing: "border-box",
+                  width: 240,
+                  bgcolor: "background.paper",
+                  backgroundImage: "none",
+                },
               }}
             >
-              {selectedSection}
-            </Typography>
+              <AdminSidebar
+                selectedSection={selectedSection}
+                onSelectSection={handleSectionChange}
+                isMobile={true}
+              />
+            </Drawer>
+          ) : (
+            <AdminSidebar
+              selectedSection={selectedSection}
+              onSelectSection={setSelectedSection}
+              isMobile={false}
+            />
+          )}
+
+          <Box sx={{ flex: 1, minWidth: 0, overflow: "auto" }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+                position: "relative",
+                minHeight: "48px",
+              }}
+            >
+              {isMobile && (
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={handleDrawerToggle}
+                  sx={{
+                    position: "absolute",
+                    left: 0,
+                    border: `1px solid ${THEME.primaryColor}`,
+                    borderRadius: 1,
+                    color: THEME.primaryColor,
+                    ml: 1,
+                  }}
+                >
+                  <MenuOpenIcon />
+                </IconButton>
+              )}
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: { xs: "1.5rem", sm: "2rem" },
+                  textAlign: "center",
+                  width: "100%",
+                }}
+              >
+                {selectedSection}
+              </Typography>
+            </Box>
             {renderTable()}
 
             {!loading && !error && totalPages > 1 && (

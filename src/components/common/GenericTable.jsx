@@ -11,6 +11,8 @@ import TableBody from "@mui/material/TableBody";
 import { TableControls } from "./TableComponents";
 import { GenericRow } from "./GenericRow";
 import { CreateItemModal } from "../admin/CreateItemModal";
+import { GenericCard } from "./GenericCard";
+import { useTheme, useMediaQuery } from "@mui/material";
 
 /**
  * Tabla genérica reutilizable para todas las secciones del admin
@@ -90,91 +92,132 @@ export const GenericTable = ({
     };
   });
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   if (!tableHeader.find((h) => h.key === "actions")) {
     tableHeader.push({ key: "actions", label: "Acciones", align: "center" });
   }
 
+  const renderCards = () => (
+    <Box sx={{ p: 1 }}>
+      {filteredData && filteredData.length > 0 ? (
+        filteredData.map((item) => (
+          <GenericCard
+            key={item._id || item.id}
+            item={item}
+            section={section}
+            tableHeader={tableHeader}
+            editingId={editingId}
+            editedData={editedData}
+            onFieldChange={onFieldChange}
+            onEdit={onEdit}
+            onSave={onSave}
+            onCancel={onCancel}
+            onRestore={onRestore}
+            onSoftDelete={onSoftDelete}
+            onHardDelete={onHardDelete}
+            categorias={categorias}
+            onUpdateImage={onUpdateImage}
+          />
+        ))
+      ) : (
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <span style={{ color: THEME.primaryColor, fontStyle: "italic" }}>
+            {showDeleted
+              ? "No hay registros disponibles"
+              : "No hay registros activos"}
+          </span>
+        </Box>
+      )}
+    </Box>
+  );
+
   return (
     <Box sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer
-        component={Paper}
-        sx={{
-          width: "100%",
-          overflowX: "auto",
-          WebkitOverflowScrolling: "touch",
-          backgroundColor: "transparent",
-          backgroundImage: "none",
-          boxShadow: "none",
-        }}
-      >
-        <Table
+      {isMobile ? (
+        renderCards()
+      ) : (
+        <TableContainer
+          component={Paper}
           sx={{
-            minWidth: { xs: 320, sm: 500 },
+            width: "100%",
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
+            backgroundColor: "transparent",
+            backgroundImage: "none",
+            boxShadow: "none",
           }}
         >
-          <TableHead>
-            <TableRow>
-              {tableHeader.map((cell) => (
-                <TableCell
-                  key={cell.key}
-                  sx={{
-                    color: THEME.primaryColor,
-                    fontWeight: "bold",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    borderBottom: `1px solid ${THEME.primaryColor}`,
-                    textAlign: cell.align || "left",
-                    minWidth: cell.key === "actions" ? "100px" : "80px",
-                    padding: { xs: "8px 4px", sm: "16px" },
-                    fontSize: { xs: "0.7rem", sm: "0.75rem" },
-                  }}
-                >
-                  {cell.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredData && filteredData.length > 0 ? (
-              filteredData.map((item) => (
-                <GenericRow
-                  key={item._id || item.id}
-                  item={item}
-                  section={section}
-                  tableHeader={tableHeader}
-                  editingId={editingId}
-                  editedData={editedData}
-                  onFieldChange={onFieldChange}
-                  onEdit={onEdit}
-                  onSave={onSave}
-                  onCancel={onCancel}
-                  onRestore={onRestore}
-                  onSoftDelete={onSoftDelete}
-                  onHardDelete={onHardDelete}
-                  categorias={categorias}
-                  onUpdateImage={onUpdateImage}
-                />
-              ))
-            ) : (
+          <Table
+            sx={{
+              minWidth: { xs: 320, sm: 500 },
+            }}
+          >
+            <TableHead>
               <TableRow>
-                <TableCell
-                  colSpan={tableHeader.length}
-                  align="center"
-                  sx={{ py: 3 }}
-                >
-                  <span
-                    style={{ color: THEME.primaryColor, fontStyle: "italic" }}
+                {tableHeader.map((cell) => (
+                  <TableCell
+                    key={cell.key}
+                    sx={{
+                      color: THEME.primaryColor,
+                      fontWeight: "bold",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.1em",
+                      borderBottom: `1px solid ${THEME.primaryColor}`,
+                      textAlign: cell.align || "left",
+                      minWidth: cell.key === "actions" ? "100px" : "80px",
+                      padding: { xs: "8px 4px", sm: "16px" },
+                      fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                    }}
                   >
-                    {showDeleted
-                      ? "No hay registros disponibles"
-                      : "No hay registros activos"}
-                  </span>
-                </TableCell>
+                    {cell.label}
+                  </TableCell>
+                ))}
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {filteredData && filteredData.length > 0 ? (
+                filteredData.map((item) => (
+                  <GenericRow
+                    key={item._id || item.id}
+                    item={item}
+                    section={section}
+                    tableHeader={tableHeader}
+                    editingId={editingId}
+                    editedData={editedData}
+                    onFieldChange={onFieldChange}
+                    onEdit={onEdit}
+                    onSave={onSave}
+                    onCancel={onCancel}
+                    onRestore={onRestore}
+                    onSoftDelete={onSoftDelete}
+                    onHardDelete={onHardDelete}
+                    categorias={categorias}
+                    onUpdateImage={onUpdateImage}
+                  />
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={tableHeader.length}
+                    align="center"
+                    sx={{ py: 3 }}
+                  >
+                    <span
+                      style={{ color: THEME.primaryColor, fontStyle: "italic" }}
+                    >
+                      {showDeleted
+                        ? "No hay registros disponibles"
+                        : "No hay registros activos"}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <Box sx={{ mt: 2 }}>
         <TableControls
