@@ -85,6 +85,7 @@ export const GenericTable = ({
       fechaInicio: "Fecha Inicio",
       fechaFin: "Fecha Fin",
       activa: "Activa",
+      destacado: "Destacado",
     };
 
     return {
