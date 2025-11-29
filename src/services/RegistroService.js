@@ -27,7 +27,6 @@ export async function registroService({
 
     return { token, usuario, msg };
   } catch (error) {
-    // Normalizar el error para que el componente lo muestre
     const mensaje =
       error.response?.data?.msg ||
       error.response?.data?.message ||
