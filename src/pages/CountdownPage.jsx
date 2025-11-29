@@ -15,6 +15,7 @@ import {
   Button,
 } from "@mui/material";
 import { AccessTime, CalendarToday, Lock } from "@mui/icons-material";
+import { setItem } from "../utils/localStorageHelper";
 
 function getTargetDate() {
   return new Date(2025, 11, 1, 19, 0, 0, 0);
@@ -70,7 +71,7 @@ export default function CountdownPage({ onLogin }) {
 
   const handleLogin = () => {
     if (password === "ClickStock") {
-      localStorage.setItem("site_access_granted", "true");
+      setItem("site_access_granted", true);
       setOpenAuth(false);
       if (onLogin) onLogin();
     } else {
