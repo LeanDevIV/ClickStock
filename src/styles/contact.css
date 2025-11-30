@@ -1,0 +1,158 @@
+.contact-page {
+  position: relative;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  padding: 40px 0;
+  background-attachment: fixed;
+}
+
+.contact-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.contact-wrapper {
+  position: relative;
+  z-index: 10;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: center;
+}
+
+.contact-info-box {
+  color: #fff;
+  padding-left: 30px;
+}
+
+.contact-title {
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.info-item i {
+  font-size: 1.5rem;
+  color: #ff3b3b;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.info-item span {
+  flex: 1;
+}
+
+.contact-form-box {
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 15px;
+  padding: 25px;
+  backdrop-filter: blur(4px);
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ff3b3b;
+  font-size: 1rem;
+}
+
+.input-with-icon textarea + i {
+  top: 18px;
+}
+
+.input-with-icon input,
+.input-with-icon textarea {
+  padding-left: 10px;
+  background: rgba(255, 255, 255, 0.438);
+  border: 1px solid #ffffff55;
+  border-radius: 10px;
+  color: white;
+}
+
+.send-btn {
+  width: 100%;
+  background-color: #ff3b3b;
+  border: none;
+  font-weight: bold;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+}
+
+.send-btn:hover {
+  background-color: #d32a2a;
+}
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .contact-info-box {
+    padding-left: 0;
+  }
+
+  .info-item {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .contact-title {
+    font-size: 2rem;
+  }
+
+  .contact-form-box {
+    padding: 18px;
+  }
+}
+
+.map-container {
+  width: 100%;
+  margin-top: 20px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.map-container iframe {
+  width: 100%;
+  height: 200px;
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  .map-container iframe {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container iframe {
+    height: 200px;
+  }
+}

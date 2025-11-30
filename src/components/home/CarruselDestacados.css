@@ -1,0 +1,60 @@
+.destacado-card-wrapper {
+  position: relative;
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 260px;
+  height: 420px;
+  margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+  .destacado-card-wrapper {
+    height: 400px;
+  }
+}
+
+@media (max-width: 600px) {
+  .destacado-card-wrapper {
+    height: 380px;
+    width: 100%;
+    max-width: 260px;
+  }
+}
+
+.destacado-card-wrapper:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+}
+
+.destacado-ribbon {
+  position: absolute;
+  top: 15px;
+  right: -8px;
+  z-index: 10;
+  background: linear-gradient(90deg, #d4af37, #b4941f);
+  color: #000;
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 10px 50%);
+  border-radius: 2px 0 0 2px;
+}
+
+.destacado-ribbon::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 0;
+  border-top: 8px solid #8a7018;
+  border-right: 8px solid transparent;
+}
+
+.destacado-card-wrapper > .MuiPaper-root {
+  height: 100% !important;
+  width: 100% !important;
+  max-width: none !important;
+  border-radius: 12px;
+}

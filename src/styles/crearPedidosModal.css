@@ -1,0 +1,200 @@
+.modal-crear-pedido .MuiDialog-paper {
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2) !important;
+  min-width: 900px !important;
+  max-width: 95vw !important;
+}
+
+.header-modal-crear {
+  background: linear-gradient(135deg, #000000 0%, #434343 100%) !important;
+  color: white !important;
+  padding: 24px 24px 20px 24px !important;
+}
+
+.titulo-modal-crear {
+  font-weight: 700 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contenido-modal-crear {
+  padding: 24px !important;
+  max-height: 75vh !important;
+  overflow-y: auto;
+}
+
+.tarjeta-seccion {
+  border: 1px solid !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.titulo-seccion {
+  font-weight: 700 !important;
+  margin-bottom: 16px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 2px solid;
+  padding-bottom: 12px;
+}
+
+.tarjeta-producto {
+  border: 1px solid !important;
+  border-radius: 10px !important;
+  margin-bottom: 12px !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer;
+}
+
+.tarjeta-producto:hover {
+  border-color: #10b981 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.contenido-producto {
+  padding: 16px !important;
+}
+
+.nombre-producto {
+  font-weight: 600 !important;
+  margin-bottom: 4px !important;
+  color: #000000 !important ;
+}
+
+.descripcion-producto {
+  color: #000000 !important ;
+  font-size: 0.875rem !important;
+  margin-bottom: 8px !important;
+}
+
+.precio-stock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.precio-producto {
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+}
+
+.tarjeta-inventario {
+  border: 1px solid !important;
+  border-radius: 10px !important;
+  margin-bottom: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.tarjeta-inventario:hover {
+  border-color: #667eea !important;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1) !important;
+}
+
+.contenido-inventario {
+  padding: 16px !important;
+}
+
+.controles-cantidad {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.botones-cantidad {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.boton-cantidad {
+  min-width: 32px !important;
+  width: 32px;
+  height: 32px;
+}
+
+.input-cantidad {
+  width: 60px !important;
+}
+
+.input-cantidad .MuiOutlinedInput-input {
+  text-align: center;
+  padding: 6px 8px;
+  font-weight: 600;
+}
+
+.boton-eliminar:hover {
+  background-color: rgba(220, 38, 38, 0.1) !important;
+}
+
+.contenedor-productos-inventario {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  min-height: 450px !important;
+}
+
+.lista-productos,
+.lista-inventario {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 380px !important;
+  padding-right: 8px;
+}
+
+.contenedor-botones-crear {
+  padding: 16px 24px 20px 24px !important;
+  border-top: 1px solid !important;
+  gap: 12px !important;
+}
+
+.boton-cancelar-crear {
+  border-radius: 12px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+}
+
+.boton-crear {
+  border-radius: 12px !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+.boton-crear:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+}
+
+.boton-crear:disabled {
+  background: #9ca3af !important;
+}
+
+@media (max-width: 768px) {
+  .modal-crear-pedido .MuiDialog-paper {
+    min-width: auto !important;
+    margin: 16px !important;
+  }
+
+  .contenedor-productos-inventario {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    min-height: auto !important;
+  }
+
+  .tarjeta-seccion {
+    min-height: 300px;
+  }
+
+  .lista-productos,
+  .lista-inventario {
+    max-height: 280px !important;
+  }
+}
