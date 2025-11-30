@@ -32,6 +32,7 @@ import {
   Brightness7,
   BlurOn,
   BlurOff,
+  ReceiptLong,
   AdminPanelSettings,
   Favorite,
 } from "@mui/icons-material";
@@ -203,7 +204,18 @@ export const Header = ({
             </Box>
           </ListItemButton>
         </ListItem>
-
+        <ListItem disablePadding>
+          <ListItemButton
+            component={Link}
+            to="/mis-pedidos"
+            onClick={handleDrawerToggle}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", mx: "auto" }}>
+              <ReceiptLong sx={{ mr: 1 }} />
+              <ListItemText primary="Mis Pedidos" />
+            </Box>
+          </ListItemButton>
+        </ListItem>
         <ListItem disablePadding>
           <ListItemButton onClick={toggleBackground}>
             <Box sx={{ display: "flex", alignItems: "center", mx: "auto" }}>
@@ -400,6 +412,11 @@ export const Header = ({
               <Tooltip title="Mis Favoritos">
                 <IconButton component={Link} to="/favoritos" color="inherit">
                   <Favorite />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Mis pedidos">
+                <IconButton component={Link} to="/mis-pedidos" color="inherit">
+                  <ReceiptLong />
                 </IconButton>
               </Tooltip>
 
