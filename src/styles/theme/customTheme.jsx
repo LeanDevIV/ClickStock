@@ -5,14 +5,14 @@ export const getCustomTheme = (modoOscuro) =>
     palette: {
       mode: modoOscuro ? "dark" : "light",
       primary: {
-        main: "#D4AF37", 
-        light: "#E6C869", 
-        dark: "#B8941F", 
+        main: "#D4AF37",
+        light: "#E6C869",
+        dark: "#B8941F",
         contrastText: "#000000",
       },
       secondary: {
-        main: "#B91C1C", 
-        light: "#D33434", 
+        main: "#B91C1C",
+        light: "#D33434",
         dark: "#8B0000",
         contrastText: "#FFFFFF",
       },
@@ -21,7 +21,7 @@ export const getCustomTheme = (modoOscuro) =>
         paper: modoOscuro ? "#1E1E1E" : "#FFFFFF",
       },
       text: {
-        primary: modoOscuro ? "#FFFFFF" : "#000000", 
+        primary: modoOscuro ? "#FFFFFF" : "#000000",
         secondary: modoOscuro ? "#D4AF37" : "#404040",
       },
 
@@ -37,4 +37,15 @@ export const getCustomTheme = (modoOscuro) =>
       info: {
         main: "#3B82F6",
       },
-    },})
+    },
+    typography: {
+      fontFamily: "'Exo 2', sans-serif",
+      h1: { fontFamily: "'Orbitron', sans-serif" },
+      h2: { fontFamily: "'Orbitron', sans-serif" },
+      h3: { fontFamily: "'Orbitron', sans-serif" },
+      h4: { fontFamily: "'Orbitron', sans-serif" },
+      h5: { fontFamily: "'Orbitron', sans-serif" },
+      h6: { fontFamily: "'Orbitron', sans-serif" },
+      button: { fontFamily: "'Exo 2', sans-serif", fontWeight: 600 },
+    },
+  });

@@ -19,6 +19,10 @@ import {
   useTheme,
 } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
+
+// 👈 RUTA DEL LOGO (Asegúrate de que 'logo-mouse.png' esté en la carpeta public/)
+const LOGO_PATH = "/logo-mouse.png";
+
 import {
   Search as SearchIcon,
   ShoppingCart,
@@ -38,7 +42,7 @@ import { useScrollDirection } from "../../hooks/useScrollDirection";
 import { UserMenu } from "../auth/MenuUsuario";
 import AuthModal from "../auth/AuthModal";
 import "../../styles/header.css";
-// Search Styles
+
 const SearchContainer = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
@@ -91,7 +95,7 @@ export const Header = ({
   const [showCarrito, setShowCarrito] = useState(false);
   const handleOpenPreview = () => setShowCarrito(true);
   const handleClosePreview = () => setShowCarrito(false);
-  // const [showAuthModal, setShowAuthModal] = useState(false); // Removed local state
+
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -110,9 +114,6 @@ export const Header = ({
     }
   };
 
-  // const handleOpenAuth = () => setShowAuthModal(true); // Removed local handler
-  // const handleCloseAuth = () => setShowAuthModal(false); // Removed local handler
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -121,13 +122,6 @@ export const Header = ({
     logout();
     navigate("/");
   };
-
-  const navLinks = [
-    { title: "Inicio", path: "/" },
-    { title: "Productos", path: "/productos" },
-    { title: "Nosotros", path: "/nosotros" },
-    { title: "Contacto", path: "/contacto" },
-  ];
 
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -138,10 +132,9 @@ export const Header = ({
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Box sx={{ my: 2 }}>
+      <Box sx={{ my: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Link
           to="/"
           style={{
@@ -149,27 +142,37 @@ export const Header = ({
             color: "inherit",
             fontWeight: "bold",
             fontSize: "1.2rem",
+            fontFamily: "'Orbitron', sans-serif",
+            letterSpacing: "1px",
           }}
         >
-          ClickStock
+          <img
+            src={LOGO_PATH}
+            alt="ClickStock Logo"
+            style={{
+              height: 70, 
+              display: "block",
+              filter: modoOscuro
+                ? "drop-shadow(0 0 5px rgba(255, 255, 255, 0.4))"
+                : "none",
+            }}
+          />
+          <Box
+            component="span"
+            sx={{
+              fontWeight: "bold",
+              fontSize: "1.2rem",
+              color: "inherit",
+            }}
+          >
+            ClickStock
+          </Box>
         </Link>
       </Box>
       <Divider />
-      <List>
-        {navLinks.map((item) => (
-          <ListItem key={item.title} disablePadding>
-            <ListItemButton
-              component={Link}
-              to={item.path}
-              sx={{ textAlign: "center" }}
-            >
-              <ListItemText primary={item.title} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <List></List>
       <Divider />
-      {/* Mobile Actions in Drawer */}
+
       <List>
         <ListItem disablePadding>
           <ListItemButton onClick={handleOpenPreview}>
@@ -267,7 +270,6 @@ export const Header = ({
       </List>
     </Box>
   );
-
   return (
     <>
       <AppBar
@@ -289,7 +291,6 @@ export const Header = ({
       >
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            {/* Logo Desktop */}
             <Box sx={{ display: { xs: "none", md: "flex" }, mr: 1 }}>
               <Link
                 to="/"
@@ -298,13 +299,34 @@ export const Header = ({
                   color: "inherit",
                   fontWeight: "bold",
                   fontSize: "1.5rem",
+                  fontFamily: "'Orbitron', sans-serif",
+                  letterSpacing: "1px",
                 }}
               >
-                ClickStock
+                <img
+                  src={LOGO_PATH}
+                  alt="ClickStock Logo"
+                  style={{
+                    height: 70,
+                    display: "block",
+                    filter: modoOscuro
+                      ? "drop-shadow(0 0 5px rgba(255, 255, 255, 0.4))"
+                      : "none",
+                  }}
+                />
+                <Box
+                  component="span"
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "1.75rem",
+                    color: "inherit",
+                  }}
+                >
+                  ClickStock
+                </Box>
               </Link>
             </Box>
 
-            {/* Logo Mobile (Moved to start) */}
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               <Link
                 to="/"
@@ -313,13 +335,36 @@ export const Header = ({
                   color: "inherit",
                   fontWeight: "bold",
                   fontSize: "1.2rem",
+                  fontFamily: "'Orbitron', sans-serif",
+                  letterSpacing: "1px",
                 }}
               >
-                ClickStock
+                {/* Imagen del Logo */}
+                <img
+                  src={LOGO_PATH}
+                  alt="ClickStock Logo"
+                  style={{
+                    height: 65, 
+                    display: "block",
+                    filter: modoOscuro
+                      ? "drop-shadow(0 0 5px rgba(255, 255, 255, 0.4))"
+                      : "none",
+                  }}
+                />
+                {/* Texto del Nombre */}
+                <Box
+                  component="span"
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "1.2rem",
+                    color: "inherit",
+                  }}
+                >
+                  ClickStock
+                </Box>
               </Link>
             </Box>
 
-            {/* Desktop Nav Links */}
             <Box
               sx={{
                 flexGrow: 1,
@@ -327,24 +372,12 @@ export const Header = ({
                 justifyContent: "center",
                 gap: 2,
               }}
-            >
-              {navLinks.map((page) => (
-                <Button
-                  key={page.title}
-                  component={Link}
-                  to={page.path}
-                  sx={{ my: 2, color: "inherit", display: "block" }}
-                >
-                  {page.title}
-                </Button>
-              ))}
-            </Box>
+            ></Box>
 
-            {/* Actions (Search, Cart, etc.) - Hidden on Mobile */}
             <Box
               sx={{
                 flexGrow: 0,
-                display: { xs: "none", md: "flex" }, // Hide on mobile
+                display: { xs: "none", md: "flex" },
                 alignItems: "center",
                 gap: 1,
               }}
@@ -424,7 +457,6 @@ export const Header = ({
               )}
             </Box>
 
-            {/* Mobile Menu Button (Moved to end) */}
             <Box sx={{ display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
@@ -439,10 +471,9 @@ export const Header = ({
         </Container>
       </AppBar>
 
-      {/* Mobile Drawer */}
       <nav>
         <Drawer
-          anchor="right" // Open from right
+          anchor="right"
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}

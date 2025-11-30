@@ -8,7 +8,7 @@ import ProductDetail from "../pages/shop/ProductDetail.jsx";
 import AdminLayout from "../layouts/AdminLayout";
 import PedidosPage from "../pages/admin/PedidosPage.jsx";
 import ScrollToTop from "../components/layouts/ScrollToTop.jsx";
-import ProductList from "../pages/shop/ProductList.jsx";
+
 import PromocionesPage from "../pages/admin/PromocionesPage.jsx";
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
 import CarritoPage from "../pages/checkout/CarritoPage.jsx";
@@ -27,7 +27,6 @@ function IndexRoutes({
     <>
       <ScrollToTop />
       <Routes>
-        {/* Layout público */}
         <Route
           element={
             <MainLayout
@@ -42,15 +41,13 @@ function IndexRoutes({
           <Route path="/carrito" element={<CarritoPage />} />
           <Route path="/nosotros" element={<AboutUs />} />
           <Route path="/contacto" element={<Contact />} />
-          <Route path="/productos" element={<ProductList />} />
+
           <Route path="/buscar" element={<SearchResults />} />
           <Route path="/favoritos" element={<FavoritosPage />} />
           <Route path="/mis-pedidos" element={<MisPedidos />} />
 
-          {/* ✅ Página de productos */}
           <Route path="/producto/detalle/:id" element={<ProductDetail />} />
-          {/* ✅ Dinámica */}
-          {/* Layout administrativo */}
+
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminHome />} />
             <Route path="dashboard" element={<AdminDashboard />} />
@@ -59,7 +56,6 @@ function IndexRoutes({
           </Route>
         </Route>
 
-        {/* Página 404 */}
         <Route path="*" element={<Error404 />} />
       </Routes>
     </>

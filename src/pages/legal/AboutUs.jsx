@@ -10,7 +10,6 @@ import {
 import { GitHub, LinkedIn } from "@mui/icons-material";
 import { styled, keyframes } from "@mui/material/styles";
 
-// Keyframe para el efecto de luz neón recorriendo los bordes
 const neonBorder = keyframes`
   0% {
     background-position: 0% 50%;
@@ -20,9 +19,8 @@ const neonBorder = keyframes`
   }
 `;
 
-// Styled Card (Contenedor Principal)
 const NeonCard = styled(Card)(({ theme }) => ({
-  height: "100%", // Se estira para llenar la celda del Grid
+  height: "100%",
   minHeight: "320px",
   width: "100%",
   position: "relative",
@@ -38,7 +36,6 @@ const NeonCard = styled(Card)(({ theme }) => ({
     cursor: "pointer",
   },
 
-  // Capa del Borde Gradiente (Detrás)
   "&::before": {
     content: '""',
     position: "absolute",
@@ -63,18 +60,17 @@ const NeonCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-// Capa de Superficie (Frente - Tapa el centro del gradiente)
 const CardSurface = styled(Box)(({ theme }) => ({
   position: "relative",
   zIndex: 1,
   height: "100%",
   width: "100%",
-  // Color sólido explícito según modo
+
   backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#ffffff",
   borderRadius: "16px",
   display: "flex",
   flexDirection: "column",
-  justifyContent: "space-between", // Distribuye espacio entre avatar/info y redes
+  justifyContent: "space-between",
   alignItems: "center",
   padding: theme.spacing(4),
   boxShadow: theme.shadows[4],
@@ -99,7 +95,7 @@ const integrantes = [
   {
     nombre: "Sara Robles",
     rol: "Diseñador fullstack",
-    imagen: "https://avatars.githubusercontent.com/u/209563219?v=4",
+    imagen: "https://avatars.githubusercontent.com/u/209563219?s=400&u=5014b0af280a14903d42f113e74f572233278f5d&v=4",
     github: "https://github.com/sara-18Git",
     linkedin: "#",
   },
@@ -164,21 +160,20 @@ export default function AboutUs() {
           web moderna y funcional. Y por sobre todo, APROBAR😁
         </Typography>
 
-        {/* CSS Grid Nativo para anchos idénticos garantizados */}
         <Box
           sx={{
             display: "grid",
             gridTemplateColumns: {
-              xs: "repeat(1, 1fr)", // 1 columna en móvil
-              sm: "repeat(2, 1fr)", // 2 columnas en tablet
-              md: "repeat(3, 1fr)", // 3 columnas en desktop pequeño
-              lg: "repeat(5, 1fr)", // 5 columnas en pantallas grandes (para que entren todos en una fila si se quiere)
+              xs: "repeat(1, 1fr)",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+              lg: "repeat(5, 1fr)",
             },
-            gap: 3, // Espaciado uniforme
+            gap: 3,
             width: "100%",
-            alignItems: "stretch", // Altura uniforme
+            alignItems: "stretch",
             justifyContent: "center",
-            mb: 6, // Margen inferior para separar del footer
+            mb: 6,
           }}
         >
           {integrantes.map((integrante, index) => (

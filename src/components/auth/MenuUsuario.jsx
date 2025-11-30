@@ -15,7 +15,6 @@ export const UserMenu = ({ user, modoOscuro, handleLogout }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const open = Boolean(anchorEl);
 
-  // Para abrir/cerrar el menú
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };

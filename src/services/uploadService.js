@@ -11,14 +11,11 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
  */
 export const subirArchivo = async (archivo, directorio = "productos") => {
   try {
-    // Crear FormData
     const formData = new FormData();
     formData.append("file", archivo);
 
-    // Obtener token del store o localStorage
     const token = useStore.getState().token || localStorage.getItem("token");
 
-    // Configurar headers
     const headers = {
       "Content-Type": "multipart/form-data",
     };
@@ -27,21 +24,19 @@ export const subirArchivo = async (archivo, directorio = "productos") => {
       headers.Authorization = `Bearer ${token}`;
     }
 
-    // Hacer la petición
     const response = await axios.post(
       `${API_URL}/uploads/${directorio}`,
       formData,
       { headers }
     );
 
-    // Retornar la URL del archivo
     return response.data.url;
   } catch (error) {
     console.error("Error al subir archivo:", error);
     throw new Error(
       error.response?.data?.error?.message ||
-      error.response?.data?.error ||
-      "Error al subir el archivo"
+        error.response?.data?.error ||
+        "Error al subir el archivo"
     );
   }
 };
@@ -67,4 +62,3 @@ export const subirMultiplesArchivos = async (
     throw error;
   }
 };
-

@@ -9,22 +9,31 @@ import FloatingChat from "./components/home/Chatbot.jsx";
 import { getItem, setItem } from "./utils/localStorageHelper";
 import LiquidEther from "./styles/liquid-ether/LiquidEther.jsx";
 import WelcomeScreen from "./styles/welcome-screen/WelcomeScreen.jsx";
+import BannerPromocional from "./components/common/BannerPromocional.jsx";
+import CountdownPage from "./pages/CountdownPage.jsx";
 
 function App() {
   const [modoOscuro, setModoOscuro] = useState(() => {
-    return getItem("modoOscuro", false); // Retorna boolean directamente
+    return getItem("modoOscuro", false);
   });
 
   const [backgroundEnabled, setBackgroundEnabled] = useState(() => {
-    return getItem("backgroundEnabled", false); // Default false
+    return getItem("backgroundEnabled", false);
   });
+
+  const [accessGranted, setAccessGranted] = useState(() => {
+    const stored = getItem("site_access_granted", false);
+    return stored === true || stored === "true";
+  });
+
+  const MAINTENANCE_MODE = true;
 
   const theme = useMemo(() => getCustomTheme(modoOscuro), [modoOscuro]);
 
   const toggleModo = () => {
     setModoOscuro((prev) => {
       const nuevoModo = !prev;
-      setItem("modoOscuro", nuevoModo); // Guarda boolean directamente
+      setItem("modoOscuro", nuevoModo);
       return nuevoModo;
     });
   };
@@ -37,9 +46,19 @@ function App() {
     });
   };
 
+  if (MAINTENANCE_MODE && !accessGranted) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <CountdownPage onLogin={() => setAccessGranted(true)} />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <BannerPromocional />
       {globalStyles(theme, modoOscuro)}
       <Toaster
         position="top-center"
@@ -63,7 +82,7 @@ function App() {
           },
         }}
       />
-      {/* Background animado - posición absoluta (Solo en Modo Oscuro) */}
+
       {backgroundEnabled && modoOscuro && (
         <div
           style={{

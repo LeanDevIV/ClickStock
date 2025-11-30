@@ -7,7 +7,7 @@ if (typeof window !== "undefined") {
       localStorage.removeItem("ecommerce-storage");
     }
   } catch (error) {
-    // Silencioso
+    console.error(error);
   }
 }
 
@@ -22,7 +22,7 @@ export const useStore = create(
         totalArticulos: 0,
         cargando: false,
       },
-      favoritos: [], // Array of favorite product IDs
+      favoritos: [],
 
       setUser: (userData, token) => {
         set({ user: userData, token });

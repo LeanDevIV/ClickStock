@@ -7,14 +7,12 @@ const clientAxios = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// 🔹 Interceptor para incluir token si existe
 clientAxios.interceptors.request.use((config) => {
   const token = useStore.getState().token || getItem("token", null);
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// 🔹 Si el token es inválido o expiró, desloguea al usuario
 clientAxios.interceptors.response.use(
   (response) => response,
   (error) => {
