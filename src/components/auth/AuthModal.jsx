@@ -14,13 +14,16 @@ import { FaGithub } from "react-icons/fa";
 import RegistroForm from "./RegistroForm";
 import LoginForm from "./LoginForm";
 import { auth, googleProvider, githubProvider } from "../../config/firebase";
-import { signInWithRedirect } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
+import { socialLoginService } from "../../services/LoginService";
+import { useStore } from "../../hooks/useStore";
 
 function AuthModal({ show, handleClose }) {
   const [modo, setModo] = useState(0); // 0 = login, 1 = registro
   const [mensaje, setMensaje] = useState("");
   const [height, setHeight] = useState("auto");
   const contentRef = useRef(null);
+  const setUser = useStore((state) => state.setUser);
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -47,10 +50,21 @@ function AuthModal({ show, handleClose }) {
 
   const handleSocialLogin = async (provider) => {
     try {
+      console.log("Iniciando login social...");
       setMensaje("");
-      // signInWithRedirect redirige al usuario, no devuelve un resultado inmediato
-      await signInWithRedirect(auth, provider);
-      // El resultado se manejará en el componente que detecta el redirect
+      const result = await signInWithPopup(auth, provider);
+      console.log("Popup cerrado, resultado:", result);
+
+      const token = await result.user.getIdToken();
+      console.log("Token obtenido:", token);
+
+      const data = await socialLoginService(token);
+      console.log("Respuesta del backend:", data);
+
+      if (data.usuario || data.token) {
+        setUser(data.usuario, data.token);
+        handleSuccess();
+      }
     } catch (error) {
       console.error("Error Social Login:", error);
       setMensaje(error.message || "Error al iniciar sesión");

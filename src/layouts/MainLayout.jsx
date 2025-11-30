@@ -4,9 +4,6 @@ import { Header } from "../components/layouts/Header";
 import { Toolbar, Box } from "@mui/material";
 import { useFavoritos } from "../hooks/useFavoritos";
 import { useStore } from "../hooks/useStore";
-import { auth } from "../config/firebase";
-import { getRedirectResult } from "firebase/auth";
-import { socialLoginService } from "../services/LoginService";
 
 export const MainLayout = ({
   modoOscuro,
@@ -16,7 +13,7 @@ export const MainLayout = ({
 }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { cargarFavoritos } = useFavoritos();
-  const { token, setUser } = useStore();
+  const { token } = useStore();
 
   const handleOpenAuth = () => setShowAuthModal(true);
   const handleCloseAuth = () => setShowAuthModal(false);
@@ -26,27 +23,6 @@ export const MainLayout = ({
       cargarFavoritos();
     }
   }, [token, cargarFavoritos]);
-
-  // Manejar el resultado del redirect de Firebase Auth
-  useEffect(() => {
-    const handleRedirectResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result && result.user) {
-          const firebaseToken = await result.user.getIdToken();
-          const data = await socialLoginService(firebaseToken);
-
-          if (data.usuario && data.token) {
-            setUser(data.usuario, data.token);
-          }
-        }
-      } catch (error) {
-        console.error("Error al manejar redirect de Firebase:", error);
-      }
-    };
-
-    handleRedirectResult();
-  }, [setUser]);
 
   return (
     <>
