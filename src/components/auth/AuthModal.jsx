@@ -50,16 +50,12 @@ function AuthModal({ show, handleClose }) {
 
   const handleSocialLogin = async (provider) => {
     try {
-      console.log("Iniciando login social...");
       setMensaje("");
       const result = await signInWithPopup(auth, provider);
-      console.log("Popup cerrado, resultado:", result);
 
       const token = await result.user.getIdToken();
-      console.log("Token obtenido:", token);
 
       const data = await socialLoginService(token);
-      console.log("Respuesta del backend:", data);
 
       if (data.usuario || data.token) {
         setUser(data.usuario, data.token);
