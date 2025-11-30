@@ -1,6 +1,6 @@
 import { Container, TextField, Button, Box, Typography } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import axios from "axios";
+import clientAxios from "../../utils/clientAxios";
 import "../../styles/contact.css";
 import Swal from "sweetalert2";
 import { showValidationErrors } from "../../utils/validationErrors";
@@ -18,10 +18,7 @@ const Contacto = () => {
 
   const onSubmit = async (data) => {
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/contacto/enviar-correo",
-        data
-      );
+      const res = await clientAxios.post("/contacto/enviar-correo", data);
 
       if (res.data.ok) {
         Swal.fire("Éxito", "Tu mensaje ha sido enviado", "success");
