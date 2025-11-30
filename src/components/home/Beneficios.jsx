@@ -31,7 +31,6 @@ const NeonCard = styled(Card)(({ theme }) => ({
   "&:hover": {
     transform: "translateY(-8px)",
     transition: "transform 0.3s ease",
-    cursor: "pointer",
   },
 
   "&::before": {

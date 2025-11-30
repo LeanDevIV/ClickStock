@@ -14,16 +14,13 @@ import { FaGithub } from "react-icons/fa";
 import RegistroForm from "./RegistroForm";
 import LoginForm from "./LoginForm";
 import { auth, googleProvider, githubProvider } from "../../config/firebase";
-import { signInWithPopup } from "firebase/auth";
-import { socialLoginService } from "../../services/LoginService";
-import { useStore } from "../../hooks/useStore";
+import { signInWithRedirect } from "firebase/auth";
 
 function AuthModal({ show, handleClose }) {
   const [modo, setModo] = useState(0); // 0 = login, 1 = registro
   const [mensaje, setMensaje] = useState("");
   const [height, setHeight] = useState("auto");
   const contentRef = useRef(null);
-  const setUser = useStore((state) => state.setUser);
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -51,15 +48,9 @@ function AuthModal({ show, handleClose }) {
   const handleSocialLogin = async (provider) => {
     try {
       setMensaje("");
-      const result = await signInWithPopup(auth, provider);
-      const token = await result.user.getIdToken();
-
-      const data = await socialLoginService(token);
-
-      if (data.usuario || data.token) {
-        setUser(data.usuario, data.token);
-        handleSuccess();
-      }
+      // signInWithRedirect redirige al usuario, no devuelve un resultado inmediato
+      await signInWithRedirect(auth, provider);
+      // El resultado se manejará en el componente que detecta el redirect
     } catch (error) {
       console.error("Error Social Login:", error);
       setMensaje(error.message || "Error al iniciar sesión");
