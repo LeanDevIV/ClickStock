@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useCallback } from "react";
+import clientAxios from "../../utils/clientAxios";
 import {
   Dialog,
   DialogTitle,
@@ -33,7 +33,6 @@ import {
 } from "@mui/icons-material";
 import { Toaster, toast } from "react-hot-toast";
 import "../../styles/crearPedidosModal.css";
-import clientaxios from "../../utils/clientAxios.js";
 
 const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
   const theme = useTheme();
@@ -61,9 +60,9 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
       const interval = setInterval(cargarProductos, 30000);
       return () => clearInterval(interval);
     }
-  }, [show]);
+  }, [show, cargarUsuarios, cargarProductos, resetForm]);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setInventario([]);
     setFormData({ usuarioId: "", direccionEnvio: "" });
     setErrores({ direccionEnvio: "" });
@@ -72,9 +71,9 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
     setCargando(false);
     setCargandoUsuarios(false);
     setCargandoProductos(false);
-  };
+  }, []);
 
-  const cargarUsuarios = async () => {
+  const cargarUsuarios = useCallback(async () => {
     try {
       setCargandoUsuarios(true);
       setErrorUsuarios("");
@@ -85,11 +84,7 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
       const token = parsedStorage.state?.token;
       if (!userData || !token)
         throw new Error("Datos de autenticación incompletos");
-      const { data } = await axios.get("http://localhost:5000/api/usuarios", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const { data } = await clientAxios.get("/usuarios");
       const usuariosData = Array.isArray(data) ? data : data.usuarios || [];
       setUsuarios(usuariosData);
       if (usuariosData.length === 0)
@@ -99,40 +94,42 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
     } finally {
       setCargandoUsuarios(false);
     }
-  };
+  }, []);
 
-  const cargarProductos = async () => {
+  const cargarProductos = useCallback(async () => {
     try {
       setCargandoProductos(true);
       setErrorProductos("");
-      const { data } = await axios.get("http://localhost:5000/api/productos");
+      const { data } = await clientAxios.get("/productos");
       const productosData = Array.isArray(data)
         ? data
         : data.productos || data.data || [];
       setProductos(productosData);
-      const inventarioActualizado = inventario
-        .map((item) => {
-          const productoActual = productosData.find(
-            (p) => p._id === item.producto._id
-          );
-          return productoActual ? { ...item, producto: productoActual } : item;
-        })
-        .filter((item) => item.producto.stock > 0);
-      if (inventarioActualizado.length !== inventario.length) {
-        setInventario(inventarioActualizado);
-      }
+
+      setInventario((prevInventario) => {
+        const inventarioActualizado = prevInventario
+          .map((item) => {
+            const productoActual = productosData.find(
+              (p) => p._id === item.producto._id
+            );
+            return productoActual
+              ? { ...item, producto: productoActual }
+              : item;
+          })
+          .filter((item) => item.producto.stock > 0);
+        return inventarioActualizado;
+      });
     } catch (error) {
+      console.error(error);
       setErrorProductos("No se pudieron cargar los productos reales");
     } finally {
       setCargandoProductos(false);
     }
-  };
+  }, []);
 
   const verificarStockDisponible = async (productoId) => {
     try {
-      const { data } = await axios.get(
-        `http://localhost:5000/api/productos/${productoId}`
-      );
+      const { data } = await clientAxios.get(`/productos/${productoId}`);
       return data.stock || 0;
     } catch (error) {
       console.error("Error al verificar stock:", error);
@@ -292,16 +289,7 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
         direccion: formData.direccionEnvio.trim(),
         estado: "pendiente",
       };
-      const { data } = await axios.post(
-        "http://localhost:5000/api/pedidos",
-        pedidoData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const { data } = await clientAxios.post("/pedidos", pedidoData);
       onPedidoCreado(data.pedido || data);
       toast.success("Pedido creado exitosamente", { id: toastId });
       onHide();
