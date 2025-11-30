@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useCompartir } from "../../hooks/useCompartir";
 import { QRCodeSVG } from "qrcode.react";
 import toast from "react-hot-toast";
@@ -11,8 +11,8 @@ import {
   Button,
   Typography,
   Fade,
-  Paper,
   Tooltip,
+  Grid,
 } from "@mui/material";
 import {
   Share,
@@ -23,7 +23,6 @@ import {
   Link,
   QrCode2,
 } from "@mui/icons-material";
-import "../../styles/botonCompartir.css";
 
 const BotonCompartir = ({ idProducto, nombreProducto }) => {
   const {
@@ -33,28 +32,18 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
     alternarOpciones,
     alternarQR,
   } = useCompartir(idProducto, nombreProducto);
-
-  const modalRef = useRef(null);
-  const botonRef = useRef(null);
-
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        mostrarOpciones &&
-        modalRef.current &&
-        !modalRef.current.contains(event.target) &&
-        botonRef.current &&
-        !botonRef.current.contains(event.target)
-      ) {
-        alternarOpciones();
+    const removeAriaHidden = () => {
+      const rootElement = document.getElementById('root');
+      if (rootElement && rootElement.getAttribute('aria-hidden') === 'true') {
+        rootElement.removeAttribute('aria-hidden');
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [mostrarOpciones, alternarOpciones]);
+    if (!mostrarOpciones && !mostrarQR) {
+      setTimeout(removeAriaHidden, 100);
+    }
+  }, [mostrarOpciones, mostrarQR]);
 
   const handleWhatsApp = () => {
     window.open(
@@ -83,7 +72,20 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
 
   const handleQR = () => {
     alternarQR();
+  };
+
+  const handleCloseQR = () => {
+    alternarQR();
+    setTimeout(() => {
+      document.body.focus();
+    }, 50);
+  };
+
+  const handleCloseOpciones = () => {
     alternarOpciones();
+    setTimeout(() => {
+      document.body.focus();
+    }, 50);
   };
 
   const handleDescargarQR = () => {
@@ -113,136 +115,168 @@ const BotonCompartir = ({ idProducto, nombreProducto }) => {
     }
   };
 
-  const tooltipProps = {
-    placement: "bottom",
-    arrow: true,
-    TransitionComponent: Fade,
-  };
-
   return (
-    <Box className="boton-compartir-container">
-      <Tooltip title="Compartir producto" {...tooltipProps}>
+    <Box>
+      <Tooltip title="Compartir producto" placement="bottom" arrow>
         <IconButton
-          ref={botonRef}
           color="primary"
           onClick={alternarOpciones}
-          className="boton-compartir-icon"
         >
           <Share />
         </IconButton>
       </Tooltip>
 
-      <Fade in={mostrarOpciones} timeout={300}>
-        <Paper ref={modalRef} elevation={8} className="boton-compartir-modal">
-          <Typography variant="subtitle2" className="modal-title">
-            Compartir en:
-          </Typography>
-
-          <Box className="icon-container">
-            <Tooltip title="WhatsApp" {...tooltipProps}>
-              <IconButton
-                color="success"
-                onClick={handleWhatsApp}
-                className="icon-button whatsapp"
-              >
-                <WhatsApp />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title="Email" {...tooltipProps}>
-              <IconButton
-                color="primary"
-                onClick={handleEmail}
-                className="icon-button email"
-              >
-                <Email />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title="Copiar enlace" {...tooltipProps}>
-              <IconButton
-                color="info"
-                onClick={handleCopiarEnlace}
-                className="icon-button link"
-              >
-                <Link />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title="Código QR" {...tooltipProps}>
-              <IconButton
-                color="secondary"
-                onClick={handleQR}
-                className="icon-button qr"
-              >
-                <QrCode2 />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Paper>
-      </Fade>
-
+      {/* Modal para opciones de compartir */}
       <Dialog
-        open={mostrarQR}
-        onClose={alternarQR}
+        open={mostrarOpciones}
+        onClose={handleCloseOpciones}
         maxWidth="sm"
         fullWidth
         TransitionComponent={Fade}
-        transitionDuration={400}
+        disableEnforceFocus={true}
+        disableAutoFocus={true}
       >
         <DialogContent sx={{ position: "relative", p: 3 }}>
-          {/* Botón cerrar en la esquina superior derecha */}
-          <Tooltip title="Cerrar" {...tooltipProps}>
-            <IconButton
-              onClick={alternarQR}
-              sx={{
-                position: "absolute",
-                right: 16,
-                top: 16,
-                color: "grey.500",
-                zIndex: 1,
-                "&:hover": {
-                  bgcolor: "grey.100",
-                },
-              }}
-            >
-              <Close />
-            </IconButton>
-          </Tooltip>
+          <IconButton
+            onClick={handleCloseOpciones}
+            sx={{
+              position: "absolute",
+              right: 16,
+              top: 16,
+              color: "grey.500",
+            }}
+          >
+            <Close />
+          </IconButton>
 
-          <Box className="qr-container">
-            <Typography variant="h5" gutterBottom>
-              Escanea el código QR
-            </Typography>
+          <Typography variant="h5" gutterBottom textAlign="center" fontWeight="bold">
+            Compartir Producto
+          </Typography>
 
-            <Box className="qr-box">
-              <QRCodeSVG
-                value={generarEnlace()}
-                size={200}
-                level="H"
-                bgColor="#ffffff"
-                fgColor="#000000"
-              />
-            </Box>
+          <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ mb: 3 }}>
+            {nombreProducto}
+          </Typography>
 
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              Escanea con tu cámara para acceder al producto
-            </Typography>
-          </Box>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 6 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<WhatsApp />}
+                onClick={handleWhatsApp}
+                sx={{
+                  py: 1.5,
+                  borderRadius: 2,
+                  borderColor: "#25D366",
+                  color: "#25D366",
+                }}
+              >
+                WhatsApp
+              </Button>
+            </Grid>
+
+            <Grid size={{ xs: 6 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<Email />}
+                onClick={handleEmail}
+                sx={{
+                  py: 1.5,
+                  borderRadius: 2,
+                  borderColor: "#EA4335",
+                  color: "#EA4335",
+                }}
+              >
+                Email
+              </Button>
+            </Grid>
+
+            <Grid size={{ xs: 6 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<Link />}
+                onClick={handleCopiarEnlace}
+                sx={{
+                  py: 1.5,
+                  borderRadius: 2,
+                }}
+              >
+                Copiar Enlace
+              </Button>
+            </Grid>
+
+            <Grid size={{ xs: 6 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<QrCode2 />}
+                onClick={handleQR}
+                sx={{
+                  py: 1.5,
+                  borderRadius: 2,
+                }}
+              >
+                Código QR
+              </Button>
+            </Grid>
+          </Grid>
         </DialogContent>
+      </Dialog>
 
-        <DialogActions className="dialog-actions">
-          <Tooltip title="Descargar QR" {...tooltipProps}>
+      {/* Modal para QR */}
+      <Dialog
+        open={mostrarQR}
+        onClose={handleCloseQR}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Fade}
+        disableEnforceFocus={true}
+        disableAutoFocus={true}
+      >
+        <DialogContent sx={{ position: "relative", p: 3, textAlign: "center" }}>
+          <IconButton
+            onClick={handleCloseQR}
+            sx={{
+              position: "absolute",
+              right: 16,
+              top: 16,
+              color: "grey.500",
+            }}
+          >
+            <Close />
+          </IconButton>
+
+          <Typography variant="h5" gutterBottom fontWeight="bold">
+            Escanea el código QR
+          </Typography>
+
+          <Box sx={{ my: 3 }}>
+            <QRCodeSVG
+              value={generarEnlace()}
+              size={200}
+              level="H"
+              bgColor="#ffffff"
+              fgColor="#000000"
+            />
+          </Box>
+
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            Escanea con tu cámara para acceder al producto
+          </Typography>
+
+          <DialogActions sx={{ justifyContent: 'center', pt: 2 }}>
             <Button
               variant="contained"
               startIcon={<Download />}
               onClick={handleDescargarQR}
-              className="download-button"
+              sx={{ borderRadius: 2 }}
             >
               Descargar QR
             </Button>
-          </Tooltip>
-        </DialogActions>
+          </DialogActions>
+        </DialogContent>
       </Dialog>
     </Box>
   );

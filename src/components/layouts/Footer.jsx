@@ -254,7 +254,7 @@ const Footer = () => {
                 textAlign: "left",
               }}
             >
-              Enlaces/Links de las páginas
+            Links útiles
             </Typography>
             <Box
               sx={{
@@ -316,7 +316,7 @@ const Footer = () => {
             fontSize: "0.9rem",
           }}
         >
-          Todos los derechos reservados © {new Date().getFullYear()}
+          © {new Date().getFullYear()} BugBusters. Todos los derechos reservados.
         </Typography>
       </Container>
     </FooterContainer>

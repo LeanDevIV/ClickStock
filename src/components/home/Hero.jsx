@@ -12,11 +12,17 @@ const HeroHomePage = () => {
   const slides = [
     {
       image: "https://i.imgur.com/WQCfEbH.jpeg",
-      link: "/nosotros",
+      link: "/",
+      title: "Una comunidad de confianza",
+      description: "Únete a miles de usuarios satisfechos que gestionan su inventario con nosotros.",
+      buttonText: "Empezar Ahora",
     },
     {
       image: "https://i.imgur.com/27tgbdE.jpeg",
       link: "/contacto",
+      title: "Una gran variedad de productos",
+      description: "Encuentra todo lo que necesitas para tu negocio en un solo lugar. Y sí no lo tenemos, ¡déjanos un mensaje!",
+      buttonText: "Empezar Ahora",
     },
     {
       image: "https://i.imgur.com/Db3z0Pj.jpeg",
@@ -49,7 +55,7 @@ const HeroHomePage = () => {
     pauseOnHover: false,
     resetProgress: false,
     arrows: true,
-    pagination: true, // Enable default pagination dots for cleaner look
+    pagination: true, 
     speed: 800,
     dragAngleThreshold: 30,
     autoScroll: {

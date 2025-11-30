@@ -19,6 +19,10 @@ import {
   useTheme,
 } from "@mui/material";
 import { styled, alpha } from "@mui/material/styles";
+
+// 👈 RUTA DEL LOGO (Asegúrate de que 'logo-mouse.png' esté en la carpeta public/)
+const LOGO_PATH = "/logo-mouse.png";
+
 import {
   Search as SearchIcon,
   ShoppingCart,
@@ -127,10 +131,9 @@ export const Header = ({
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Box sx={{ my: 2 }}>
+      <Box sx={{ my: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Link
           to="/"
           style={{
@@ -142,7 +145,27 @@ export const Header = ({
             letterSpacing: "1px",
           }}
         >
-          ClickStock
+          <img
+            src={LOGO_PATH}
+            alt="ClickStock Logo"
+            style={{
+              height: 70, 
+              display: "block",
+              filter: modoOscuro
+                ? "drop-shadow(0 0 5px rgba(255, 255, 255, 0.4))"
+                : "none",
+            }}
+          />
+          <Box
+            component="span"
+            sx={{
+              fontWeight: "bold",
+              fontSize: "1.2rem",
+              color: "inherit",
+            }}
+          >
+            ClickStock
+          </Box>
         </Link>
       </Box>
       <Divider />
@@ -235,7 +258,6 @@ export const Header = ({
       </List>
     </Box>
   );
-
   return (
     <>
       <AppBar
@@ -269,7 +291,27 @@ export const Header = ({
                   letterSpacing: "1px",
                 }}
               >
-                ClickStock
+                <img
+                  src={LOGO_PATH}
+                  alt="ClickStock Logo"
+                  style={{
+                    height: 70,
+                    display: "block",
+                    filter: modoOscuro
+                      ? "drop-shadow(0 0 5px rgba(255, 255, 255, 0.4))"
+                      : "none",
+                  }}
+                />
+                <Box
+                  component="span"
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "1.75rem",
+                    color: "inherit",
+                  }}
+                >
+                  ClickStock
+                </Box>
               </Link>
             </Box>
 
@@ -285,7 +327,29 @@ export const Header = ({
                   letterSpacing: "1px",
                 }}
               >
-                ClickStock
+                {/* Imagen del Logo */}
+                <img
+                  src={LOGO_PATH}
+                  alt="ClickStock Logo"
+                  style={{
+                    height: 65, 
+                    display: "block",
+                    filter: modoOscuro
+                      ? "drop-shadow(0 0 5px rgba(255, 255, 255, 0.4))"
+                      : "none",
+                  }}
+                />
+                {/* Texto del Nombre */}
+                <Box
+                  component="span"
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "1.2rem",
+                    color: "inherit",
+                  }}
+                >
+                  ClickStock
+                </Box>
               </Link>
             </Box>
 
