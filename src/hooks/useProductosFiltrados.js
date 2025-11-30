@@ -30,15 +30,22 @@ export const useProductosFiltrados = () => {
         );
         setProductos(datosProductos);
 
-        let datosCategorias = respuestaCategorias.data || [];
+        let datosCategorias = respuestaCategorias.data;
+
+        // Verificar si viene envuelto en { success: true, data: [...] }
         if (
           datosCategorias &&
-          typeof datosCategorias === "object" &&
-          !Array.isArray(datosCategorias)
+          datosCategorias.data &&
+          Array.isArray(datosCategorias.data)
         ) {
-          datosCategorias = Object.values(datosCategorias);
+          datosCategorias = datosCategorias.data;
         }
-        if (!Array.isArray(datosCategorias)) datosCategorias = [];
+
+        // Asegurar que sea un array
+        if (!Array.isArray(datosCategorias)) {
+          datosCategorias = [];
+        }
+
         setCategorias(datosCategorias);
       } catch (error) {
         console.error(error);
