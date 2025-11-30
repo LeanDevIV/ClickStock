@@ -133,7 +133,14 @@ export const Header = ({
   }, []);
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Box sx={{ my: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Box
+        sx={{
+          my: 2,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <Link
           to="/"
           style={{
@@ -149,7 +156,7 @@ export const Header = ({
             src={LOGO_PATH}
             alt="ClickStock Logo"
             style={{
-              height: 70, 
+              height: 70,
               display: "block",
               filter: modoOscuro
                 ? "drop-shadow(0 0 5px rgba(255, 255, 255, 0.4))"
@@ -289,6 +296,9 @@ export const Header = ({
                   fontSize: "1.5rem",
                   fontFamily: "'Orbitron', sans-serif",
                   letterSpacing: "1px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
                 }}
               >
                 <img
@@ -325,6 +335,9 @@ export const Header = ({
                   fontSize: "1.2rem",
                   fontFamily: "'Orbitron', sans-serif",
                   letterSpacing: "1px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
                 }}
               >
                 {/* Imagen del Logo */}
@@ -332,7 +345,7 @@ export const Header = ({
                   src={LOGO_PATH}
                   alt="ClickStock Logo"
                   style={{
-                    height: 65, 
+                    height: 65,
                     display: "block",
                     filter: modoOscuro
                       ? "drop-shadow(0 0 5px rgba(255, 255, 255, 0.4))"
