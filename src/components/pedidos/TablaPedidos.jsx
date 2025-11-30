@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Box,
   Card,
@@ -21,32 +20,52 @@ import {
   Paper,
   IconButton,
   Tooltip,
+  Pagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  useTheme,
 } from "@mui/material";
 import {
   AddCircle as AddCircleIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   LocalShipping as LocalShippingIcon,
+  Warning as WarningIcon,
 } from "@mui/icons-material";
+
 import CrearPedidosModal from "./CrearPedidosModal.jsx";
 import EditarPedidosModal from "./EditarPedidosModal.jsx";
-import "../../styles/tablaPedidos.css";
 import clientaxios from "../../utils/clientAxios.js";
 import { Toaster, toast } from "react-hot-toast";
+
 const TablaPedidos = () => {
+  const theme = useTheme();
+
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
   const [pedidoEditando, setPedidoEditando] = useState(null);
+
   const [filtroEstado, setFiltroEstado] = useState("todos");
+
+  const [pagina, setPagina] = useState(1);
+  const itemsPorPagina = 6;
+
+  const [confirmarBorrado, setConfirmarBorrado] = useState(false);
+  const [pedidoAEliminar, setPedidoAEliminar] = useState(null);
+  const [cargandoEliminar, setCargandoEliminar] = useState(false);
 
   const obtenerPedidos = async () => {
     try {
       setCargando(true);
-      const { data } = await axios.get("http://localhost:5000/api/pedidos");
+      const { data } = await clientaxios.get("/pedidos");
       setPedidos(data.pedidos || data);
     } catch (error) {
-      console.error("Error al obtener los pedidos:", error);
+      console.error("Error al obtener pedidos:", error);
+      toast.error("No se pudieron cargar los pedidos.");
     } finally {
       setCargando(false);
     }
@@ -56,68 +75,71 @@ const TablaPedidos = () => {
     obtenerPedidos();
   }, []);
 
-  const manejarPedidoCreado = (nuevoPedido) => {
-    setPedidos([nuevoPedido, ...pedidos]);
+  const manejarPedidoCreado = (nuevo) => {
+    setPedidos([nuevo, ...pedidos]);
     setModalCrearAbierto(false);
   };
 
-  const manejarEditarPedido = async (pedidoActualizado) => {
-    try {
-      await axios.put(
-        `http://localhost:5000/api/pedidos/${pedidoActualizado._id}`,
-        pedidoActualizado,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setPedidoEditando(null);
-    } catch (err) {
-      alert("Error al editar pedido: " + err.message);
-    }
+  const manejarPedidoEditado = (actualizado) => {
+    setPedidos((prev) =>
+      prev.map((p) => (p._id === actualizado._id ? actualizado : p))
+    );
+    setPedidoEditando(null);
   };
 
-  const manejarEliminarPedido = async (pedidoId) => {
-    if (!window.confirm("¿Seguro que deseas eliminar este pedido?")) return;
-    try {
-      setPedidos((prev) => prev.filter((p) => p._id !== pedidoId));
-
-      await axios.delete(`http://localhost:5000/api/pedidos/${pedidoId}`);
-
-      toast.success("Pedido eliminado correctamente");
-    } catch (err) {
-      alert("Error al eliminar pedido: " + err.message);
-    }
+  const iniciarEliminarPedido = (pedido) => {
+    setPedidoAEliminar(pedido);
+    setConfirmarBorrado(true);
   };
 
-  const getEstadoClass = (estado) => `estado-${estado}`;
+  const ejecutarEliminarPedido = async () => {
+    if (!pedidoAEliminar) return;
 
+    setCargandoEliminar(true);
+    const toastId = toast.loading("Eliminando pedido...");
+
+    try {
+      await clientaxios.delete(`/pedidos/permanent/${pedidoAEliminar._id}`);
+      setPedidos((prev) => prev.filter((p) => p._id !== pedidoAEliminar._id));
+
+      toast.success("Pedido eliminado correctamente.", { id: toastId });
+      setConfirmarBorrado(false);
+    } catch (err) {
+      toast.error("Error al eliminar el pedido.", { id: toastId });
+    } finally {
+      setCargandoEliminar(false);
+    }
+  };
   const pedidosFiltrados =
     filtroEstado === "todos"
       ? pedidos
       : pedidos.filter((p) => p.estado === filtroEstado);
 
-  const pedidosPendientes = pedidos.filter(
-    (p) => p.estado === "pendiente"
-  ).length;
-  const pedidosEntregados = pedidos.filter(
-    (p) => p.estado === "entregado"
-  ).length;
+  const totalPaginas = Math.ceil(pedidosFiltrados.length / itemsPorPagina);
 
+  const pedidosPaginados = pedidosFiltrados.slice(
+    (pagina - 1) * itemsPorPagina,
+    pagina * itemsPorPagina
+  );
   if (cargando) {
     return (
-      <Box className="contenedor-cargando">
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        mt={10}
+      >
         <CircularProgress size={60} />
-        <Typography color="text.secondary" sx={{ mt: 2 }}>
-          Cargando pedidos...
-        </Typography>
+        <Typography sx={{ mt: 2 }}>Cargando pedidos...</Typography>
       </Box>
     );
   }
 
   return (
-    <Box className="contenedor-principal">
+    <Box>
+      <Toaster />
+
+      {/* HEADER */}
       <Grid
         container
         justifyContent="space-between"
@@ -125,12 +147,13 @@ const TablaPedidos = () => {
         sx={{ mb: 3 }}
       >
         <Grid>
-          <Typography variant="h4" color="primary" fontWeight="bold">
-            <LocalShippingIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+          <Typography variant="h4" fontWeight="bold" color="primary">
+            <LocalShippingIcon sx={{ mr: 1 }} />
             Gestión de Pedidos
           </Typography>
+
           <Typography color="text.secondary">
-            Administra y crea nuevos pedidos del sistema
+            Administra y crea nuevos pedidos
           </Typography>
         </Grid>
 
@@ -140,25 +163,26 @@ const TablaPedidos = () => {
             color="success"
             startIcon={<AddCircleIcon />}
             onClick={() => setModalCrearAbierto(true)}
-            sx={{ px: 3, py: 1.2, fontWeight: "bold", fontSize: "1rem" }}
+            sx={{ px: 3, py: 1.2, fontWeight: "bold" }}
           >
             Cargar pedido
           </Button>
         </Grid>
       </Grid>
 
-      <Card sx={{ borderRadius: 2, boxShadow: 3, overflow: "hidden" }}>
+      {/* TABLA */}
+      <Card>
         <CardHeader
           title={
             <Box
               display="flex"
               justifyContent="space-between"
-              alignItems="center"
               flexWrap="wrap"
               gap={2}
             >
+              {/* FILTRO */}
               <Box display="flex" alignItems="center" gap={2}>
-                <Typography fontWeight="bold" color="text.primary">
+                <Typography fontWeight="bold">
                   Filtrar por estado:
                 </Typography>
                 <Select
@@ -167,11 +191,10 @@ const TablaPedidos = () => {
                   size="small"
                   sx={{
                     minWidth: 150,
-                    backgroundColor: "#1a1919ff ",
-                    color: "white",
+                    bgcolor: theme.palette.background.paper,
                   }}
                 >
-                  <MenuItem value="todos">Todos los estados</MenuItem>
+                  <MenuItem value="todos">Todos</MenuItem>
                   <MenuItem value="pendiente">Pendiente</MenuItem>
                   <MenuItem value="procesando">Procesando</MenuItem>
                   <MenuItem value="enviado">Enviado</MenuItem>
@@ -180,239 +203,195 @@ const TablaPedidos = () => {
                 </Select>
               </Box>
 
+              {/* RESUMEN */}
               <Box display="flex" gap={1} flexWrap="wrap">
+                <Chip label={`Total: ${pedidos.length}`} color="primary" variant="outlined" />
                 <Chip
-                  label={`Total: ${pedidos.length}`}
-                  color="primary"
-                  variant="outlined"
-                />
-                <Chip
-                  label={`Pendiente: ${pedidosPendientes}`}
+                  label={`Pendientes: ${
+                    pedidos.filter((p) => p.estado === "pendiente").length
+                  }`}
                   color="warning"
                   variant="outlined"
                 />
                 <Chip
-                  label={`Entregado: ${pedidosEntregados}`}
+                  label={`Entregados: ${
+                    pedidos.filter((p) => p.estado === "entregado").length
+                  }`}
                   color="success"
                   variant="outlined"
                 />
               </Box>
             </Box>
           }
-          sx={{ backgroundColor: "#f8f9fa", borderBottom: "1px solid #e0e0e0" }}
         />
 
         <CardContent sx={{ p: 0 }}>
-          <TableContainer component={Paper} className="tabla-contenedor">
-            <Table stickyHeader sx={{ minWidth: 800 }}>
+          <TableContainer component={Paper}>
+            <Table size="small">
               <TableHead>
-                <TableRow className="tabla-cabecera">
-                  <TableCell className="tabla-celda-cabecera" width="60">
-                    #
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-cliente">
-                    Cliente
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-productos">
-                    Productos
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-productos">
-                    Dirección de Envío
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-total">
-                    Total
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-estado">
-                    Estado
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-fecha">
-                    Fecha
-                  </TableCell>
-                  <TableCell className="tabla-celda-cabecera tabla-celda-acciones">
-                    Acciones
-                  </TableCell>
+                <TableRow>
+                  <TableCell>#</TableCell>
+                  <TableCell>Cliente</TableCell>
+                  <TableCell>Productos</TableCell>
+                  <TableCell>Dirección</TableCell>
+                  <TableCell>Total</TableCell>
+                  <TableCell>Estado</TableCell>
+                  <TableCell>Fecha</TableCell>
+                  <TableCell>Acciones</TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
-                {pedidosFiltrados.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="estado-vacio">
-                      <Typography
-                        variant="h6"
-                        color="text.secondary"
-                        gutterBottom
-                      >
-                        No hay pedidos
+                {pedidosPaginados.map((pedido, index) => (
+                  <TableRow key={pedido._id} hover>
+                    <TableCell>{index + 1}</TableCell>
+
+                    <TableCell>
+                      <Typography fontWeight="bold">
+                        {pedido.usuario?.nombre}
                       </Typography>
-                      <Typography color="text.secondary" sx={{ mb: 2 }}>
-                        {filtroEstado !== "todos"
-                          ? `No se encontraron pedidos con estado "${filtroEstado}"`
-                          : "No hay pedidos registrados en el sistema"}
+                      <Typography variant="caption" color="text.secondary">
+                        {pedido.usuario?.correo}
                       </Typography>
-                      <Button
-                        variant="contained"
-                        startIcon={<AddCircleIcon />}
-                        onClick={() => setModalCrearAbierto(true)}
-                        size="small"
-                      >
-                        Crear primer pedido
-                      </Button>
                     </TableCell>
-                  </TableRow>
-                ) : (
-                  pedidosFiltrados.map((pedido, index) => (
-                    <TableRow key={pedido._id} hover>
-                      <TableCell className="tabla-celda">{index + 1}</TableCell>
 
-                      <TableCell className="tabla-celda tabla-celda-cliente">
-                        <Typography className="texto-cliente">
-                          {pedido.usuario?.nombre || "Cliente no disponible"}
-                          {pedido.usuario?.correo || "Email no disponible"}
-                        </Typography>
-                        <Typography
-                          className="texto-email"
-                          title={
-                            pedido.usuario?.correo || "Email no disponible"
-                          }
-                        >
-                          {pedido.usuario?.correo || "Email no disponible"}
-                        </Typography>
-                      </TableCell>
+                    <TableCell>
+                      {pedido.productos.map((p, i) => (
+                        <Chip
+                          key={i}
+                          size="small"
+                          label={`${p.producto?.nombre} (x${p.cantidad})`}
+                          variant="outlined"
+                          sx={{ m: 0.3 }}
+                        />
+                      ))}
+                    </TableCell>
 
-                      <TableCell className="tabla-celda tabla-celda-productos">
-                        <Box className="contenedor-chips">
-                          {pedido.productos.map((item, idx) => (
-                            <Chip
-                              key={idx}
-                              label={`${
-                                item.producto?.nombre ||
-                                "Producto no disponible"
-                              } (x${item.cantidad})`}
-                              size="small"
-                              className="chip-producto"
-                              variant="outlined"
-                              title={`${
-                                item.producto?.nombre ||
-                                "Producto no disponible"
-                              } - Cantidad: ${item.cantidad}`}
-                            />
-                          ))}
-                        </Box>
-                      </TableCell>
+                    <TableCell>{pedido.direccion || "N/A"}</TableCell>
 
-                      <TableCell className="tabla-celda">
-                        <Typography className="texto-cliente">
-                          {pedido.direccion || "Dirección no disponible"}
-                        </Typography>
-                      </TableCell>
+                    <TableCell>
+                      <Typography fontWeight="bold" color="primary">
+                        ${pedido.total}
+                      </Typography>
+                    </TableCell>
 
-                      <TableCell className="tabla-celda tabla-celda-total">
-                        <Typography
-                          className="texto-total"
-                          variant="subtitle1"
-                          fontWeight="bold"
+                    <TableCell>
+                      <Chip
+                        label={pedido.estado}
+                        color={
+                          pedido.estado === "pendiente"
+                            ? "warning"
+                            : pedido.estado === "entregado"
+                            ? "success"
+                            : "default"
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+
+                    <TableCell>
+                      {new Date(pedido.fechaCreacion).toLocaleDateString()}
+                    </TableCell>
+
+                    <TableCell>
+                      <Tooltip title="Editar">
+                        <IconButton
+                          onClick={() => setPedidoEditando(pedido)}
                           color="primary"
                         >
-                          ${pedido.total || 0}
-                        </Typography>
-                      </TableCell>
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
 
-                      <TableCell className="tabla-celda tabla-celda-estado">
-                        <Chip
-                          label={pedido.estado || "pendiente"}
-                          className={getEstadoClass(
-                            pedido.estado || "pendiente"
-                          )}
-                          size="small"
-                        />
-                      </TableCell>
+                      <Tooltip title="Eliminar">
+                        <IconButton
+                          color="error"
+                          onClick={() => iniciarEliminarPedido(pedido)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
 
-                      <TableCell className="tabla-celda tabla-celda-fecha">
-                        <Typography variant="body2">
-                          {pedido.fechaCreacion
-                            ? new Date(
-                                pedido.fechaCreacion
-                              ).toLocaleDateString()
-                            : "Fecha no disponible"}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {pedido.fechaCreacion
-                            ? new Date(
-                                pedido.fechaCreacion
-                              ).toLocaleTimeString()
-                            : ""}
-                        </Typography>
-                      </TableCell>
-
-                      <TableCell className="tabla-celda tabla-celda-acciones">
-                        <Box className="contenedor-acciones">
-                          <Tooltip title="Editar pedido">
-                            <IconButton
-                              size="small"
-                              onClick={() => setPedidoEditando(pedido)}
-                              className="boton-accion"
-                              color="primary"
-                            >
-                              <EditIcon />
-                            </IconButton>
-                          </Tooltip>
-
-                          <Tooltip title="Eliminar pedido">
-                            <IconButton
-                              size="small"
-                              onClick={() => manejarEliminarPedido(pedido._id)}
-                              className="boton-accion"
-                              color="error"
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                {pedidosPaginados.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center" sx={{ py: 5 }}>
+                      <Typography variant="h6" color="text.secondary">
+                        No hay pedidos para mostrar
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
                 )}
               </TableBody>
             </Table>
           </TableContainer>
         </CardContent>
-
-        {pedidosFiltrados.length > 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              px: 3,
-              py: 1.5,
-              backgroundColor: "#fafafa",
-              borderTop: "1px solid #e0e0e0",
-            }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              Mostrando {pedidosFiltrados.length} de {pedidos.length} pedidos
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Última actualización: {new Date().toLocaleTimeString()}
-            </Typography>
-          </Box>
-        )}
       </Card>
 
+      {/* PAGINACIÓN */}
+      {pedidosFiltrados.length > 0 && (
+        <Box display="flex" justifyContent="center" my={3}>
+          <Pagination
+            count={totalPaginas}
+            page={pagina}
+            onChange={(e, v) => setPagina(v)}
+            color="primary"
+            size="large"
+          />
+        </Box>
+      )}
+
+      {/* MODALES */}
       <CrearPedidosModal
         show={modalCrearAbierto}
         onHide={() => setModalCrearAbierto(false)}
         onPedidoCreado={manejarPedidoCreado}
       />
 
-      <EditarPedidosModal
-        show={!!pedidoEditando}
-        onHide={() => setPedidoEditando(null)}
-        pedido={pedidoEditando}
-        onPedidoEditado={manejarEditarPedido}
-        setPedidos={setPedidos}
-      />
+<EditarPedidosModal
+  show={!!pedidoEditando}
+  onHide={() => setPedidoEditando(null)}
+  pedido={pedidoEditando}
+  onPedidoEditado={manejarPedidoEditado}
+  setPedidos={setPedidos}         
+  pedidos={pedidos}               
+/>
+
+      {/* DIALOG ELIMINAR */}
+      <Dialog open={confirmarBorrado} onClose={() => setConfirmarBorrado(false)}>
+        <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
+          <WarningIcon sx={{ mr: 1, color: "error.main" }} />
+          Confirmar eliminación
+        </DialogTitle>
+
+        <DialogContent>
+          <DialogContentText>
+            ¿Deseas eliminar el pedido? Esta acción no se puede deshacer.
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setConfirmarBorrado(false)}>Cancelar</Button>
+
+          <Button
+            variant="contained"
+            color="error"
+            onClick={ejecutarEliminarPedido}
+            startIcon={
+              cargandoEliminar ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                <DeleteIcon />
+              )
+            }
+            disabled={cargandoEliminar}
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
