@@ -166,11 +166,11 @@ export const Header = ({
           />
           <Box
             component="span"
+            className="font-orbitron"
             sx={{
               fontWeight: "bold",
               fontSize: "1.2rem",
               color: "inherit",
-              fontFamily: "'Orbitron', sans-serif",
             }}
           >
             ClickStock
@@ -327,11 +327,11 @@ export const Header = ({
                 />
                 <Box
                   component="span"
+                  className="font-orbitron"
                   sx={{
                     fontWeight: "bold",
                     fontSize: "1.75rem",
                     color: "inherit",
-                    fontFamily: "'Orbitron', sans-serif",
                   }}
                 >
                   ClickStock
@@ -369,11 +369,11 @@ export const Header = ({
                 {/* Texto del Nombre */}
                 <Box
                   component="span"
+                  className="font-orbitron"
                   sx={{
                     fontWeight: "bold",
                     fontSize: "1.2rem",
                     color: "inherit",
-                    fontFamily: "'Orbitron', sans-serif",
                   }}
                 >
                   ClickStock
