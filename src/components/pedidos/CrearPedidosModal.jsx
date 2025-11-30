@@ -51,17 +51,6 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
   const [errorProductos, setErrorProductos] = useState("");
   const [cargandoUsuarios, setCargandoUsuarios] = useState(false);
   const [cargandoProductos, setCargandoProductos] = useState(false);
-
-  useEffect(() => {
-    if (show) {
-      cargarUsuarios();
-      cargarProductos();
-      resetForm();
-      const interval = setInterval(cargarProductos, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [show, cargarUsuarios, cargarProductos, resetForm]);
-
   const resetForm = useCallback(() => {
     setInventario([]);
     setFormData({ usuarioId: "", direccionEnvio: "" });
@@ -120,6 +109,15 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
       setCargandoProductos(false);
     }
   }, []);
+ useEffect(() => {
+    if (show) {
+      cargarUsuarios();
+      cargarProductos();
+      resetForm();
+      const interval = setInterval(cargarProductos, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [show, cargarUsuarios, cargarProductos, resetForm]);
 
   const verificarStockDisponible = async (productoId) => {
     try {
