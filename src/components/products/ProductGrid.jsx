@@ -3,7 +3,7 @@ import { Box, Typography, useTheme } from "@mui/material";
 import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import ProductCard from "./ProductCard";
 
-const ProductGrid = ({ productos = [] }) => {
+const ProductGrid = ({ productos = [], promociones = [] }) => {
   const theme = useTheme();
 
   if (productos.length === 0) {
@@ -68,7 +68,11 @@ const ProductGrid = ({ productos = [] }) => {
       }}
     >
       {productos.map((producto) => (
-        <ProductCard key={producto._id} producto={producto} />
+        <ProductCard
+          key={producto._id}
+          producto={producto}
+          promociones={promociones}
+        />
       ))}
     </Box>
   );

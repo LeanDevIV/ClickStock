@@ -16,6 +16,7 @@ import SearchResults from "../pages/shop/SearchResults.jsx";
 import AdminHome from "../pages/admin/AdminHome.jsx";
 import FavoritosPage from "../pages/user/FavoritosPage.jsx";
 import MisPedidos from "../pages/user/MisPedidos.jsx";
+import PromosPage from "../pages/shop/PromosPage.jsx";
 
 function IndexRoutes({
   modoOscuro,
@@ -45,6 +46,7 @@ function IndexRoutes({
           <Route path="/buscar" element={<SearchResults />} />
           <Route path="/favoritos" element={<FavoritosPage />} />
           <Route path="/mis-pedidos" element={<MisPedidos />} />
+          <Route path="/promos" element={<PromosPage />} />
 
           <Route path="/producto/detalle/:id" element={<ProductDetail />} />
 

@@ -12,10 +12,13 @@ import {
 } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { useProductosFiltrados } from "../../hooks/useProductosFiltrados";
+import { usePromocionStore } from "../../hooks/usePromocionStore";
 import ProductGrid from "../products/ProductGrid";
 
 function ProductosHome() {
   const theme = useTheme();
+  const { obtenerPromocionesActivas } = usePromocionStore();
+  const [promociones, setPromociones] = useState([]);
 
   const scrollSuaveCategorias = () => {
     const el = document.getElementById("categorias-section");
@@ -44,6 +47,18 @@ function ProductosHome() {
   };
 
   const [porPagina, setPorPagina] = useState(calcularPorPagina());
+
+  useEffect(() => {
+    const cargarPromociones = async () => {
+      try {
+        const data = await obtenerPromocionesActivas();
+        setPromociones(data);
+      } catch (error) {
+        console.error("Error al cargar promociones:", error);
+      }
+    };
+    cargarPromociones();
+  }, [obtenerPromocionesActivas]);
 
   useEffect(() => {
     const onResize = () => {
@@ -134,7 +149,7 @@ function ProductosHome() {
         </Box>
       ) : (
         <>
-          <ProductGrid productos={lista} />
+          <ProductGrid productos={lista} promociones={promociones} />
 
           {totalPag > 1 && (
             <Box

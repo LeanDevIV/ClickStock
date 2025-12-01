@@ -2,12 +2,10 @@ import { create } from "zustand";
 import clientAxios from "../utils/clientAxios";
 
 export const usePromocionStore = create((set) => ({
-  // Estado
   promociones: [],
+  promocionesActivas: [],
   loading: false,
   error: null,
-
-  // 🔹 Crear promoción
   crearPromocion: async (data) => {
     set({ loading: true, error: null });
     try {
@@ -41,7 +39,6 @@ export const usePromocionStore = create((set) => ({
     }
   },
 
-  // 🔹 Obtener todas las promociones
   obtenerPromociones: async () => {
     set({ loading: true, error: null });
     try {
@@ -58,7 +55,6 @@ export const usePromocionStore = create((set) => ({
     }
   },
 
-  // 🔹 Obtener promoción por ID
   obtenerPromocionPorId: async (id) => {
     set({ loading: true, error: null });
     try {
@@ -74,7 +70,6 @@ export const usePromocionStore = create((set) => ({
     }
   },
 
-  // 🔹 Actualizar promoción
   actualizarPromocion: async (id, data) => {
     set({ loading: true, error: null });
     try {
@@ -110,7 +105,6 @@ export const usePromocionStore = create((set) => ({
     }
   },
 
-  // 🔹 Eliminar promoción
   eliminarPromocion: async (id) => {
     set({ loading: true, error: null });
     try {
@@ -129,7 +123,28 @@ export const usePromocionStore = create((set) => ({
     }
   },
 
-  // 🔹 Limpiar estado
+  obtenerPromocionesActivas: async () => {
+    set({ loading: true, error: null });
+    try {
+      const response = await clientAxios.get("/promociones/activas");
+      set({ promocionesActivas: response.data, loading: false });
+      return response.data;
+    } catch (error) {
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        "Error al obtener promociones activas";
+      set({ error: errorMsg, loading: false });
+      throw error;
+    }
+  },
+
   limpiarError: () => set({ error: null }),
-  resetPromociones: () => set({ promociones: [], error: null, loading: false }),
+  resetPromociones: () =>
+    set({
+      promociones: [],
+      promocionesActivas: [],
+      error: null,
+      loading: false,
+    }),
 }));

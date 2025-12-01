@@ -18,10 +18,15 @@ import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/useCart";
 import { useFavoritos } from "../../hooks/useFavoritos";
+import PromocionBadge from "../promotions/PromocionBadge";
+import {
+  obtenerPromocionProducto,
+  calcularPrecioConDescuento,
+} from "../../utils/promocionUtils";
 
 const placeholder = () => `https://picsum.photos/id/66/300/200`;
 
-const ProductCard = ({ producto }) => {
+const ProductCard = ({ producto, promociones = [] }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [hoverId, setHoverId] = useState(null);
@@ -71,6 +76,11 @@ const ProductCard = ({ producto }) => {
   const enCarrito = estaEnCarrito(producto._id);
   const enFavoritos = esFavorito(producto._id);
 
+  const promocion = obtenerPromocionProducto(producto._id, promociones);
+  const precioConDescuento = promocion
+    ? calcularPrecioConDescuento(producto.precio, promocion.descuento)
+    : null;
+
   return (
     <Card
       onMouseEnter={() => setHoverId(producto._id)}
@@ -107,6 +117,20 @@ const ProductCard = ({ producto }) => {
             display: "block",
           }}
         />
+
+        {/* Badge de promoción */}
+        {promocion && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 8,
+              left: 8,
+              zIndex: 1,
+            }}
+          >
+            <PromocionBadge descuento={promocion.descuento} size="small" />
+          </Box>
+        )}
 
         <Box sx={{ display: { xs: "none", md: "block" } }}>
           <Fade in={hoverId === producto._id} timeout={200}>
@@ -259,37 +283,63 @@ const ProductCard = ({ producto }) => {
             {producto.nombre}
           </Typography>
 
-          <Chip
-            label={producto.categoria?.nombre}
-            size="small"
-            sx={{
-              color: theme.palette.primary.main,
-              fontWeight: 600,
-              backgroundColor: alpha(theme.palette.primary.main, 0.1),
-              border: "none",
-              mb: 2,
-            }}
-          />
+          {producto.categoria?.nombre && (
+            <Chip
+              label={producto.categoria.nombre}
+              size="small"
+              sx={{
+                color: theme.palette.primary.main,
+                fontWeight: 600,
+                backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                border: "none",
+                mb: 2,
+              }}
+            />
+          )}
         </Box>
 
         <Box>
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              flexDirection: "column",
+              gap: 0.5,
               mb: 1,
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 800,
-                color: theme.palette.primary.main,
-              }}
-            >
-              ${producto.precio?.toLocaleString()}
-            </Typography>
+            {promocion ? (
+              <>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    textDecoration: "line-through",
+                    color: theme.palette.text.secondary,
+                    fontWeight: 500,
+                  }}
+                >
+                  ${producto.precio?.toLocaleString()}
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 800,
+                    color: theme.palette.error.main,
+                  }}
+                >
+                  ${precioConDescuento?.toLocaleString()}
+                </Typography>
+              </>
+            ) : (
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 800,
+                  color: theme.palette.primary.main,
+                }}
+              >
+                ${producto.precio?.toLocaleString()}
+              </Typography>
+            )}
           </Box>
 
           <Box

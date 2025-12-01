@@ -5,11 +5,14 @@ import "@splidejs/react-splide/css";
 import clientAxios from "../../utils/clientAxios";
 import { Box, Typography, Container, Skeleton } from "@mui/material";
 import ProductCard from "../products/ProductCard";
+import { usePromocionStore } from "../../hooks/usePromocionStore";
 import "./CarruselDestacados.css";
 
 const CarruselDestacados = () => {
   const [productosDestacados, setProductosDestacados] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { obtenerPromocionesActivas } = usePromocionStore();
+  const [promociones, setPromociones] = useState([]);
 
   useEffect(() => {
     const obtenerProductosDestacados = async () => {
@@ -23,8 +26,18 @@ const CarruselDestacados = () => {
       }
     };
 
+    const cargarPromociones = async () => {
+      try {
+        const data = await obtenerPromocionesActivas();
+        setPromociones(data);
+      } catch (error) {
+        console.error("Error al cargar promociones:", error);
+      }
+    };
+
     obtenerProductosDestacados();
-  }, []);
+    cargarPromociones();
+  }, [obtenerPromocionesActivas]);
 
   if (loading) {
     return (
@@ -108,7 +121,7 @@ const CarruselDestacados = () => {
           <SplideSlide key={producto._id} style={{ padding: "20px 10px" }}>
             <div className="destacado-card-wrapper">
               <div className="destacado-ribbon">Destacado</div>
-              <ProductCard producto={producto} />
+              <ProductCard producto={producto} promociones={promociones} />
             </div>
           </SplideSlide>
         ))}

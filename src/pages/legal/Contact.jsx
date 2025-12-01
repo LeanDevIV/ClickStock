@@ -15,8 +15,10 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import clientAxios from "../../utils/clientAxios";
 import Swal from "sweetalert2";
 import { showValidationErrors } from "../../utils/validationErrors";
+import { usePageTitle } from "../../hooks/usePageTitle";
 
 const Contacto = () => {
+  usePageTitle("Contacto");
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 

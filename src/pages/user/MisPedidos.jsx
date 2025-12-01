@@ -20,7 +20,11 @@ import clientAxios from "../../utils/clientAxios.js";
 import { useStore } from "../../hooks/useStore.js";
 import { useOutletContext } from "react-router-dom";
 
+import { usePageTitle } from "../../hooks/usePageTitle";
+
 const MisPedidos = () => {
+  usePageTitle("Mis Pedidos");
+
   const { user } = useStore();
   const { handleOpenAuth } = useOutletContext() || {};
   const [pedidos, setPedidos] = useState([]);
