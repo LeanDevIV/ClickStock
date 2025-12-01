@@ -29,24 +29,22 @@ import {
   useTheme,
 } from "@mui/material";
 import {
-  AddCircle as AddCircleIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   LocalShipping as LocalShippingIcon,
   Warning as WarningIcon,
 } from "@mui/icons-material";
 
-import CrearPedidosModal from "./CrearPedidosModal.jsx";
-import EditarPedidosModal from "./EditarPedidosModal.jsx";
-import clientaxios from "../../utils/clientAxios.js";
 import { Toaster, toast } from "react-hot-toast";
+import clientaxios from "../../utils/clientAxios.js";
+
+const EditarPedidosModal = React.lazy(() => import("./EditarPedidosModal.jsx"));
 
 const TablaPedidos = () => {
   const theme = useTheme();
 
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
   const [pedidoEditando, setPedidoEditando] = useState(null);
 
   const [filtroEstado, setFiltroEstado] = useState("todos");
@@ -75,11 +73,6 @@ const TablaPedidos = () => {
     obtenerPedidos();
   }, []);
 
-  const manejarPedidoCreado = (nuevo) => {
-    setPedidos([nuevo, ...pedidos]);
-    setModalCrearAbierto(false);
-  };
-
   const manejarPedidoEditado = (actualizado) => {
     setPedidos((prev) =>
       prev.map((p) => (p._id === actualizado._id ? actualizado : p))
@@ -104,8 +97,9 @@ const TablaPedidos = () => {
 
       toast.success("Pedido eliminado correctamente.", { id: toastId });
       setConfirmarBorrado(false);
-    } catch (err) {
+    } catch (error) {
       toast.error("Error al eliminar el pedido.", { id: toastId });
+      console.error("Error al eliminar el pedido:", error);
     } finally {
       setCargandoEliminar(false);
     }
@@ -123,12 +117,7 @@ const TablaPedidos = () => {
   );
   if (cargando) {
     return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        mt={10}
-      >
+      <Box display="flex" flexDirection="column" alignItems="center" mt={10}>
         <CircularProgress size={60} />
         <Typography sx={{ mt: 2 }}>Cargando pedidos...</Typography>
       </Box>
@@ -138,8 +127,6 @@ const TablaPedidos = () => {
   return (
     <Box>
       <Toaster />
-
-      {/* HEADER */}
       <Grid
         container
         justifyContent="space-between"
@@ -152,25 +139,9 @@ const TablaPedidos = () => {
             Gestión de Pedidos
           </Typography>
 
-          <Typography color="text.secondary">
-            Administra y crea nuevos pedidos
-          </Typography>
-        </Grid>
-
-        <Grid>
-          <Button
-            variant="contained"
-            color="success"
-            startIcon={<AddCircleIcon />}
-            onClick={() => setModalCrearAbierto(true)}
-            sx={{ px: 3, py: 1.2, fontWeight: "bold" }}
-          >
-            Cargar pedido
-          </Button>
+          <Typography color="text.secondary">Administra los pedidos</Typography>
         </Grid>
       </Grid>
-
-      {/* TABLA */}
       <Card>
         <CardHeader
           title={
@@ -180,11 +151,8 @@ const TablaPedidos = () => {
               flexWrap="wrap"
               gap={2}
             >
-              {/* FILTRO */}
               <Box display="flex" alignItems="center" gap={2}>
-                <Typography fontWeight="bold">
-                  Filtrar por estado:
-                </Typography>
+                <Typography fontWeight="bold">Filtrar por estado:</Typography>
                 <Select
                   value={filtroEstado}
                   onChange={(e) => setFiltroEstado(e.target.value)}
@@ -202,10 +170,12 @@ const TablaPedidos = () => {
                   <MenuItem value="cancelado">Cancelado</MenuItem>
                 </Select>
               </Box>
-
-              {/* RESUMEN */}
               <Box display="flex" gap={1} flexWrap="wrap">
-                <Chip label={`Total: ${pedidos.length}`} color="primary" variant="outlined" />
+                <Chip
+                  label={`Total: ${pedidos.length}`}
+                  color="primary"
+                  variant="outlined"
+                />
                 <Chip
                   label={`Pendientes: ${
                     pedidos.filter((p) => p.estado === "pendiente").length
@@ -329,8 +299,6 @@ const TablaPedidos = () => {
           </TableContainer>
         </CardContent>
       </Card>
-
-      {/* PAGINACIÓN */}
       {pedidosFiltrados.length > 0 && (
         <Box display="flex" justifyContent="center" my={3}>
           <Pagination
@@ -338,29 +306,25 @@ const TablaPedidos = () => {
             page={pagina}
             onChange={(e, v) => setPagina(v)}
             color="primary"
-            size="large"
           />
         </Box>
       )}
-
-      {/* MODALES */}
-      <CrearPedidosModal
-        show={modalCrearAbierto}
-        onHide={() => setModalCrearAbierto(false)}
-        onPedidoCreado={manejarPedidoCreado}
-      />
-
-<EditarPedidosModal
-  show={!!pedidoEditando}
-  onHide={() => setPedidoEditando(null)}
-  pedido={pedidoEditando}
-  onPedidoEditado={manejarPedidoEditado}
-  setPedidos={setPedidos}         
-  pedidos={pedidos}               
-/>
-
-      {/* DIALOG ELIMINAR */}
-      <Dialog open={confirmarBorrado} onClose={() => setConfirmarBorrado(false)}>
+      <React.Suspense fallback={null}>
+        {pedidoEditando && (
+          <EditarPedidosModal
+            show={!!pedidoEditando}
+            onHide={() => setPedidoEditando(null)}
+            pedido={pedidoEditando}
+            onPedidoEditado={manejarPedidoEditado}
+            setPedidos={setPedidos}
+            pedidos={pedidos}
+          />
+        )}
+      </React.Suspense>
+      <Dialog
+        open={confirmarBorrado}
+        onClose={() => setConfirmarBorrado(false)}
+      >
         <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
           <WarningIcon sx={{ mr: 1, color: "error.main" }} />
           Confirmar eliminación

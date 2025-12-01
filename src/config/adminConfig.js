@@ -51,6 +51,8 @@ export const TABLE_CONFIG = {
       "rol",
       "createdAt",
       "isDeleted",
+      "deletedBy",
+      "deletedAt",
     ],
   },
   Pedidos: {

@@ -52,6 +52,7 @@ function AuthModal({ show, handleClose }) {
     try {
       setMensaje("");
       const result = await signInWithPopup(auth, provider);
+
       const token = await result.user.getIdToken();
 
       const data = await socialLoginService(token);

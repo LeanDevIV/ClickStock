@@ -166,6 +166,7 @@ export const Header = ({
           />
           <Box
             component="span"
+            className="font-orbitron"
             sx={{
               fontWeight: "bold",
               fontSize: "1.2rem",
@@ -326,6 +327,7 @@ export const Header = ({
                 />
                 <Box
                   component="span"
+                  className="font-orbitron"
                   sx={{
                     fontWeight: "bold",
                     fontSize: "1.75rem",
@@ -367,6 +369,7 @@ export const Header = ({
                 {/* Texto del Nombre */}
                 <Box
                   component="span"
+                  className="font-orbitron"
                   sx={{
                     fontWeight: "bold",
                     fontSize: "1.2rem",

@@ -99,7 +99,7 @@ export default function CountdownPage({ onLogin }) {
             backdropFilter: "blur(6px)",
             backgroundColor: "rgba(255, 255, 255, 0.8)",
             boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
-            p: { xs: 3, md: 5 },
+            p: { xs: 2, md: 5 },
             textAlign: "center",
             position: "relative",
           }}
@@ -128,6 +128,7 @@ export default function CountdownPage({ onLogin }) {
             component="h1"
             fontWeight="bold"
             gutterBottom
+            sx={{ fontSize: { xs: "1.8rem", sm: "3rem", md: "3.75rem" } }}
           >
             Lanzamiento
           </Typography>
@@ -157,7 +158,7 @@ export default function CountdownPage({ onLogin }) {
                 flexWrap="wrap"
                 justifyContent="center"
                 alignItems="center"
-                spacing={{ xs: 1, sm: 2, md: 3 }}
+                spacing={{ xs: 0.5, sm: 2, md: 3 }}
                 mb={4}
               >
                 <TimeBox label="Días" value={days} subtle />
@@ -245,8 +246,8 @@ function TimeBox({ label, value, progress, highlight, subtle }) {
         borderRadius: 4,
         border: subtle ? "1px solid" : "none",
         borderColor: "divider",
-        minWidth: { xs: 70, sm: 90, md: 110 },
-        p: 2,
+        minWidth: { xs: 55, sm: 90, md: 110 },
+        p: { xs: 1, md: 2 },
         boxShadow: subtle ? 1 : 0,
       }}
     >
@@ -254,11 +255,16 @@ function TimeBox({ label, value, progress, highlight, subtle }) {
         variant="h3"
         fontWeight="bold"
         color={highlight ? "primary.main" : "text.primary"}
-        sx={{ lineHeight: 1, mb: 1, fontSize: { xs: "2rem", md: "3rem" } }}
+        sx={{ lineHeight: 1, mb: 1, fontSize: { xs: "1.5rem", md: "3rem" } }}
       >
         {padded}
       </Typography>
-      <Typography variant="caption" color="text.secondary" mb={1}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        mb={1}
+        sx={{ fontSize: { xs: "0.7rem", md: "0.875rem" } }}
+      >
         {label}
       </Typography>
       {typeof progress === "number" && (
