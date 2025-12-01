@@ -77,20 +77,14 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
     try {
       setCargandoUsuarios(true);
       setErrorUsuarios("");
-      const authStorage = localStorage.getItem("auth-storage");
-      if (!authStorage) throw new Error("No hay sesión activa");
-      const parsedStorage = JSON.parse(authStorage);
-      const userData = parsedStorage.state?.user;
-      const token = parsedStorage.state?.token;
-      if (!userData || !token)
-        throw new Error("Datos de autenticación incompletos");
+
       const { data } = await clientAxios.get("/usuarios");
       const usuariosData = Array.isArray(data) ? data : data.usuarios || [];
       setUsuarios(usuariosData);
       if (usuariosData.length === 0)
         setErrorUsuarios("No se encontraron usuarios");
     } catch (error) {
-      setErrorUsuarios(error.message);
+      setErrorUsuarios(error.message || "Error al cargar usuarios");
     } finally {
       setCargandoUsuarios(false);
     }
@@ -266,10 +260,6 @@ const CrearPedidosModal = ({ show, onHide, onPedidoCreado }) => {
     setCargando(true);
     const toastId = toast.loading("Creando pedido...");
     try {
-      const authStorage = localStorage.getItem("auth-storage");
-      if (!authStorage) throw new Error("No hay sesión activa");
-      const token = JSON.parse(authStorage).state?.token;
-      if (!token) throw new Error("Token no encontrado");
       for (const item of inventario) {
         const stockActual = await verificarStockDisponible(item.producto._id);
         if (item.cantidad > stockActual) {

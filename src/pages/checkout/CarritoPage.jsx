@@ -31,6 +31,7 @@ import useCart from "../../hooks/useCart";
 import { useMercadoPago } from "../../hooks/useMercadoPago";
 import { useStore } from "../../hooks/useStore";
 import AuthModal from "../../components/auth/AuthModal";
+import clientAxios from "../../utils/clientAxios";
 
 const MAX_STOCK_QUANTITY_GLOBAL = 2000;
 const LOW_STOCK_THRESHOLD = 5;
@@ -95,31 +96,9 @@ const OrderSummarySkeleton = () => {
               alignItems: "center",
             }}
           >
-            <Skeleton variant="text" width="20%" height={28} />
-            <Skeleton variant="text" width="40%" height={36} />
+            <Skeleton variant="text" width="30%" height={32} />
+            <Skeleton variant="text" width="40%" height={32} />
           </Box>
-        </Box>
-        <Stack spacing={1}>
-          <Skeleton
-            variant="rectangular"
-            height={48}
-            sx={{ borderRadius: 1 }}
-          />
-          <Skeleton
-            variant="rectangular"
-            height={40}
-            sx={{ borderRadius: 1 }}
-          />
-        </Stack>
-        <Box
-          sx={{
-            mt: 2,
-            p: 2,
-            backgroundColor: theme.palette.background.default,
-            borderRadius: 2,
-          }}
-        >
-          <Skeleton variant="text" width="100%" height={20} />
         </Box>
       </CardContent>
     </Card>
@@ -145,6 +124,8 @@ const CarritoPage = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  const [direccion, setDireccion] = useState("");
+  const [errorDireccion, setErrorDireccion] = useState("");
   const [tempQuantities, setTempQuantities] = useState({});
 
   const handleStepChange = useCallback(
@@ -296,7 +277,7 @@ const CarritoPage = () => {
     setSnackbarOpen(false);
   };
 
-  const handleProcederPago = async () => {
+  const handleFinalizarCompra = async () => {
     if (articulos.length === 0) return;
 
     if (!user) {
@@ -304,24 +285,57 @@ const CarritoPage = () => {
       return;
     }
 
-    if (!user.correo) {
-      alert("Tu usuario no tiene un correo asociado válido.");
+    if (!direccion.trim()) {
+      setErrorDireccion("Por favor ingresa una dirección de envío");
       return;
     }
+    setErrorDireccion("");
 
-    const productos = articulos.map((producto) => ({
-      idProducto: producto.idProducto,
-      nombre: producto.nombre,
-      precio: producto.precio,
-      cantidad: producto.cantidad,
-      imagen: producto.imagen,
-    }));
+    try {
+      const pedidoData = {
+        usuario: user._id || user.id,
+        productos: articulos.map((item) => ({
+          producto: item.idProducto,
+          cantidad: item.cantidad,
+          precioUnitario: item.precio,
+        })),
+        total: precioTotal,
+        direccion: direccion.trim(),
+        estado: "pendiente",
+      };
 
-    setSnackbarOpen(true);
-    const result = await crearPreferencia(productos, user.correo);
+      // Crear pedido en backend
+      const { data } = await clientAxios.post("/pedidos", pedidoData);
 
-    if (!result.success) {
-      alert(result.error);
+      // El backend debe devolver el pedido creado con su ID
+      const pedidoId = data.pedido?._id || data._id;
+
+      if (pedidoId) {
+        // Iniciar flujo de Mercado Pago vinculado al pedido
+        const result = await crearPreferencia(articulos, user.correo, pedidoId);
+
+        if (!result.success) {
+          alert(
+            "Pedido creado pero hubo un error al iniciar el pago: " +
+              result.error
+          );
+          // Redirigir a mis pedidos de todas formas para que pueda intentar pagar luego
+          limpiarCarrito();
+          navigate("/mis-pedidos");
+        }
+      } else {
+        // Fallback si no hay ID (no debería pasar)
+        limpiarCarrito();
+        setSnackbarOpen(true);
+        setTimeout(() => {
+          navigate("/mis-pedidos");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error al crear pedido:", error);
+      alert(
+        "Hubo un error al procesar tu pedido. Por favor intenta nuevamente."
+      );
     }
   };
 
@@ -419,14 +433,6 @@ const CarritoPage = () => {
               }}
             >
               <CardContent>
-                <ShoppingBag
-                  sx={{
-                    fontSize: 80,
-                    color: theme.palette.text.secondary,
-                    mb: 2,
-                    opacity: 0.5,
-                  }}
-                />
                 <Typography variant="h5" color="text.secondary" gutterBottom>
                   Inicia sesión para ver tu carrito
                 </Typography>
@@ -705,13 +711,27 @@ const CarritoPage = () => {
                     </Box>
                   </Box>
 
+                  <Box sx={{ mb: 3 }}>
+                    <TextField
+                      label="Dirección de envío"
+                      fullWidth
+                      variant="outlined"
+                      value={direccion}
+                      onChange={(e) => setDireccion(e.target.value)}
+                      error={!!errorDireccion}
+                      helperText={errorDireccion}
+                      placeholder="Calle 123, Ciudad"
+                      size="small"
+                    />
+                  </Box>
+
                   <Stack spacing={1}>
                     <Button
                       variant="contained"
                       size="large"
                       startIcon={<Payment />}
                       disabled={loading || loadingPayment}
-                      onClick={handleProcederPago}
+                      onClick={handleFinalizarCompra}
                       sx={{
                         backgroundColor: theme.palette.secondary.main,
                         "&:hover": {
@@ -722,7 +742,7 @@ const CarritoPage = () => {
                         color: theme.palette.secondary.contrastText,
                       }}
                     >
-                      {loadingPayment ? "Procesando..." : "Proceder al Pago"}
+                      {loadingPayment ? "Procesando..." : "Finalizar Compra"}
                     </Button>
                     <Button
                       variant="outlined"
@@ -777,10 +797,10 @@ const CarritoPage = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="info"
+          severity="success"
           sx={{ width: "100%" }}
         >
-          Redirigiendo a Mercado Pago... Se abrirá en una nueva pestaña
+          ¡Pedido creado con éxito! Redirigiendo a tus pedidos...
         </Alert>
       </Snackbar>
       <AuthModal

@@ -128,7 +128,7 @@ export default function CountdownPage({ onLogin }) {
             component="h1"
             fontWeight="bold"
             gutterBottom
-            sx={{ fontSize: { xs: "2.5rem", sm: "3rem", md: "3.75rem" } }}
+            sx={{ fontSize: { xs: "1.8rem", sm: "3rem", md: "3.75rem" } }}
           >
             Lanzamiento
           </Typography>

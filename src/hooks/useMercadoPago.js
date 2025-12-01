@@ -9,7 +9,7 @@ initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY, {
 export const useMercadoPago = () => {
   const [loading, setLoading] = useState(false);
 
-  const crearPreferencia = async (productos, usuarioEmail) => {
+  const crearPreferencia = async (productos, usuarioEmail, pedidoId) => {
     try {
       setLoading(true);
 
@@ -17,6 +17,7 @@ export const useMercadoPago = () => {
         productos: productos,
         usuario: {
           emailUsuario: usuarioEmail,
+          pedidoId: pedidoId,
         },
       });
 

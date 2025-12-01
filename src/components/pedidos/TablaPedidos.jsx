@@ -36,10 +36,11 @@ import {
   Warning as WarningIcon,
 } from "@mui/icons-material";
 
-import CrearPedidosModal from "./CrearPedidosModal.jsx";
-import EditarPedidosModal from "./EditarPedidosModal.jsx";
-import clientaxios from "../../utils/clientAxios.js";
 import { Toaster, toast } from "react-hot-toast";
+import clientaxios from "../../utils/clientAxios.js";
+
+const CrearPedidosModal = React.lazy(() => import("./CrearPedidosModal.jsx"));
+const EditarPedidosModal = React.lazy(() => import("./EditarPedidosModal.jsx"));
 
 const TablaPedidos = () => {
   const theme = useTheme();
@@ -104,8 +105,9 @@ const TablaPedidos = () => {
 
       toast.success("Pedido eliminado correctamente.", { id: toastId });
       setConfirmarBorrado(false);
-    } catch (err) {
+    } catch (error) {
       toast.error("Error al eliminar el pedido.", { id: toastId });
+      console.error("Error al eliminar el pedido:", error);
     } finally {
       setCargandoEliminar(false);
     }
@@ -123,12 +125,7 @@ const TablaPedidos = () => {
   );
   if (cargando) {
     return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        mt={10}
-      >
+      <Box display="flex" flexDirection="column" alignItems="center" mt={10}>
         <CircularProgress size={60} />
         <Typography sx={{ mt: 2 }}>Cargando pedidos...</Typography>
       </Box>
@@ -182,9 +179,7 @@ const TablaPedidos = () => {
             >
               {/* FILTRO */}
               <Box display="flex" alignItems="center" gap={2}>
-                <Typography fontWeight="bold">
-                  Filtrar por estado:
-                </Typography>
+                <Typography fontWeight="bold">Filtrar por estado:</Typography>
                 <Select
                   value={filtroEstado}
                   onChange={(e) => setFiltroEstado(e.target.value)}
@@ -205,7 +200,11 @@ const TablaPedidos = () => {
 
               {/* RESUMEN */}
               <Box display="flex" gap={1} flexWrap="wrap">
-                <Chip label={`Total: ${pedidos.length}`} color="primary" variant="outlined" />
+                <Chip
+                  label={`Total: ${pedidos.length}`}
+                  color="primary"
+                  variant="outlined"
+                />
                 <Chip
                   label={`Pendientes: ${
                     pedidos.filter((p) => p.estado === "pendiente").length
@@ -338,29 +337,37 @@ const TablaPedidos = () => {
             page={pagina}
             onChange={(e, v) => setPagina(v)}
             color="primary"
-            size="large"
           />
         </Box>
       )}
 
       {/* MODALES */}
-      <CrearPedidosModal
-        show={modalCrearAbierto}
-        onHide={() => setModalCrearAbierto(false)}
-        onPedidoCreado={manejarPedidoCreado}
-      />
+      <React.Suspense fallback={null}>
+        {modalCrearAbierto && (
+          <CrearPedidosModal
+            show={modalCrearAbierto}
+            onHide={() => setModalCrearAbierto(false)}
+            onPedidoCreado={manejarPedidoCreado}
+          />
+        )}
 
-<EditarPedidosModal
-  show={!!pedidoEditando}
-  onHide={() => setPedidoEditando(null)}
-  pedido={pedidoEditando}
-  onPedidoEditado={manejarPedidoEditado}
-  setPedidos={setPedidos}         
-  pedidos={pedidos}               
-/>
+        {pedidoEditando && (
+          <EditarPedidosModal
+            show={!!pedidoEditando}
+            onHide={() => setPedidoEditando(null)}
+            pedido={pedidoEditando}
+            onPedidoEditado={manejarPedidoEditado}
+            setPedidos={setPedidos}
+            pedidos={pedidos}
+          />
+        )}
+      </React.Suspense>
 
       {/* DIALOG ELIMINAR */}
-      <Dialog open={confirmarBorrado} onClose={() => setConfirmarBorrado(false)}>
+      <Dialog
+        open={confirmarBorrado}
+        onClose={() => setConfirmarBorrado(false)}
+      >
         <DialogTitle sx={{ display: "flex", alignItems: "center" }}>
           <WarningIcon sx={{ mr: 1, color: "error.main" }} />
           Confirmar eliminación
