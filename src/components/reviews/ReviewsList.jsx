@@ -24,14 +24,14 @@ const ReviewsList = ({ productId, refreshTrigger }) => {
       try {
         setLoading(true);
         setError("");
-        const [dataReviews, dataPromedio] = await Promise.all([
-          getReviewsByProduct(productId),
-          getAverageRating(productId),
-        ]);
+
+        const dataReviews = await getReviewsByProduct(productId);
+        const dataPromedio = await getAverageRating(productId);
 
         setReviews(Array.isArray(dataReviews) ? dataReviews : []);
         setAverage(dataPromedio?.averageRating || 0);
-      } catch {
+
+      } catch (err) {
         setError("❌ No se pudieron cargar las reseñas. Intenta más tarde.");
       } finally {
         setLoading(false);
@@ -47,6 +47,7 @@ const ReviewsList = ({ productId, refreshTrigger }) => {
         <CircularProgress />
       </Box>
     );
+
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
@@ -54,6 +55,7 @@ const ReviewsList = ({ productId, refreshTrigger }) => {
       <Typography variant="h5" gutterBottom>
         Reseñas
       </Typography>
+
       <Typography variant="body1" gutterBottom>
         ⭐ Promedio: <strong>{average}</strong>/5
       </Typography>
