@@ -101,7 +101,7 @@ const Footer = () => {
 
       <Container maxWidth="lg">
         <Grid container spacing={4} sx={{ mb: 4 }} justifyContent="center">
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography
               variant="h6"
               gutterBottom
@@ -174,7 +174,7 @@ const Footer = () => {
             </Box>
           </Grid>
 
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography
               variant="h6"
               gutterBottom
@@ -243,7 +243,7 @@ const Footer = () => {
             </Box>
           </Grid>
 
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography
               variant="h6"
               gutterBottom
@@ -254,7 +254,7 @@ const Footer = () => {
                 textAlign: "left",
               }}
             >
-            Links útiles
+              Links útiles
             </Typography>
             <Box
               sx={{
@@ -316,7 +316,8 @@ const Footer = () => {
             fontSize: "0.9rem",
           }}
         >
-          © {new Date().getFullYear()} BugBusters. Todos los derechos reservados.
+          © {new Date().getFullYear()} BugBusters. Todos los derechos
+          reservados.
         </Typography>
       </Container>
     </FooterContainer>

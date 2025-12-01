@@ -294,9 +294,18 @@ export const GenericRow = ({
         return <DeletedByCell value={value} />;
 
       case "usuario":
-        if (!value) return "-";
+        if (!value)
+          return (
+            <Chip
+              label="Usuario no disponible"
+              size="small"
+              color="default"
+              variant="outlined"
+              sx={{ fontStyle: "italic" }}
+            />
+          );
         return typeof value === "object"
-          ? value.nombreUsuario || value.name
+          ? value.nombre || value.nombreUsuario || value.name
           : value;
 
       case "productId":
@@ -336,6 +345,31 @@ export const GenericRow = ({
             color={value ? "success" : "default"}
           />
         );
+      case "productos":
+        if (!value || !Array.isArray(value) || value.length === 0) {
+          return (
+            <Typography variant="caption" color="text.secondary">
+              Sin productos
+            </Typography>
+          );
+        }
+        return (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            {value.map((p, i) => (
+              <Chip
+                key={i}
+                size="small"
+                label={
+                  p.producto && typeof p.producto === "object"
+                    ? `${p.producto.nombre} (x${p.cantidad})`
+                    : `Producto no disponible (x${p.cantidad})`
+                }
+                variant="outlined"
+              />
+            ))}
+          </Box>
+        );
+
       default:
         if (Array.isArray(value)) {
           return value.length > 0 ? `${value.length} items` : "-";

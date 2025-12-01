@@ -63,6 +63,7 @@ export const TABLE_CONFIG = {
     editableFields: ["direccion", "estado"],
     displayFields: [
       "usuario",
+      "productos",
       "direccion",
       "total",
       "estado",

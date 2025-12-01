@@ -93,3 +93,36 @@ export const reviewSchema = z.object({
       message: "Lenguaje inapropiado en el comentario",
     }),
 });
+
+const objectIdRegex = /^[a-f\d]{24}$/i;
+const isValidObjectId = (id) => objectIdRegex.test(id);
+
+export const pedidoSchema = z.object({
+  usuario: z
+    .string()
+    .min(1, "El usuario es requerido")
+    .refine(isValidObjectId, "ID de usuario inválido"),
+  productos: z
+    .array(
+      z.object({
+        producto: z
+          .string()
+          .min(1, "El producto es requerido")
+          .refine(isValidObjectId, "ID de producto inválido"),
+        cantidad: z.coerce
+          .number()
+          .min(1, "La cantidad mínima es 1")
+          .int("La cantidad debe ser un número entero"),
+      })
+    )
+    .min(1, "El pedido debe tener al menos un producto"),
+  direccion: z
+    .string()
+    .min(5, "La dirección debe tener al menos 5 caracteres")
+    .trim(),
+  total: z.coerce.number().min(0, "El total no puede ser negativo"),
+  estado: z
+    .enum(["pendiente", "procesando", "enviado", "entregado", "cancelado"])
+    .optional()
+    .default("pendiente"),
+});

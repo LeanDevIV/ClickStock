@@ -19,11 +19,17 @@ import { socialLoginService } from "../../services/LoginService";
 import { useStore } from "../../hooks/useStore";
 
 function AuthModal({ show, handleClose }) {
-  const [modo, setModo] = useState(0); // 0 = login, 1 = registro
+  const [modo, setModo] = useState(0);
   const [mensaje, setMensaje] = useState("");
   const [height, setHeight] = useState("auto");
   const contentRef = useRef(null);
   const setUser = useStore((state) => state.setUser);
+
+  useEffect(() => {
+    if (show) {
+      setMensaje("");
+    }
+  }, [show]);
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -83,8 +89,8 @@ function AuthModal({ show, handleClose }) {
         sx: {
           borderRadius: 2,
           maxHeight: "90vh",
-          bgcolor: "#1e1e1e", // Dark background
-          color: "#ffffff", // White text
+          bgcolor: "#1e1e1e",
+          color: "#ffffff",
           border: "1px solid #333",
         },
       }}
@@ -120,10 +126,10 @@ function AuthModal({ show, handleClose }) {
               minHeight: 40,
               "& .MuiTab-root": {
                 color: "rgba(255,255,255,0.7)",
-                "&.Mui-selected": { color: "#d32f2f" }, // Red selected text
+                "&.Mui-selected": { color: "#d32f2f" },
               },
               "& .MuiTabs-indicator": {
-                backgroundColor: "#d32f2f", // Red indicator
+                backgroundColor: "#d32f2f",
               },
             }}
           >
