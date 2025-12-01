@@ -8,12 +8,21 @@ import {
   CircularProgress,
   Alert,
   Divider,
+  Button,
 } from "@mui/material";
 
-import { LocationOn } from "@mui/icons-material";
+import {
+  LocationOn,
+  ShoppingBag,
+  Login as LoginIcon,
+} from "@mui/icons-material";
 import clientAxios from "../../utils/clientAxios.js";
+import { useStore } from "../../hooks/useStore.js";
+import { useOutletContext } from "react-router-dom";
 
 const MisPedidos = () => {
+  const { user } = useStore();
+  const { handleOpenAuth } = useOutletContext() || {};
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
@@ -47,8 +56,9 @@ const MisPedidos = () => {
       try {
         const response = await clientAxios.get("/pedidos/mis-pedidos");
         setPedidos(response.data);
-      } catch (err) {
+      } catch (error) {
         setError("Error al obtener los pedidos");
+        console.error("Error al obtener los pedidos:", error);
       } finally {
         setCargando(false);
       }
@@ -57,19 +67,51 @@ const MisPedidos = () => {
     obtenerPedidos();
   }, []);
 
-  if (cargando)
+  if (!user) {
     return (
-      <Box display="flex" justifyContent="center" mt={10}>
+      <Box sx={{ maxWidth: 900, mx: "auto", mt: 5, px: 2 }}>
+        <Card
+          sx={{
+            textAlign: "center",
+            py: 8,
+            backgroundColor: "background.default",
+          }}
+        >
+          <CardContent>
+            <Typography variant="h5" color="text.secondary" gutterBottom>
+              Inicia sesión para ver tus pedidos
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={handleOpenAuth}
+              sx={{
+                mt: 2,
+              }}
+            >
+              Iniciar Sesión
+            </Button>
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  }
+
+  if (cargando) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
         <CircularProgress />
       </Box>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <Alert severity="error" sx={{ mt: 5, width: "90%", mx: "auto" }}>
         {error}
       </Alert>
     );
+  }
 
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", mt: 5, px: 2 }}>
@@ -82,14 +124,25 @@ const MisPedidos = () => {
       )}
 
       {pedidos.map((pedido) => (
-        <Card key={pedido._id} sx={{ mb: 3, borderRadius: 3, boxShadow: 3, p: 2 }}>
+        <Card
+          key={pedido._id}
+          sx={{ mb: 3, borderRadius: 3, boxShadow: 3, p: 2 }}
+        >
           <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={1}
+            >
               <Typography variant="h6" fontWeight="bold">
                 Pedido #{pedido._id.slice(-6)}
               </Typography>
 
-              <Chip label={pedido.estado.toUpperCase()} color={getEstadoColor(pedido.estado)} />
+              <Chip
+                label={pedido.estado.toUpperCase()}
+                color={getEstadoColor(pedido.estado)}
+              />
             </Box>
 
             <Typography variant="body2" color="text.secondary" mb={1}>
@@ -103,7 +156,12 @@ const MisPedidos = () => {
             </Typography>
 
             {pedido.productos.map((item) => (
-              <Box key={item._id} display="flex" justifyContent="space-between" mb={1}>
+              <Box
+                key={item._id}
+                display="flex"
+                justifyContent="space-between"
+                mb={1}
+              >
                 <Typography variant="body2">
                   {item.producto?.nombre} (x{item.cantidad})
                 </Typography>
@@ -121,7 +179,12 @@ const MisPedidos = () => {
               <Typography variant="body2">{pedido.direccion}</Typography>
             </Box>
 
-            <Typography variant="h6" fontWeight="bold" textAlign="right" color="primary">
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              textAlign="right"
+              color="primary"
+            >
               Total: {formatCurrency(pedido.total)}
             </Typography>
           </CardContent>

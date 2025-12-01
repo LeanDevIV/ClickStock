@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
-import { AutoScroll } from "@splidejs/splide-extension-auto-scroll";
 import "@splidejs/splide/dist/css/splide.min.css";
 import "../../styles/hero.css";
 
@@ -14,14 +13,16 @@ const HeroHomePage = () => {
       image: "https://i.imgur.com/WQCfEbH.jpeg",
       link: "/",
       title: "Una comunidad de confianza",
-      description: "Únete a miles de usuarios satisfechos que gestionan su inventario con nosotros.",
+      description:
+        "Únete a miles de usuarios satisfechos que gestionan su inventario con nosotros.",
       buttonText: "Empezar Ahora",
     },
     {
       image: "https://i.imgur.com/27tgbdE.jpeg",
       link: "/contacto",
       title: "Una gran variedad de productos",
-      description: "Encuentra todo lo que necesitas para tu negocio en un solo lugar. Y sí no lo tenemos, ¡déjanos un mensaje!",
+      description:
+        "Encuentra todo lo que necesitas para tu negocio en un solo lugar. Y sí no lo tenemos, ¡déjanos un mensaje!",
       buttonText: "Empezar Ahora",
     },
     {
@@ -48,20 +49,17 @@ const HeroHomePage = () => {
   ];
 
   const splideOptions = {
-    type: "loop",
+    type: "fade",
+    rewind: true,
     perPage: 1,
     autoplay: true,
-    interval: 4000,
-    pauseOnHover: false,
+    interval: 3000,
+    pauseOnHover: true,
     resetProgress: false,
     arrows: true,
-    pagination: true, 
+    pagination: true,
     speed: 800,
     dragAngleThreshold: 30,
-    autoScroll: {
-      speed: 1.5,
-      pauseOnHover: false,
-    },
   };
 
   return (
@@ -69,7 +67,6 @@ const HeroHomePage = () => {
       <div className="carousel-wrapper">
         <Splide
           options={splideOptions}
-          extensions={{ AutoScroll }}
           onMoved={(splide, index) => {
             setCurrentSlide(index);
           }}

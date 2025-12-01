@@ -217,28 +217,53 @@ const TablaPedidos = () => {
                     <TableCell>{index + 1}</TableCell>
 
                     <TableCell>
-                      <Typography fontWeight="bold">
-                        {pedido.usuario?.nombre}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {pedido.usuario?.correo}
-                      </Typography>
+                      {pedido.usuario && typeof pedido.usuario === "object" ? (
+                        <>
+                          <Typography fontWeight="bold">
+                            {pedido.usuario.nombre}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {pedido.usuario.correo}
+                          </Typography>
+                        </>
+                      ) : (
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontStyle="italic"
+                        >
+                          Usuario no disponible
+                        </Typography>
+                      )}
                     </TableCell>
 
                     <TableCell>
-                      {pedido.productos.map((p, i) => (
-                        <Chip
-                          key={i}
-                          size="small"
-                          label={`${p.producto?.nombre} (x${p.cantidad})`}
-                          variant="outlined"
-                          sx={{ m: 0.3 }}
-                        />
-                      ))}
+                      {pedido.productos && pedido.productos.length > 0 ? (
+                        pedido.productos.map((p, i) => (
+                          <Chip
+                            key={i}
+                            size="small"
+                            label={
+                              p.producto && typeof p.producto === "object"
+                                ? `${p.producto.nombre} (x${p.cantidad})`
+                                : `Producto no disponible (x${p.cantidad})`
+                            }
+                            variant="outlined"
+                            sx={{ m: 0.3 }}
+                          />
+                        ))
+                      ) : (
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontStyle="italic"
+                        >
+                          Sin productos
+                        </Typography>
+                      )}
                     </TableCell>
 
                     <TableCell>{pedido.direccion || "N/A"}</TableCell>
-
                     <TableCell>
                       <Typography fontWeight="bold" color="primary">
                         ${pedido.total}

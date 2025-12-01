@@ -70,7 +70,7 @@ export default function CountdownPage({ onLogin }) {
   });
 
   const handleLogin = () => {
-    if (password === "ClickStock") {
+    if (password === import.meta.env.VITE_PASSWORD) {
       setItem("site_access_granted", true);
       setOpenAuth(false);
       if (onLogin) onLogin();
