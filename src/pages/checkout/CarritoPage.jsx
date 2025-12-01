@@ -304,14 +304,11 @@ const CarritoPage = () => {
         estado: "pendiente",
       };
 
-      // Crear pedido en backend
       const { data } = await clientAxios.post("/pedidos", pedidoData);
 
-      // El backend debe devolver el pedido creado con su ID
       const pedidoId = data.pedido?._id || data._id;
 
       if (pedidoId) {
-        // Iniciar flujo de Mercado Pago vinculado al pedido
         const result = await crearPreferencia(articulos, user.correo, pedidoId);
 
         if (!result.success) {
@@ -319,12 +316,10 @@ const CarritoPage = () => {
             "Pedido creado pero hubo un error al iniciar el pago: " +
               result.error
           );
-          // Redirigir a mis pedidos de todas formas para que pueda intentar pagar luego
           limpiarCarrito();
           navigate("/mis-pedidos");
         }
       } else {
-        // Fallback si no hay ID (no debería pasar)
         limpiarCarrito();
         setSnackbarOpen(true);
         setTimeout(() => {
