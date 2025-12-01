@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -14,12 +14,18 @@ import {
   Typography,
   Checkbox,
   FormControlLabel,
+  Divider,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
+import { Add as AddIcon } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FIELD_TYPES, SELECT_OPTIONS, THEME } from "../../config/adminConfig";
 import { productoSchema } from "../../schemas/validationSchemas";
 import { showValidationErrors } from "../../utils/validationErrors";
+import { CrearCategoriaDialog } from "./CrearCategoriaDialog";
+import { useCategoriesStore } from "../../hooks/useCategoriesStore";
 
 export const CreateItemModal = ({
   open,
@@ -28,20 +34,22 @@ export const CreateItemModal = ({
   section,
   config,
 }) => {
-  // Determinar si debemos usar un esquema de validación (solo para productos por ahora)
   const resolver =
     section === "productos" ? zodResolver(productoSchema) : undefined;
+
+  const [dialogCategoriaOpen, setDialogCategoriaOpen] = useState(false);
+  const { fetchCategorias } = useCategoriesStore();
 
   const {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver,
   });
 
-  // Resetear formulario cuando se cierra o cambia la sección
   useEffect(() => {
     if (open) {
       reset();
@@ -53,10 +61,15 @@ export const CreateItemModal = ({
     onClose();
   };
 
-  // Determinar qué campos mostrar (usamos editableFields por defecto para creación)
+  const handleNuevaCategoriaCreada = async (nuevaCategoria) => {
+    await fetchCategorias();
+    if (nuevaCategoria && nuevaCategoria._id) {
+      setValue("categoria", nuevaCategoria._id);
+    }
+  };
+
   const camposParaMostrar = config?.editableFields || [];
 
-  // Estilos comunes para inputs
   const inputStyles = {
     "& .MuiOutlinedInput-root": {
       color: "#fff",
@@ -181,6 +194,35 @@ export const CreateItemModal = ({
                                 {opcion.label}
                               </MenuItem>
                             ))}
+                            {campo === "categoria" && [
+                              <Divider
+                                key="divider"
+                                sx={{
+                                  borderColor: "rgba(212, 175, 55, 0.2)",
+                                }}
+                              />,
+                              <MenuItem
+                                key="nueva-categoria"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDialogCategoriaOpen(true);
+                                }}
+                                sx={{
+                                  color: THEME.primaryColor,
+                                  fontWeight: "bold",
+                                  "&:hover": {
+                                    bgcolor: "rgba(212, 175, 55, 0.15)",
+                                  },
+                                }}
+                              >
+                                <ListItemIcon
+                                  sx={{ color: THEME.primaryColor }}
+                                >
+                                  <AddIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Nueva Categoría" />
+                              </MenuItem>,
+                            ]}
                           </Select>
                           {errors[campo] && (
                             <Typography variant="caption" color="error">
@@ -324,6 +366,12 @@ export const CreateItemModal = ({
           </Button>
         </DialogActions>
       </form>
+
+      <CrearCategoriaDialog
+        open={dialogCategoriaOpen}
+        onClose={() => setDialogCategoriaOpen(false)}
+        onCategoriaCreada={handleNuevaCategoriaCreada}
+      />
     </Dialog>
   );
 };
