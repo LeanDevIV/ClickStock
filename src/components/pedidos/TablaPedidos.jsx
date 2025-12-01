@@ -29,7 +29,6 @@ import {
   useTheme,
 } from "@mui/material";
 import {
-  AddCircle as AddCircleIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   LocalShipping as LocalShippingIcon,
@@ -39,7 +38,6 @@ import {
 import { Toaster, toast } from "react-hot-toast";
 import clientaxios from "../../utils/clientAxios.js";
 
-const CrearPedidosModal = React.lazy(() => import("./CrearPedidosModal.jsx"));
 const EditarPedidosModal = React.lazy(() => import("./EditarPedidosModal.jsx"));
 
 const TablaPedidos = () => {
@@ -47,7 +45,6 @@ const TablaPedidos = () => {
 
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
   const [pedidoEditando, setPedidoEditando] = useState(null);
 
   const [filtroEstado, setFiltroEstado] = useState("todos");
@@ -75,11 +72,6 @@ const TablaPedidos = () => {
   useEffect(() => {
     obtenerPedidos();
   }, []);
-
-  const manejarPedidoCreado = (nuevo) => {
-    setPedidos([nuevo, ...pedidos]);
-    setModalCrearAbierto(false);
-  };
 
   const manejarPedidoEditado = (actualizado) => {
     setPedidos((prev) =>
@@ -135,8 +127,6 @@ const TablaPedidos = () => {
   return (
     <Box>
       <Toaster />
-
-      {/* HEADER */}
       <Grid
         container
         justifyContent="space-between"
@@ -149,25 +139,9 @@ const TablaPedidos = () => {
             Gestión de Pedidos
           </Typography>
 
-          <Typography color="text.secondary">
-            Administra y crea nuevos pedidos
-          </Typography>
-        </Grid>
-
-        <Grid>
-          <Button
-            variant="contained"
-            color="success"
-            startIcon={<AddCircleIcon />}
-            onClick={() => setModalCrearAbierto(true)}
-            sx={{ px: 3, py: 1.2, fontWeight: "bold" }}
-          >
-            Cargar pedido
-          </Button>
+          <Typography color="text.secondary">Administra los pedidos</Typography>
         </Grid>
       </Grid>
-
-      {/* TABLA */}
       <Card>
         <CardHeader
           title={
@@ -177,7 +151,6 @@ const TablaPedidos = () => {
               flexWrap="wrap"
               gap={2}
             >
-              {/* FILTRO */}
               <Box display="flex" alignItems="center" gap={2}>
                 <Typography fontWeight="bold">Filtrar por estado:</Typography>
                 <Select
@@ -197,8 +170,6 @@ const TablaPedidos = () => {
                   <MenuItem value="cancelado">Cancelado</MenuItem>
                 </Select>
               </Box>
-
-              {/* RESUMEN */}
               <Box display="flex" gap={1} flexWrap="wrap">
                 <Chip
                   label={`Total: ${pedidos.length}`}
@@ -328,8 +299,6 @@ const TablaPedidos = () => {
           </TableContainer>
         </CardContent>
       </Card>
-
-      {/* PAGINACIÓN */}
       {pedidosFiltrados.length > 0 && (
         <Box display="flex" justifyContent="center" my={3}>
           <Pagination
@@ -340,17 +309,7 @@ const TablaPedidos = () => {
           />
         </Box>
       )}
-
-      {/* MODALES */}
       <React.Suspense fallback={null}>
-        {modalCrearAbierto && (
-          <CrearPedidosModal
-            show={modalCrearAbierto}
-            onHide={() => setModalCrearAbierto(false)}
-            onPedidoCreado={manejarPedidoCreado}
-          />
-        )}
-
         {pedidoEditando && (
           <EditarPedidosModal
             show={!!pedidoEditando}
@@ -362,8 +321,6 @@ const TablaPedidos = () => {
           />
         )}
       </React.Suspense>
-
-      {/* DIALOG ELIMINAR */}
       <Dialog
         open={confirmarBorrado}
         onClose={() => setConfirmarBorrado(false)}

@@ -18,9 +18,8 @@ import {
   CircularProgress,
   Grid,
   Alert,
-  IconButton,
-
   DialogContentText,
+  useTheme,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -28,13 +27,10 @@ import {
   AttachMoney as MoneyIcon,
   Inventory as InventoryIcon,
   Delete as DeleteIcon,
-  Add as AddIcon,
-  Remove as RemoveIcon,
-  Warning as WarningIcon, 
+  Warning as WarningIcon,
 } from "@mui/icons-material";
 import { toast } from "react-hot-toast";
 import clientaxios from "../../utils/clientAxios.js";
-import "../../styles/editarPedidosModal.css";
 
 const EditarPedidosModal = ({
   show,
@@ -43,6 +39,7 @@ const EditarPedidosModal = ({
   onPedidoEditado,
   setPedidos,
 }) => {
+  const theme = useTheme();
   const [formData, setFormData] = useState({
     direccionEnvio: "",
     estado: "pendiente",
@@ -51,9 +48,6 @@ const EditarPedidosModal = ({
   const [cargando, setCargando] = useState(false);
   const [cargandoProductos, setCargandoProductos] = useState(false);
   const [error, setError] = useState("");
-  const [errores, setErrores] = useState({
-    direccionEnvio: "",
-  });
   const [productosDisponibles, setProductosDisponibles] = useState([]);
   const [stockOriginal, setStockOriginal] = useState({});
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
@@ -67,7 +61,6 @@ const EditarPedidosModal = ({
         productos: pedido.productos ? [...pedido.productos] : [],
       });
       setError("");
-      setErrores({ direccionEnvio: "" });
     }
   }, [show, pedido]);
 
@@ -99,7 +92,7 @@ const EditarPedidosModal = ({
         pedido?.productos?.find(
           (item) => (item.producto?._id || item.producto) === productoId
         )?.cantidad || 0;
-      
+
       const stockTotalDisponible = stockBase + cantidadOriginalEnPedido;
 
       return stockTotalDisponible;
@@ -114,31 +107,8 @@ const EditarPedidosModal = ({
     [productosDisponibles]
   );
 
-  const validarDireccion = (direccion) => {
-    if (!direccion || direccion.trim() === "") {
-      return "La dirección es obligatoria";
-    }
-
-    if (direccion.trim().length < 10) {
-      return "La dirección debe tener al menos 10 caracteres";
-    }
-
-    if (direccion.trim().length > 200) {
-      return "La dirección no puede exceder los 200 caracteres";
-    }
-
-    const tieneNumero = /\d/.test(direccion);
-    const tieneTexto = /[a-zA-Z]/.test(direccion);
-
-    if (!tieneNumero || !tieneTexto) {
-      return "La dirección debe incluir número y nombre de calle";
-    }
-
-    return "";
-  };
-
   const iniciarEliminarPedido = () => {
-      setConfirmarBorrado(true);
+    setConfirmarBorrado(true);
   };
 
   const manejarEliminarPedido = async () => {
@@ -149,107 +119,31 @@ const EditarPedidosModal = ({
 
     try {
       await clientaxios.delete(`/pedidos/permanent/${pedido._id}`);
-      
+
       setPedidos((prev) => prev.filter((p) => p._id !== pedido._id));
-      
-      toast.success("Pedido eliminado correctamente y stock restaurado", { id: toastId });
+
+      toast.success("Pedido eliminado correctamente y stock restaurado", {
+        id: toastId,
+      });
       onHide();
     } catch (error) {
       console.error("Error al eliminar pedido:", error);
-      toast.error("Error al eliminar pedido o restaurar stock", { id: toastId });
+      toast.error("Error al eliminar pedido o restaurar stock", {
+        id: toastId,
+      });
     } finally {
       setCargando(false);
     }
-  };
-  
-  const manejarCambioDireccion = (e) => {
-    const nuevaDireccion = e.target.value;
-    setFormData({ ...formData, direccionEnvio: nuevaDireccion });
-
-    if (nuevaDireccion.length > 0) {
-      const error = validarDireccion(nuevaDireccion);
-      setErrores({ ...errores, direccionEnvio: error });
-    } else {
-      setErrores({ ...errores, direccionEnvio: "" });
-    }
-  };
-
-  const actualizarCantidad = (index, nuevaCantidad) => {
-    const cantidadAjustada = Math.max(1, parseInt(nuevaCantidad) || 1);
-    
-    const productoItem = formData.productos[index];
-    const productoId = productoItem.producto?._id || productoItem.producto;
-    const stockDisponible = calcularStockDisponible(productoId);
-    
-    const cantidadFinal = Math.min(cantidadAjustada, stockDisponible);
-
-    if (cantidadAjustada === 0) return; 
-    
-    const productosActualizados = [...formData.productos];
-    productosActualizados[index] = {
-      ...productosActualizados[index],
-      cantidad: cantidadFinal,
-    };
-
-    setFormData({
-      ...formData,
-      productos: productosActualizados,
-    });
-    
-    setError(null);
-  };
-  
-  const eliminarProducto = (index) => {
-    if (formData.productos.length <= 1) {
-      toast.error("El pedido debe tener al menos un producto");
-      return;
-    }
-
-    const productosActualizados = formData.productos.filter(
-      (_, i) => i !== index
-    );
-        
-    setFormData({
-      ...formData,
-      productos: productosActualizados,
-    });
-    
-    toast.success("Producto eliminado del pedido");
-    setError(null);
   };
 
   const calcularTotal = useCallback(() => {
     return formData.productos.reduce((total, item) => {
       const productoId = item.producto?._id || item.producto;
       const producto = obtenerProductoInfo(productoId);
-      const precio = item.precioUnitario || producto?.precio || 0; 
+      const precio = item.precioUnitario || producto?.precio || 0;
       return total + precio * item.cantidad;
     }, 0);
   }, [formData.productos, obtenerProductoInfo]);
-
-  const validarStockProductos = () => {
-    for (const item of formData.productos) {
-      const productoId = item.producto?._id || item.producto;
-      const producto = obtenerProductoInfo(productoId);
-
-      if (!producto) {
-        return `El producto "${
-          item.producto?.nombre || "Producto"
-        }" ya no existe. Por favor, elimínalo del pedido.`;
-      }
-      
-      const stockDisponible = calcularStockDisponible(productoId);
-      
-      if (item.cantidad < 1 || !Number.isInteger(item.cantidad)) {
-        return `Cantidad inválida (${item.cantidad}) para el producto "${producto.nombre}".`;
-      }
-      
-      if (item.cantidad > stockDisponible) {
-        return `Stock insuficiente para "${producto.nombre}". Disponible: ${stockDisponible}, Solicitado: ${item.cantidad}`;
-      }
-    }
-    return null;
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -260,40 +154,12 @@ const EditarPedidosModal = ({
       return;
     }
 
-    const errorDireccion = validarDireccion(formData.direccionEnvio);
-    if (errorDireccion) {
-      setErrores({ ...errores, direccionEnvio: errorDireccion });
-      setError("Por favor, corrige los errores en el formulario");
-      return;
-    }
-
-    if (formData.productos.length === 0) {
-      setError("El pedido debe tener al menos un producto");
-      return;
-    }
-
-    const errorStock = validarStockProductos();
-    if (errorStock) {
-      setError(errorStock);
-      return;
-    }
-    
-    setErrores({ ...errores, direccionEnvio: "" });
-    setError("");
-
     setCargando(true);
     const toastId = toast.loading("Actualizando pedido...");
 
     try {
       const updateData = {
-        direccion: formData.direccionEnvio.trim(),
         estado: formData.estado,
-        productos: formData.productos.map((item) => ({
-          producto: item.producto?._id || item.producto,
-          cantidad: item.cantidad,
-          precioUnitario: item.precioUnitario || obtenerProductoInfo(item.producto?._id || item.producto)?.precio,
-        })),
-        total: calcularTotal(),
       };
 
       const { data: responseData } = await clientaxios.put(
@@ -302,10 +168,13 @@ const EditarPedidosModal = ({
       );
 
       onPedidoEditado(responseData.pedido || responseData);
-      toast.success("Pedido actualizado exitosamente", { id: toastId });
+      toast.success("Estado del pedido actualizado exitosamente", {
+        id: toastId,
+      });
       onHide();
     } catch (error) {
-      const errorMessage = error.response?.data?.error || error.message || "Problema de conexión.";
+      const errorMessage =
+        error.response?.data?.error || error.message || "Problema de conexión.";
       toast.error(`Error al actualizar pedido: ${errorMessage}`, {
         id: toastId,
       });
@@ -328,100 +197,255 @@ const EditarPedidosModal = ({
 
   return (
     <>
-      {/* MODAL PRINCIPAL DE EDICIÓN */}
       <Dialog
         open={show}
         onClose={onHide}
         maxWidth="md"
         fullWidth
-        className="modal-editar-pedido"
+        sx={{
+          "& .MuiDialog-paper": {
+            backgroundColor: theme.palette.background.paper,
+            backgroundImage: "none",
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 8px 40px rgba(212, 175, 55, 0.15)"
+                : "0 8px 40px rgba(0, 0, 0, 0.15)",
+          },
+        }}
       >
-        <DialogTitle className="header-modal">
-          <Box className="titulo-modal">
-            <EditIcon />
-            <Typography variant="h5" component="div">
+        <DialogTitle
+          sx={{
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+            color: theme.palette.primary.contrastText,
+            padding: "24px",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <EditIcon sx={{ fontSize: 28 }} />
+            <Typography
+              variant="h5"
+              component="div"
+              fontFamily="'Orbitron', sans-serif"
+              fontWeight="700"
+            >
               Editar Pedido #{pedido._id?.slice(-6)}
             </Typography>
           </Box>
         </DialogTitle>
 
         <form onSubmit={handleSubmit}>
-          <DialogContent className="contenido-modal">
+          <DialogContent
+            sx={{
+              padding: 3,
+              backgroundColor: theme.palette.background.default,
+            }}
+          >
             {error && (
-              <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+              <Alert
+                severity="error"
+                sx={{
+                  mb: 3,
+                  borderRadius: 2,
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? "rgba(185, 28, 28, 0.15)"
+                      : "rgba(239, 68, 68, 0.1)",
+                  borderLeft: `4px solid ${theme.palette.error.main}`,
+                }}
+              >
                 {error}
               </Alert>
             )}
 
             {cargandoProductos && (
-              <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+              <Alert
+                severity="info"
+                sx={{
+                  mb: 3,
+                  borderRadius: 2,
+                  backgroundColor:
+                    theme.palette.mode === "dark"
+                      ? "rgba(59, 130, 246, 0.15)"
+                      : "rgba(59, 130, 246, 0.1)",
+                  borderLeft: `4px solid ${theme.palette.info.main}`,
+                }}
+              >
                 Cargando información de productos...
               </Alert>
             )}
 
-            {/* ... (Contenido del formulario) ... */}
-            <Grid container spacing={3} className="seccion-datos">
-              <Grid xs={12} md={7}>
-                <Box className="tarjeta-dato">
-                  <Typography variant="body2" className="etiqueta-dato">
-                    <PersonIcon sx={{ fontSize: 18, mr: 1 }} />
+            <Grid container spacing={3} sx={{ mb: 3 }}>
+              <Grid item xs={12} md={7}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    padding: 2.5,
+                    backgroundColor: theme.palette.background.paper,
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: 2,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow:
+                        theme.palette.mode === "dark"
+                          ? "0 4px 20px rgba(212, 175, 55, 0.1)"
+                          : "0 4px 20px rgba(0, 0, 0, 0.08)",
+                      borderColor: theme.palette.primary.main,
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      mb: 1.5,
+                      color: theme.palette.text.secondary,
+                      fontWeight: 600,
+                    }}
+                  >
+                    <PersonIcon
+                      sx={{
+                        fontSize: 20,
+                        mr: 1,
+                        color: theme.palette.primary.main,
+                      }}
+                    />
                     Información del Cliente
                   </Typography>
                   <Typography
                     variant="h6"
-                    className="valor-dato valor-dato-cliente"
+                    sx={{
+                      fontWeight: 700,
+                      color: theme.palette.text.primary,
+                      fontFamily: "'Orbitron', sans-serif",
+                    }}
                   >
                     {pedido.usuario?.nombre || "Cliente no especificado"}
                   </Typography>
-                  <Typography variant="body2" className="texto-email">
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      mt: 0.5,
+                      fontFamily: "'Exo 2', sans-serif",
+                    }}
+                  >
                     {pedido.usuario?.correo || "Email no disponible"}
                   </Typography>
-                </Box>
+                </Card>
               </Grid>
 
-              <Grid xs={12} md={5}>
-                <Box className="tarjeta-dato">
-                  <Typography variant="body2" className="etiqueta-dato">
-                    <MoneyIcon sx={{ fontSize: 18, mr: 1 }} />
+              <Grid item xs={12} md={5}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    padding: 2.5,
+                    backgroundColor: theme.palette.background.paper,
+                    border: `2px solid ${theme.palette.success.main}`,
+                    borderRadius: 2,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      boxShadow:
+                        theme.palette.mode === "dark"
+                          ? "0 4px 20px rgba(34, 197, 94, 0.2)"
+                          : "0 4px 20px rgba(34, 197, 94, 0.15)",
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      mb: 1.5,
+                      color: theme.palette.text.secondary,
+                      fontWeight: 600,
+                    }}
+                  >
+                    <MoneyIcon
+                      sx={{
+                        fontSize: 20,
+                        mr: 1,
+                        color: theme.palette.success.main,
+                      }}
+                    />
                     Total del Pedido
                   </Typography>
                   <Typography
                     variant="h4"
-                    className="valor-dato valor-dato-total"
+                    sx={{
+                      fontWeight: 700,
+                      color: theme.palette.success.main,
+                      fontFamily: "'Orbitron', sans-serif",
+                    }}
                   >
                     {formatCurrency(totalCalculado)}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      fontFamily: "'Exo 2', sans-serif",
+                    }}
+                  >
                     {formData.productos.length} producto(s)
                   </Typography>
-                </Box>
+                </Card>
               </Grid>
             </Grid>
 
-            <Box className="campo-direccion">
+            <Box sx={{ mb: 3 }}>
               <TextField
                 fullWidth
                 label="Dirección de Envío"
                 value={formData.direccionEnvio}
-                onChange={manejarCambioDireccion}
-                placeholder="Ingresa la dirección completa de envío (ej: Av. Corrientes 1234, CABA)"
+                disabled
                 multiline
                 rows={3}
-                error={!!errores.direccionEnvio}
-                helperText={errores.direccionEnvio}
-                inputProps={{ maxLength: 200 }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: theme.palette.action.disabledBackground,
+                    "& fieldset": {
+                      borderColor: theme.palette.divider,
+                    },
+                  },
+                  "& .MuiInputBase-input.Mui-disabled": {
+                    WebkitTextFillColor: theme.palette.text.primary,
+                    fontFamily: "'Exo 2', sans-serif",
+                  },
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "'Exo 2', sans-serif",
+                  },
+                }}
               />
               <Typography
                 variant="caption"
-                color="text.secondary"
-                sx={{ display: "block", mt: 0.5 }}
+                sx={{
+                  display: "block",
+                  mt: 0.5,
+                  color: theme.palette.text.secondary,
+                  fontStyle: "italic",
+                  fontFamily: "'Exo 2', sans-serif",
+                }}
               >
-                {formData.direccionEnvio.length}/200 caracteres
+                La dirección no se puede modificar una vez creado el pedido
               </Typography>
             </Box>
 
-            <Box className="campo-estado">
-              <FormControl fullWidth>
+            <Box sx={{ mb: 3 }}>
+              <FormControl
+                fullWidth
+                sx={{
+                  "& .MuiInputLabel-root": {
+                    fontFamily: "'Exo 2', sans-serif",
+                  },
+                  "& .MuiSelect-select": {
+                    fontFamily: "'Exo 2', sans-serif",
+                  },
+                }}
+              >
                 <InputLabel>Estado del Pedido</InputLabel>
                 <Select
                   value={formData.estado}
@@ -429,6 +453,18 @@ const EditarPedidosModal = ({
                     setFormData({ ...formData, estado: e.target.value })
                   }
                   label="Estado del Pedido"
+                  sx={{
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: theme.palette.divider,
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: theme.palette.primary.main,
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: theme.palette.primary.main,
+                      borderWidth: 2,
+                    },
+                  }}
                 >
                   <MenuItem value="pendiente">Pendiente</MenuItem>
                   <MenuItem value="procesando">Procesando</MenuItem>
@@ -439,21 +475,36 @@ const EditarPedidosModal = ({
               </FormControl>
             </Box>
 
-            <Box className="seccion-productos">
-              <Box className="titulo-productos">
+            <Box>
+              <Box sx={{ mb: 2 }}>
                 <Typography
                   variant="h6"
-                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    mb: 0.5,
+                    fontFamily: "'Orbitron', sans-serif",
+                    fontWeight: 700,
+                  }}
                 >
-                  <InventoryIcon />
+                  <InventoryIcon sx={{ color: theme.palette.primary.main }} />
                   Productos del Pedido
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Stock disponible se actualiza en tiempo real
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    fontFamily: "'Exo 2', sans-serif",
+                  }}
+                >
+                  Los productos no se pueden modificar una vez creado el pedido
                 </Typography>
               </Box>
 
-              <Box className="contenedor-productos">
+              <Box
+                sx={{ display: "flex", flexDirection: "column", gap: 2, mb: 3 }}
+              >
                 {formData.productos.map((item, index) => {
                   const productoId = item.producto?._id || item.producto;
                   const producto = obtenerProductoInfo(productoId);
@@ -463,100 +514,132 @@ const EditarPedidosModal = ({
                     producto?.nombre ||
                     item.producto?.nombre ||
                     "Producto no disponible";
-                  const stockBaseParaChip = stockDisponible; 
 
                   return (
                     <Card
                       key={index}
-                      className="tarjeta-producto"
                       variant="outlined"
+                      sx={{
+                        backgroundColor: theme.palette.background.paper,
+                        border: `1px solid ${theme.palette.divider}`,
+                        borderLeft: `4px solid ${theme.palette.primary.main}`,
+                        borderRadius: 2,
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          boxShadow:
+                            theme.palette.mode === "dark"
+                              ? "0 4px 20px rgba(212, 175, 55, 0.15)"
+                              : "0 4px 20px rgba(0, 0, 0, 0.1)",
+                          transform: "translateX(8px)",
+                        },
+                      }}
                     >
-                      <CardContent className="contenido-producto">
-                        <Box className="info-producto">
-                          <Typography className="nombre-producto" variant="body1">
-                            {nombreProducto}
-                          </Typography>
+                      <CardContent>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>
+                            <Typography
+                              variant="body1"
+                              fontWeight="600"
+                              sx={{
+                                mb: 1,
+                                fontFamily: "'Orbitron', sans-serif",
+                                color: theme.palette.text.primary,
+                              }}
+                            >
+                              {nombreProducto}
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                gap: 1,
+                                alignItems: "center",
+                                flexWrap: "wrap",
+                              }}
+                            >
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: theme.palette.text.secondary,
+                                  fontFamily: "'Exo 2', sans-serif",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {formatCurrency(precio)} c/u
+                              </Typography>
+                              <Chip
+                                label={`Stock: ${stockDisponible}`}
+                                sx={{
+                                  backgroundColor:
+                                    stockDisponible > 0
+                                      ? theme.palette.success.main
+                                      : theme.palette.error.main,
+                                  color: "white",
+                                  fontWeight: 600,
+                                  fontFamily: "'Exo 2', sans-serif",
+                                }}
+                                size="small"
+                                variant="filled"
+                              />
+                            </Box>
+                          </Box>
+
                           <Box
                             sx={{
                               display: "flex",
-                              gap: 1,
                               alignItems: "center",
-                              flexWrap: "wrap",
-                              mt: 1,
+                              gap: 1,
                             }}
                           >
-                            <Typography
-                              className="precio-producto"
-                              variant="body2"
-                            >
-                              {formatCurrency(precio)} c/u
-                            </Typography>
-                            <Chip
-                              label={`Stock disponible: ${stockBaseParaChip}`} 
-                              sx={{ backgroundColor: stockBaseParaChip > 0 ? "green" : "red" }}
+                            <TextField
+                              value={item.cantidad ?? 1}
+                              disabled
+                              type="number"
                               size="small"
-                              color="default"
-                              variant="filled"
+                              sx={{
+                                width: 80,
+                                "& .MuiInputBase-input.Mui-disabled": {
+                                  WebkitTextFillColor:
+                                    theme.palette.text.primary,
+                                  fontWeight: 600,
+                                  textAlign: "center",
+                                  fontFamily: "'Exo 2', sans-serif",
+                                },
+                                "& .MuiOutlinedInput-root": {
+                                  backgroundColor:
+                                    theme.palette.action.disabledBackground,
+                                },
+                              }}
                             />
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: theme.palette.text.secondary,
+                                fontFamily: "'Exo 2', sans-serif",
+                              }}
+                            >
+                              unidades
+                            </Typography>
                           </Box>
                         </Box>
 
-                        <Box className="controles-cantidad">
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              actualizarCantidad(index, item.cantidad - 1)
-                            }
-                            disabled={item.cantidad <= 1}
-                            sx={{ color: "#000000" }}
-                          >
-                            <RemoveIcon />
-                          </IconButton>
-
-                          <TextField
-                            value={item.cantidad ?? 1}
-                            onChange={(e) => {
-                              const valor = parseInt(e.target.value) || 1;
-                              actualizarCantidad(index, valor);
-                            }}
-                            type="number"
-                            size="small"
-                            className="input-cantidad"
-                            inputProps={{
-                              min: 1,
-                              max: stockDisponible, 
-                            }}
-                          />
-
-                          <IconButton
-                            size="small"
-                            onClick={() => {
-                              if (item.cantidad >= stockDisponible) {
-                                toast.error(
-                                  "Ya alcanzaste el stock máximo disponible"
-                                );
-                                return;
-                              }
-                              actualizarCantidad(index, item.cantidad + 1);
-                            }}
-                            disabled={item.cantidad >= stockDisponible}
-                            sx={{ color: "#000000" }}
-                          >
-                            <AddIcon />
-                          </IconButton>
-
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            onClick={() => eliminarProducto(index)} 
-                            disabled={formData.productos.length <= 1}
-                          >
-                            <DeleteIcon />
-                          </Button>
-                        </Box>
-
                         {stockDisponible === 0 && (
-                          <Alert severity="error" sx={{ mt: 1, py: 0 }}>
+                          <Alert
+                            severity="error"
+                            sx={{
+                              mt: 1,
+                              py: 0,
+                              backgroundColor:
+                                theme.palette.mode === "dark"
+                                  ? "rgba(185, 28, 28, 0.15)"
+                                  : "rgba(239, 68, 68, 0.1)",
+                            }}
+                          >
                             Sin stock disponible
                           </Alert>
                         )}
@@ -566,21 +649,57 @@ const EditarPedidosModal = ({
                 })}
               </Box>
 
-              <Card className="resumen-total">
+              <Card
+                sx={{
+                  backgroundColor: theme.palette.background.paper,
+                  border: `2px solid ${theme.palette.divider}`,
+                  borderRadius: 2,
+                }}
+              >
                 <CardContent>
-                  <Box className="fila-total">
-                    <Typography variant="body1" fontWeight="600">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      fontWeight="600"
+                      sx={{ fontFamily: "'Exo 2', sans-serif" }}
+                    >
                       Subtotal:
                     </Typography>
-                    <Typography variant="body1">
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontFamily: "'Exo 2', sans-serif",
+                        fontWeight: 600,
+                      }}
+                    >
                       {formatCurrency(totalCalculado)}
                     </Typography>
                   </Box>
-                  <Box className="fila-total">
-                    <Typography variant="body2" color="text.secondary">
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        fontFamily: "'Exo 2', sans-serif",
+                      }}
+                    >
                       Productos: {formData.productos.length}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: theme.palette.text.secondary,
+                        fontFamily: "'Exo 2', sans-serif",
+                      }}
+                    >
                       Items totales:{" "}
                       {formData.productos.reduce(
                         (sum, item) => sum + item.cantidad,
@@ -589,20 +708,27 @@ const EditarPedidosModal = ({
                     </Typography>
                   </Box>
                   <Box
-                    className="fila-total total-final"
                     sx={{
-                      padding: "5px 15px",
-                      borderRadius: "5px",
-                      borderTopColor: "black",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mt: 2,
+                      pt: 2,
+                      borderTop: `2px solid ${theme.palette.divider}`,
                     }}
                   >
-                    <Typography variant="h6" fontWeight="700">
+                    <Typography
+                      variant="h6"
+                      fontWeight="700"
+                      sx={{ fontFamily: "'Orbitron', sans-serif" }}
+                    >
                       Total Final:
                     </Typography>
                     <Typography
                       variant="h6"
                       fontWeight="700"
                       color="success.main"
+                      sx={{ fontFamily: "'Orbitron', sans-serif" }}
                     >
                       {formatCurrency(totalCalculado)}
                     </Typography>
@@ -612,34 +738,77 @@ const EditarPedidosModal = ({
             </Box>
           </DialogContent>
 
-          <DialogActions className="contenedor-botones">
+          <DialogActions
+            sx={{
+              padding: 3,
+              gap: 1,
+              backgroundColor: theme.palette.background.default,
+              borderTop: `1px solid ${theme.palette.divider}`,
+            }}
+          >
             <Button
-              onClick={iniciarEliminarPedido} 
-              className="boton-eliminar-pedido"
+              onClick={iniciarEliminarPedido}
               variant="contained"
               color="error"
               startIcon={<DeleteIcon />}
               disabled={cargando}
-              sx={{ mr: 2 }} 
+              sx={{
+                fontFamily: "'Exo 2', sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                boxShadow: "0 4px 15px rgba(239, 68, 68, 0.3)",
+                "&:hover": {
+                  boxShadow: "0 6px 20px rgba(239, 68, 68, 0.4)",
+                },
+              }}
             >
               Eliminar Pedido
             </Button>
-            
+
+            <Box sx={{ flex: 1 }} />
+
             <Button
               onClick={onHide}
-              className="boton-cancelar"
               variant="outlined"
-              sx={{ color: "black!important", backgroundColor: "white !important" }}
               disabled={cargando}
+              sx={{
+                color: theme.palette.text.primary,
+                borderColor: theme.palette.divider,
+                fontFamily: "'Exo 2', sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                "&:hover": {
+                  borderColor: theme.palette.primary.main,
+                  backgroundColor: theme.palette.action.hover,
+                },
+              }}
             >
               Cancelar
             </Button>
             <Button
               type="submit"
-              className="boton-guardar"
               variant="contained"
-              disabled={cargando || !!errores.direccionEnvio || formData.productos.length === 0}
-              startIcon={cargando ? <CircularProgress size={16} /> : <EditIcon />}
+              disabled={cargando}
+              startIcon={
+                cargando ? <CircularProgress size={16} /> : <EditIcon />
+              }
+              sx={{
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                fontFamily: "'Exo 2', sans-serif",
+                fontWeight: 600,
+                textTransform: "none",
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 4px 15px rgba(212, 175, 55, 0.3)"
+                    : "0 4px 15px rgba(185, 28, 28, 0.3)",
+                "&:hover": {
+                  boxShadow:
+                    theme.palette.mode === "dark"
+                      ? "0 6px 20px rgba(212, 175, 55, 0.4)"
+                      : "0 6px 20px rgba(185, 28, 28, 0.4)",
+                  transform: "translateY(-2px)",
+                },
+              }}
             >
               {cargando ? "Guardando..." : "Guardar Cambios"}
             </Button>
@@ -647,39 +816,81 @@ const EditarPedidosModal = ({
         </form>
       </Dialog>
 
-      {/* 🆕 MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */}
       <Dialog
         open={confirmarBorrado}
         onClose={() => setConfirmarBorrado(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        sx={{
+          "& .MuiDialog-paper": {
+            backgroundColor: theme.palette.background.paper,
+            boxShadow:
+              theme.palette.mode === "dark"
+                ? "0 8px 40px rgba(185, 28, 28, 0.3)"
+                : "0 8px 40px rgba(0, 0, 0, 0.2)",
+          },
+        }}
       >
-        <DialogTitle id="alert-dialog-title" sx={{ display: 'flex', alignItems: 'center', color: 'red' }}>
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            color: theme.palette.error.main,
+            fontFamily: "'Orbitron', sans-serif",
+            fontWeight: 700,
+          }}
+        >
           <WarningIcon sx={{ mr: 1, fontSize: 30 }} />
-          {"Confirmar Eliminación"}
+          Confirmar Eliminación
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Estás a punto de **eliminar permanentemente el Pedido # {pedido?._id?.slice(-6)}**. 
-            
-            Esta acción no se puede deshacer y el stock de los productos será restaurado. ¿Estás seguro de que deseas proceder?
+          <DialogContentText
+            sx={{
+              color: theme.palette.text.primary,
+              fontFamily: "'Exo 2', sans-serif",
+            }}
+          >
+            Estás a punto de{" "}
+            <strong>
+              eliminar permanentemente el Pedido # {pedido?._id?.slice(-6)}
+            </strong>
+            . Esta acción no se puede deshacer y el stock de los productos será
+            restaurado. ¿Estás seguro de que deseas proceder?
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button 
-            onClick={() => setConfirmarBorrado(false)} 
+        <DialogActions sx={{ padding: 2 }}>
+          <Button
+            onClick={() => setConfirmarBorrado(false)}
             color="primary"
             variant="outlined"
+            sx={{
+              fontFamily: "'Exo 2', sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+            }}
           >
             Cancelar
           </Button>
-          <Button 
-            onClick={manejarEliminarPedido} 
-            color="error" 
+          <Button
+            onClick={manejarEliminarPedido}
+            color="error"
             variant="contained"
             autoFocus
-            startIcon={cargando ? <CircularProgress size={16} color="inherit" /> : <DeleteIcon />}
+            startIcon={
+              cargando ? (
+                <CircularProgress size={16} color="inherit" />
+              ) : (
+                <DeleteIcon />
+              )
+            }
             disabled={cargando}
+            sx={{
+              fontFamily: "'Exo 2', sans-serif",
+              fontWeight: 600,
+              textTransform: "none",
+              boxShadow: "0 4px 15px rgba(239, 68, 68, 0.3)",
+              "&:hover": {
+                boxShadow: "0 6px 20px rgba(239, 68, 68, 0.4)",
+              },
+            }}
           >
             {cargando ? "Eliminando..." : "Sí, Eliminar"}
           </Button>
