@@ -33,6 +33,7 @@ const registerSchema = z
     telefono: z
       .string()
       .min(10, "El teléfono debe tener al menos 10 caracteres")
+      .max(15, "El teléfono no puede exceder los 15 caracteres")
       .optional()
       .or(z.literal("")),
     correo: z.string().email("Debe ser un correo electrónico válido"),
