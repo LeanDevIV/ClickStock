@@ -33,10 +33,38 @@ import { useMercadoPago } from "../../hooks/useMercadoPago";
 import { useStore } from "../../hooks/useStore";
 import AuthModal from "../../components/auth/AuthModal";
 import clientAxios from "../../utils/clientAxios";
+import { usePageTitle } from "../../hooks/usePageTitle";
 
 const MAX_STOCK_QUANTITY_GLOBAL = 2000;
 const LOW_STOCK_THRESHOLD = 5;
+
+const CartItemSkeleton = () => (
+  <Card sx={{ mb: 2, p: 2 }}>
+    <Box sx={{ display: "flex", gap: 2 }}>
+      <Skeleton
+        variant="rectangular"
+        width={80}
+        height={80}
+        sx={{ borderRadius: 2 }}
+      />
+      <Box sx={{ flex: 1 }}>
+        <Skeleton variant="text" width="60%" height={32} />
+        <Skeleton variant="text" width="30%" height={24} />
+      </Box>
+    </Box>
+  </Card>
+);
+
+const OrderSummarySkeleton = () => (
+  <Card sx={{ p: 2 }}>
+    <Skeleton variant="text" width="50%" height={40} sx={{ mb: 2 }} />
+    <Skeleton variant="rectangular" height={100} sx={{ mb: 2 }} />
+    <Skeleton variant="rectangular" height={48} />
+  </Card>
+);
+
 const CarritoPage = () => {
+  usePageTitle("Carrito de Compras");
   const theme = useTheme();
   const {
     articulos,
@@ -66,7 +94,7 @@ const CarritoPage = () => {
 
       let nuevaCantidad = productoActual.cantidad + delta;
       const limiteMaximo = Math.min(stockReal, MAX_STOCK_QUANTITY_GLOBAL);
-      
+
       if (delta === -1 && nuevaCantidad < 1) {
         nuevaCantidad = 1;
       } else if (delta === 1 && nuevaCantidad > limiteMaximo) {
@@ -75,9 +103,9 @@ const CarritoPage = () => {
 
       if (nuevaCantidad >= 1 && productoActual.cantidad !== nuevaCantidad) {
         setActualizandoId(idProducto);
-        
+
         await actualizarCantidad(idProducto, nuevaCantidad);
-        
+
         setActualizandoId(null);
         setTempQuantities((prev) => ({
           ...prev,
@@ -98,7 +126,7 @@ const CarritoPage = () => {
       let nuevaCantidad = Number(valorInput);
 
       if (!productoActual) return;
-      
+
       if (
         valorInput === "" ||
         isNaN(nuevaCantidad) ||
@@ -113,7 +141,7 @@ const CarritoPage = () => {
         setTempQuantities((prev) => ({ ...prev, [idProducto]: "1" }));
         return;
       }
-      
+
       let cantidadAEnviar = nuevaCantidad;
       const limiteMaximo = Math.min(stockReal, MAX_STOCK_QUANTITY_GLOBAL);
 
@@ -126,7 +154,7 @@ const CarritoPage = () => {
         await actualizarCantidad(idProducto, cantidadAEnviar);
         setActualizandoId(null);
       }
-      
+
       setTempQuantities((prev) => ({
         ...prev,
         [idProducto]: cantidadAEnviar.toString(),
@@ -144,7 +172,7 @@ const CarritoPage = () => {
       tempQuantities[idProducto] !== undefined
         ? tempQuantities[idProducto]
         : cantidad.toString();
-    
+
     const estaActualizando = actualizandoId === idProducto;
 
     if (stockReal === 0) {
@@ -170,8 +198,8 @@ const CarritoPage = () => {
           size="small"
           onClick={() => handleStepChange(idProducto, -1, stockReal)}
           disabled={loading || cantidad <= 1 || estaActualizando}
-          sx={{ 
-            p: 0.5, 
+          sx={{
+            p: 0.5,
             borderRadius: 1,
           }}
         >
@@ -186,8 +214,8 @@ const CarritoPage = () => {
             inputProps={{
               min: 1,
               max: limiteMaximo,
-              style: { 
-                textAlign: "center", 
+              style: {
+                textAlign: "center",
                 padding: "8px 4px",
               },
             }}
@@ -232,8 +260,8 @@ const CarritoPage = () => {
           size="small"
           onClick={() => handleStepChange(idProducto, 1, stockReal)}
           disabled={loading || cantidad >= limiteMaximo || estaActualizando}
-          sx={{ 
-            p: 0.5, 
+          sx={{
+            p: 0.5,
             borderRadius: 1,
           }}
         >
@@ -355,7 +383,7 @@ const CarritoPage = () => {
           to { transform: rotate(360deg); }
         }
       `}</style>
-      
+
       <Box sx={{ mb: 4 }}>
         <Button
           startIcon={<ArrowBack />}
