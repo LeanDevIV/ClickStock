@@ -101,9 +101,16 @@ export const useProductosFiltrados = () => {
     return null;
   };
 
+  const categoriasVisibles = categorias.filter((categoria) =>
+    productos.some((producto) => {
+      const idCategoria = producto.categoria._id || producto.categoria;
+      return idCategoria === categoria._id;
+    })
+  );
+
   return {
     productos,
-    categorias,
+    categorias: categoriasVisibles,
     categoriaSeleccionada,
     productosFiltrados,
     productosDestacados,
