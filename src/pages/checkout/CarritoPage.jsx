@@ -16,6 +16,7 @@ import {
   Snackbar,
   Alert,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import {
   Delete,
@@ -35,76 +36,6 @@ import clientAxios from "../../utils/clientAxios";
 
 const MAX_STOCK_QUANTITY_GLOBAL = 2000;
 const LOW_STOCK_THRESHOLD = 5;
-
-const CartItemSkeleton = () => {
-  const theme = useTheme();
-
-  return (
-    <Card
-      sx={{
-        p: 2,
-        borderRadius: 2,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-        backgroundColor: theme.palette.background.paper,
-      }}
-    >
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Skeleton
-          variant="rectangular"
-          width={80}
-          height={80}
-          sx={{ borderRadius: 2 }}
-        />
-        <Box sx={{ flex: 1 }}>
-          <Skeleton variant="text" width="80%" height={32} sx={{ mb: 1 }} />
-          <Skeleton variant="text" width="40%" height={28} />
-          <Skeleton variant="text" width="60%" height={20} />
-        </Box>
-        <Stack spacing={1} alignItems="flex-end">
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Skeleton variant="rectangular" width={60} height={32} />
-          </Box>
-          <Skeleton variant="circular" width={32} height={32} />
-        </Stack>
-      </Box>
-    </Card>
-  );
-};
-const OrderSummarySkeleton = () => {
-  const theme = useTheme();
-
-  return (
-    <Card
-      sx={{
-        borderRadius: 2,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-        backgroundColor: theme.palette.background.paper,
-      }}
-    >
-      <CardContent>
-        <Skeleton variant="text" width="60%" height={32} sx={{ mb: 2 }} />
-        <Box sx={{ mb: 2 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-            <Skeleton variant="text" width="30%" height={20} />
-            <Skeleton variant="text" width="20%" height={20} />
-          </Box>
-          <Divider sx={{ my: 1 }} />
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Skeleton variant="text" width="30%" height={32} />
-            <Skeleton variant="text" width="40%" height={32} />
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
-  );
-};
-
 const CarritoPage = () => {
   const theme = useTheme();
   const {
@@ -123,10 +54,10 @@ const CarritoPage = () => {
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-
   const [direccion, setDireccion] = useState("");
   const [errorDireccion, setErrorDireccion] = useState("");
   const [tempQuantities, setTempQuantities] = useState({});
+  const [actualizandoId, setActualizandoId] = useState(null);
 
   const handleStepChange = useCallback(
     async (idProducto, delta, stockReal) => {
@@ -135,6 +66,7 @@ const CarritoPage = () => {
 
       let nuevaCantidad = productoActual.cantidad + delta;
       const limiteMaximo = Math.min(stockReal, MAX_STOCK_QUANTITY_GLOBAL);
+      
       if (delta === -1 && nuevaCantidad < 1) {
         nuevaCantidad = 1;
       } else if (delta === 1 && nuevaCantidad > limiteMaximo) {
@@ -142,7 +74,11 @@ const CarritoPage = () => {
       }
 
       if (nuevaCantidad >= 1 && productoActual.cantidad !== nuevaCantidad) {
+        setActualizandoId(idProducto);
+        
         await actualizarCantidad(idProducto, nuevaCantidad);
+        
+        setActualizandoId(null);
         setTempQuantities((prev) => ({
           ...prev,
           [idProducto]: nuevaCantidad.toString(),
@@ -151,15 +87,18 @@ const CarritoPage = () => {
     },
     [articulos, loading, actualizarCantidad]
   );
+
   const handleManualChange = useCallback((idProducto, e) => {
     setTempQuantities((prev) => ({ ...prev, [idProducto]: e.target.value }));
   }, []);
+
   const handleBlur = useCallback(
     async (idProducto, e, stockReal, productoActual) => {
       let valorInput = e.target.value;
       let nuevaCantidad = Number(valorInput);
 
       if (!productoActual) return;
+      
       if (
         valorInput === "" ||
         isNaN(nuevaCantidad) ||
@@ -167,11 +106,14 @@ const CarritoPage = () => {
         nuevaCantidad <= 0
       ) {
         if (productoActual.cantidad !== 1) {
+          setActualizandoId(idProducto);
           await actualizarCantidad(idProducto, 1);
+          setActualizandoId(null);
         }
         setTempQuantities((prev) => ({ ...prev, [idProducto]: "1" }));
         return;
       }
+      
       let cantidadAEnviar = nuevaCantidad;
       const limiteMaximo = Math.min(stockReal, MAX_STOCK_QUANTITY_GLOBAL);
 
@@ -180,8 +122,11 @@ const CarritoPage = () => {
       }
 
       if (productoActual.cantidad !== cantidadAEnviar) {
+        setActualizandoId(idProducto);
         await actualizarCantidad(idProducto, cantidadAEnviar);
+        setActualizandoId(null);
       }
+      
       setTempQuantities((prev) => ({
         ...prev,
         [idProducto]: cantidadAEnviar.toString(),
@@ -189,6 +134,7 @@ const CarritoPage = () => {
     },
     [actualizarCantidad]
   );
+
   const renderQuantityControl = (producto) => {
     const { idProducto, cantidad } = producto;
     const stockReal = producto.stock || 0;
@@ -198,6 +144,9 @@ const CarritoPage = () => {
       tempQuantities[idProducto] !== undefined
         ? tempQuantities[idProducto]
         : cantidad.toString();
+    
+    const estaActualizando = actualizandoId === idProducto;
+
     if (stockReal === 0) {
       return (
         <TextField
@@ -215,49 +164,78 @@ const CarritoPage = () => {
         direction="row"
         spacing={0}
         alignItems="center"
-        sx={{ minWidth: 120 }}
+        sx={{ minWidth: 120, position: "relative" }}
       >
         <IconButton
           size="small"
           onClick={() => handleStepChange(idProducto, -1, stockReal)}
-          disabled={loading || cantidad <= 1}
-          sx={{ p: 0.5, borderRadius: 1 }}
+          disabled={loading || cantidad <= 1 || estaActualizando}
+          sx={{ 
+            p: 0.5, 
+            borderRadius: 1,
+          }}
         >
           <Remove fontSize="small" />
         </IconButton>
-        <TextField
-          type="number"
-          value={inputValue}
-          onChange={(e) => handleManualChange(idProducto, e)}
-          onBlur={(e) => handleBlur(idProducto, e, stockReal, producto)}
-          inputProps={{
-            min: 1,
-            max: limiteMaximo,
-            style: { textAlign: "center", padding: "8px 4px" },
-          }}
-          disabled={loading}
-          size="small"
-          error={hayErrorStock}
-          sx={{
-            width: 50,
-            mx: 0.5,
-            "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-              {
-                WebkitAppearance: "none",
-                margin: 0,
+        <Box sx={{ position: "relative", mx: 0.5 }}>
+          <TextField
+            type="number"
+            value={inputValue}
+            onChange={(e) => handleManualChange(idProducto, e)}
+            onBlur={(e) => handleBlur(idProducto, e, stockReal, producto)}
+            inputProps={{
+              min: 1,
+              max: limiteMaximo,
+              style: { 
+                textAlign: "center", 
+                padding: "8px 4px",
               },
-            "& input[type=number]": {
-              MozAppearance: "textfield",
-            },
-          }}
-        />
-
-        {/* Botón de Incremento (+) */}
+            }}
+            disabled={loading || estaActualizando}
+            size="small"
+            error={hayErrorStock}
+            sx={{
+              width: 50,
+              "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                {
+                  WebkitAppearance: "none",
+                  margin: 0,
+                },
+              "& input[type=number]": {
+                MozAppearance: "textfield",
+              },
+            }}
+          />
+          {estaActualizando && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 2,
+              }}
+            >
+              <CircularProgress
+                size={24}
+                sx={{
+                  color: theme.palette.primary.main,
+                }}
+              />
+            </Box>
+          )}
+        </Box>
         <IconButton
           size="small"
           onClick={() => handleStepChange(idProducto, 1, stockReal)}
-          disabled={loading || cantidad >= limiteMaximo}
-          sx={{ p: 0.5, borderRadius: 1 }}
+          disabled={loading || cantidad >= limiteMaximo || estaActualizando}
+          sx={{ 
+            p: 0.5, 
+            borderRadius: 1,
+          }}
         >
           <Add fontSize="small" />
         </IconButton>
@@ -371,6 +349,13 @@ const CarritoPage = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4, mt: 8, mb: 8 }}>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+      
       <Box sx={{ mb: 4 }}>
         <Button
           startIcon={<ArrowBack />}
