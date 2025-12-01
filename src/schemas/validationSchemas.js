@@ -43,6 +43,9 @@ export const promocionSchema = z
       .max(100, "El descuento máximo es 100%"),
     fechaInicio: z.string().min(1, "La fecha de inicio es requerida"),
     fechaFin: z.string().min(1, "La fecha de fin es requerida"),
+    productos: z
+      .array(z.any())
+      .min(1, "Debes seleccionar al menos un producto"),
     imagen: fileSchema,
   })
   .refine(
@@ -52,6 +55,32 @@ export const promocionSchema = z
     },
     {
       message: "La fecha de fin debe ser posterior a la fecha de inicio",
+      path: ["fechaFin"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.fechaInicio) return true;
+      const fechaInicio = new Date(data.fechaInicio);
+      const añoActual = new Date().getFullYear();
+      const añoInicio = fechaInicio.getFullYear();
+      return añoInicio >= añoActual && añoInicio <= añoActual + 1;
+    },
+    {
+      message: "La fecha de inicio debe ser del año actual o el próximo año",
+      path: ["fechaInicio"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.fechaFin) return true;
+      const fechaFin = new Date(data.fechaFin);
+      const añoActual = new Date().getFullYear();
+      const añoFin = fechaFin.getFullYear();
+      return añoFin >= añoActual && añoFin <= añoActual + 1;
+    },
+    {
+      message: "La fecha de fin debe ser del año actual o el próximo año",
       path: ["fechaFin"],
     }
   );
