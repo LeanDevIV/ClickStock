@@ -118,19 +118,35 @@ const ProductCard = ({ producto, promociones = [] }) => {
           }}
         />
 
-        {/* Badge de promoción */}
-        {promocion && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: 8,
-              left: 8,
-              zIndex: 1,
-            }}
-          >
-            <PromocionBadge descuento={promocion.descuento} size="small" />
-          </Box>
-        )}
+        <Box sx={{ display: { xs: "none", md: "block" } }}>
+          {promocion && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 8,
+                left: 8,
+                zIndex: 1,
+              }}
+            >
+              <PromocionBadge descuento={promocion.descuento} size="small" />
+            </Box>
+          )}
+        </Box>
+
+        <Box sx={{ display: { xs: "block", md: "none" } }}>
+          {promocion && (
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 8,
+                left: 8,
+                zIndex: 1,
+              }}
+            >
+              <PromocionBadge descuento={promocion.descuento} size="small" />
+            </Box>
+          )}
+        </Box>
 
         <Box sx={{ display: { xs: "none", md: "block" } }}>
           <Fade in={hoverId === producto._id} timeout={200}>

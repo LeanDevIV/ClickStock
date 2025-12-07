@@ -43,6 +43,13 @@
   border-radius: 2px 0 0 2px;
 }
 
+@media (max-width: 900px) {
+  .destacado-ribbon {
+    top: auto;
+    bottom: 195px;
+  }
+}
+
 .destacado-ribbon::after {
   content: "";
   position: absolute;
