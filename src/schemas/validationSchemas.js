@@ -155,3 +155,43 @@ export const pedidoSchema = z.object({
     .optional()
     .default("pendiente"),
 });
+
+export const usuarioSchema = z.object({
+  nombre: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(30, "El nombre no puede exceder los 30 caracteres")
+    .trim()
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, "El nombre solo puede contener letras")
+    .refine((val) => !noRepetitionsRegex.test(val), {
+      message: "No repitas caracteres más de 3 veces en el nombre",
+    }),
+  apellido: z
+    .string()
+    .min(2, "El apellido debe tener al menos 2 caracteres")
+    .max(30, "El apellido no puede exceder los 30 caracteres")
+    .trim()
+    .regex(
+      /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+      "El apellido solo puede contener letras"
+    )
+    .refine((val) => !noRepetitionsRegex.test(val), {
+      message: "No repitas caracteres más de 3 veces en el apellido",
+    }),
+  correo: z
+    .string()
+    .email("Correo electrónico inválido")
+    .min(1, "El correo es requerido")
+    .trim()
+    .toLowerCase(),
+  telefono: z
+    .string()
+    .max(20, "El teléfono no puede exceder los 20 caracteres")
+    .regex(/^[0-9+\-\s()]*$/, "Teléfono inválido")
+    .optional()
+    .or(z.literal("")),
+  contrasenia: z
+    .string()
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .optional(),
+});
