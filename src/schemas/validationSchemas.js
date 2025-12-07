@@ -187,7 +187,15 @@ export const usuarioSchema = z.object({
   telefono: z
     .string()
     .max(20, "El teléfono no puede exceder los 20 caracteres")
-    .regex(/^[0-9+\-\s()]*$/, "Teléfono inválido")
+    .regex(
+      /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/,
+      "Ingresa un número de teléfono válido"
+    )
+    .optional()
+    .or(z.literal("")),
+  fotoPerfil: z
+    .string()
+    .url("Debe ser una URL válida")
     .optional()
     .or(z.literal("")),
   contrasenia: z
