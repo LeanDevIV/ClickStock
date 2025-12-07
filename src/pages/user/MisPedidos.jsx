@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import {
   Box,
   Typography,
@@ -15,10 +16,11 @@ import {
   LocationOn,
   ShoppingBag,
   Login as LoginIcon,
+  Cancel,
 } from "@mui/icons-material";
 import clientAxios from "../../utils/clientAxios.js";
 import { useStore } from "../../hooks/useStore.js";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 
 import { usePageTitle } from "../../hooks/usePageTitle";
 
@@ -27,6 +29,7 @@ const MisPedidos = () => {
 
   const { user } = useStore();
   const { handleOpenAuth } = useOutletContext() || {};
+  const navigate = useNavigate();
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
@@ -53,6 +56,42 @@ const MisPedidos = () => {
       cancelado: "error",
     };
     return colors[estado] || "default";
+  };
+
+  const cancelarPedido = async (pedidoId) => {
+    try {
+      const result = await Swal.fire({
+        title: "¿Cancelar pedido?",
+        text: "Esta acción no se puede deshacer",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, cancelar",
+        cancelButtonText: "No, mantener",
+      });
+
+      if (result.isConfirmed) {
+        await clientAxios.delete(`/pedidos/${pedidoId}`);
+
+        setPedidos(pedidos.filter((p) => p._id !== pedidoId));
+
+        Swal.fire({
+          title: "¡Cancelado!",
+          text: "Tu pedido ha sido cancelado",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    } catch (error) {
+      console.error("Error al cancelar pedido:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo cancelar el pedido. Por favor, intentá de nuevo.",
+        icon: "error",
+      });
+    }
   };
 
   useEffect(() => {
@@ -191,6 +230,20 @@ const MisPedidos = () => {
             >
               Total: {formatCurrency(pedido.total)}
             </Typography>
+
+            {pedido.estado !== "entregado" && (
+              <Box sx={{ mt: 2, textAlign: "right" }}>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Cancel />}
+                  onClick={() => cancelarPedido(pedido._id)}
+                  size="small"
+                >
+                  Cancelar Pedido
+                </Button>
+              </Box>
+            )}
           </CardContent>
         </Card>
       ))}
