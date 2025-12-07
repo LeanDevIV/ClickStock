@@ -17,6 +17,7 @@ import {
   ShoppingBag,
   Login as LoginIcon,
   Cancel,
+  Receipt,
 } from "@mui/icons-material";
 import clientAxios from "../../utils/clientAxios.js";
 import { useStore } from "../../hooks/useStore.js";
@@ -150,9 +151,48 @@ const MisPedidos = () => {
 
   if (error) {
     return (
-      <Alert severity="error" sx={{ mt: 5, width: "90%", mx: "auto" }}>
-        {error}
-      </Alert>
+      <Box sx={{ maxWidth: 900, mx: "auto", mt: 5, px: 2 }}>
+        <Card
+          sx={{
+            textAlign: "center",
+            py: 8,
+            backgroundColor: "background.default",
+          }}
+        >
+          <CardContent>
+            <Receipt
+              sx={{
+                fontSize: 80,
+                color: "text.secondary",
+                mb: 2,
+                opacity: 0.5,
+              }}
+            />
+            <Typography variant="h5" color="text.secondary" gutterBottom>
+              Error al cargar tus pedidos
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Lo sentimos, hubo un problema al obtener tus pedidos. Por favor,
+              intentá de nuevo más tarde.
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => window.location.reload()}
+              sx={{ mr: 2 }}
+            >
+              Reintentar
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={() => navigate("/")}
+            >
+              Volver al Inicio
+            </Button>
+          </CardContent>
+        </Card>
+      </Box>
     );
   }
 
@@ -163,7 +203,37 @@ const MisPedidos = () => {
       </Typography>
 
       {pedidos.length === 0 && (
-        <Alert severity="info">No tenés pedidos todavía.</Alert>
+        <Card
+          sx={{
+            textAlign: "center",
+            py: 8,
+            backgroundColor: "background.default",
+          }}
+        >
+          <CardContent>
+            <ShoppingBag
+              sx={{
+                fontSize: 80,
+                color: "text.secondary",
+                mb: 2,
+                opacity: 0.5,
+              }}
+            />
+            <Typography variant="h5" color="text.secondary" gutterBottom>
+              No tenés pedidos todavía
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Comenzá a explorar nuestros productos y hacé tu primer pedido
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate("/")}
+            >
+              Explorar Productos
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {pedidos.map((pedido) => (
