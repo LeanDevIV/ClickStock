@@ -288,7 +288,7 @@ const TablaPedidos = () => {
 
         <DialogContent>
           <DialogContentText>
-            ¿Deseas eliminar el pedido? Esta acción no se puede deshacer.
+            ¿Deseas eliminar el pedido?
             {pedidoAEliminar?.isDeleted && (
               <Typography color="error" sx={{ mt: 1 }}>
                 Este pedido ya está eliminado.
