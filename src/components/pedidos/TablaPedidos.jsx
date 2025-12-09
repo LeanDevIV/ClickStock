@@ -18,8 +18,6 @@ import {
   CircularProgress,
   Grid,
   Paper,
-  IconButton,
-  Tooltip,
   Pagination,
   Dialog,
   DialogTitle,
@@ -27,31 +25,27 @@ import {
   DialogContentText,
   DialogActions,
   useTheme,
+  ToggleButtonGroup,
+  ToggleButton,
 } from "@mui/material";
 import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
   LocalShipping as LocalShippingIcon,
   Warning as WarningIcon,
+  Delete as DeleteIcon,
 } from "@mui/icons-material";
-
 import { Toaster, toast } from "react-hot-toast";
 import clientaxios from "../../utils/clientAxios.js";
-
-const EditarPedidosModal = React.lazy(() => import("./EditarPedidosModal.jsx"));
+import FilaTablaPedidos from "./FilaTablaPedidos";
 
 const TablaPedidos = () => {
   const theme = useTheme();
 
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
-  const [pedidoEditando, setPedidoEditando] = useState(null);
-
   const [filtroEstado, setFiltroEstado] = useState("todos");
-
+  const [filtroEliminados, setFiltroEliminados] = useState("activos");
   const [pagina, setPagina] = useState(1);
   const itemsPorPagina = 6;
-
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
   const [pedidoAEliminar, setPedidoAEliminar] = useState(null);
   const [cargandoEliminar, setCargandoEliminar] = useState(false);
@@ -73,11 +67,20 @@ const TablaPedidos = () => {
     obtenerPedidos();
   }, []);
 
-  const manejarPedidoEditado = (actualizado) => {
+  const manejarEstadoActualizado = (pedidoActualizado) => {
     setPedidos((prev) =>
-      prev.map((p) => (p._id === actualizado._id ? actualizado : p))
+      prev.map((pedido) =>
+        pedido._id === pedidoActualizado._id ? pedidoActualizado : pedido
+      )
     );
-    setPedidoEditando(null);
+  };
+
+  const manejarRestauracion = (pedidoRestaurado) => {
+    setPedidos((prev) =>
+      prev.map((pedido) =>
+        pedido._id === pedidoRestaurado._id ? pedidoRestaurado : pedido
+      )
+    );
   };
 
   const iniciarEliminarPedido = (pedido) => {
@@ -92,8 +95,14 @@ const TablaPedidos = () => {
     const toastId = toast.loading("Eliminando pedido...");
 
     try {
-      await clientaxios.delete(`/pedidos/permanent/${pedidoAEliminar._id}`);
-      setPedidos((prev) => prev.filter((p) => p._id !== pedidoAEliminar._id));
+      await clientaxios.delete(`/pedidos/${pedidoAEliminar._id}`);
+      setPedidos((prev) =>
+        prev.map((pedido) =>
+          pedido._id === pedidoAEliminar._id 
+            ? { ...pedido, isDeleted: true } 
+            : pedido
+        )
+      );
 
       toast.success("Pedido eliminado correctamente.", { id: toastId });
       setConfirmarBorrado(false);
@@ -104,10 +113,16 @@ const TablaPedidos = () => {
       setCargandoEliminar(false);
     }
   };
-  const pedidosFiltrados =
-    filtroEstado === "todos"
-      ? pedidos
-      : pedidos.filter((p) => p.estado === filtroEstado);
+
+  const pedidosFiltrados = pedidos.filter((pedido) => {
+    const cumpleEstado = filtroEstado === "todos" || pedido.estado === filtroEstado;
+    const cumpleEliminado = 
+      filtroEliminados === "todos" ||
+      (filtroEliminados === "activos" && !pedido.isDeleted) ||
+      (filtroEliminados === "eliminados" && pedido.isDeleted);
+    
+    return cumpleEstado && cumpleEliminado;
+  });
 
   const totalPaginas = Math.ceil(pedidosFiltrados.length / itemsPorPagina);
 
@@ -115,6 +130,7 @@ const TablaPedidos = () => {
     (pagina - 1) * itemsPorPagina,
     pagina * itemsPorPagina
   );
+
   if (cargando) {
     return (
       <Box display="flex" flexDirection="column" alignItems="center" mt={10}>
@@ -155,7 +171,7 @@ const TablaPedidos = () => {
                 <Typography fontWeight="bold">Filtrar por estado:</Typography>
                 <Select
                   value={filtroEstado}
-                  onChange={(e) => setFiltroEstado(e.target.value)}
+                  onChange={(event) => setFiltroEstado(event.target.value)}
                   size="small"
                   sx={{
                     minWidth: 150,
@@ -169,6 +185,22 @@ const TablaPedidos = () => {
                   <MenuItem value="entregado">Entregado</MenuItem>
                   <MenuItem value="cancelado">Cancelado</MenuItem>
                 </Select>
+
+                <Typography fontWeight="bold" sx={{ ml: 2 }}>
+                  Mostrar:
+                </Typography>
+                <ToggleButtonGroup
+                  value={filtroEliminados}
+                  exclusive
+                  onChange={(event, nuevoValor) => {
+                    if (nuevoValor !== null) setFiltroEliminados(nuevoValor);
+                  }}
+                  size="small"
+                >
+                  <ToggleButton value="activos">Activos</ToggleButton>
+                  <ToggleButton value="eliminados">Eliminados</ToggleButton>
+                  <ToggleButton value="todos">Todos</ToggleButton>
+                </ToggleButtonGroup>
               </Box>
               <Box display="flex" gap={1} flexWrap="wrap">
                 <Chip
@@ -178,16 +210,11 @@ const TablaPedidos = () => {
                 />
                 <Chip
                   label={`Pendientes: ${
-                    pedidos.filter((p) => p.estado === "pendiente").length
+                    pedidos.filter((pedido) => 
+                      pedido.estado === "pendiente" && !pedido.isDeleted
+                    ).length
                   }`}
                   color="warning"
-                  variant="outlined"
-                />
-                <Chip
-                  label={`Entregados: ${
-                    pedidos.filter((p) => p.estado === "entregado").length
-                  }`}
-                  color="success"
                   variant="outlined"
                 />
               </Box>
@@ -206,6 +233,7 @@ const TablaPedidos = () => {
                   <TableCell>Dirección</TableCell>
                   <TableCell>Total</TableCell>
                   <TableCell>Estado</TableCell>
+                  <TableCell align="center">Eliminado</TableCell>
                   <TableCell>Fecha</TableCell>
                   <TableCell>Acciones</TableCell>
                 </TableRow>
@@ -213,106 +241,19 @@ const TablaPedidos = () => {
 
               <TableBody>
                 {pedidosPaginados.map((pedido, index) => (
-                  <TableRow key={pedido._id} hover>
-                    <TableCell>{index + 1}</TableCell>
-
-                    <TableCell>
-                      {pedido.usuario && typeof pedido.usuario === "object" ? (
-                        <>
-                          <Typography fontWeight="bold">
-                            {pedido.usuario.nombre}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {pedido.usuario.correo}
-                          </Typography>
-                        </>
-                      ) : (
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          fontStyle="italic"
-                        >
-                          Usuario no disponible
-                        </Typography>
-                      )}
-                    </TableCell>
-
-                    <TableCell>
-                      {pedido.productos && pedido.productos.length > 0 ? (
-                        pedido.productos.map((p, i) => (
-                          <Chip
-                            key={i}
-                            size="small"
-                            label={
-                              p.producto && typeof p.producto === "object"
-                                ? `${p.producto.nombre} (x${p.cantidad})`
-                                : `Producto no disponible (x${p.cantidad})`
-                            }
-                            variant="outlined"
-                            sx={{ m: 0.3 }}
-                          />
-                        ))
-                      ) : (
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          fontStyle="italic"
-                        >
-                          Sin productos
-                        </Typography>
-                      )}
-                    </TableCell>
-
-                    <TableCell>{pedido.direccion || "N/A"}</TableCell>
-                    <TableCell>
-                      <Typography fontWeight="bold" color="primary">
-                        ${pedido.total}
-                      </Typography>
-                    </TableCell>
-
-                    <TableCell>
-                      <Chip
-                        label={pedido.estado}
-                        color={
-                          pedido.estado === "pendiente"
-                            ? "warning"
-                            : pedido.estado === "entregado"
-                            ? "success"
-                            : "default"
-                        }
-                        size="small"
-                      />
-                    </TableCell>
-
-                    <TableCell>
-                      {new Date(pedido.fechaCreacion).toLocaleDateString()}
-                    </TableCell>
-
-                    <TableCell>
-                      <Tooltip title="Editar">
-                        <IconButton
-                          onClick={() => setPedidoEditando(pedido)}
-                          color="primary"
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Eliminar">
-                        <IconButton
-                          color="error"
-                          onClick={() => iniciarEliminarPedido(pedido)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
+                  <FilaTablaPedidos
+                    key={pedido._id}
+                    pedido={pedido}
+                    index={index}
+                    onEliminar={iniciarEliminarPedido}
+                    onEstadoActualizado={manejarEstadoActualizado}
+                    onRestaurar={manejarRestauracion}
+                  />
                 ))}
 
                 {pedidosPaginados.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} align="center" sx={{ py: 5 }}>
+                    <TableCell colSpan={9} align="center" sx={{ py: 5 }}>
                       <Typography variant="h6" color="text.secondary">
                         No hay pedidos para mostrar
                       </Typography>
@@ -324,28 +265,18 @@ const TablaPedidos = () => {
           </TableContainer>
         </CardContent>
       </Card>
+
       {pedidosFiltrados.length > 0 && (
         <Box display="flex" justifyContent="center" my={3}>
           <Pagination
             count={totalPaginas}
             page={pagina}
-            onChange={(e, v) => setPagina(v)}
+            onChange={(event, value) => setPagina(value)}
             color="primary"
           />
         </Box>
       )}
-      <React.Suspense fallback={null}>
-        {pedidoEditando && (
-          <EditarPedidosModal
-            show={!!pedidoEditando}
-            onHide={() => setPedidoEditando(null)}
-            pedido={pedidoEditando}
-            onPedidoEditado={manejarPedidoEditado}
-            setPedidos={setPedidos}
-            pedidos={pedidos}
-          />
-        )}
-      </React.Suspense>
+
       <Dialog
         open={confirmarBorrado}
         onClose={() => setConfirmarBorrado(false)}
@@ -358,6 +289,11 @@ const TablaPedidos = () => {
         <DialogContent>
           <DialogContentText>
             ¿Deseas eliminar el pedido? Esta acción no se puede deshacer.
+            {pedidoAEliminar?.isDeleted && (
+              <Typography color="error" sx={{ mt: 1 }}>
+                Este pedido ya está eliminado.
+              </Typography>
+            )}
           </DialogContentText>
         </DialogContent>
 
@@ -375,7 +311,7 @@ const TablaPedidos = () => {
                 <DeleteIcon />
               )
             }
-            disabled={cargandoEliminar}
+            disabled={cargandoEliminar || pedidoAEliminar?.isDeleted}
           >
             Eliminar
           </Button>
