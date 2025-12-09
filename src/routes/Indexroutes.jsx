@@ -9,7 +9,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import PedidosPage from "../pages/admin/PedidosPage.jsx";
 import ScrollToTop from "../components/layouts/ScrollToTop.jsx";
 import PagoExitoso from "../pages/payments/PagoExitoso.jsx";
-import PagoFallido from "../pages/payments/pagoFallido.jsx";
+import PagoFallido from "../pages/payments/PagoFallido.jsx";
 import PagoPendiente from "../pages/payments/PagoPendiente.jsx";
 import PromocionesPage from "../pages/admin/PromocionesPage.jsx";
 import { AdminDashboard } from "../pages/admin/AdminDashboard.jsx";
