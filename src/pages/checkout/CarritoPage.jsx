@@ -315,7 +315,18 @@ const CarritoPage = () => {
       const pedidoId = data.pedido?._id || data._id;
 
       if (pedidoId) {
-        const result = await crearPreferencia(articulos, user.correo, pedidoId);
+        const productosParaPago = articulos.map((item) => ({
+          title: item.nombre,
+          precio: item.precio,
+          cantidad: item.cantidad,
+          idProducto: item.idProducto,
+        }));
+
+        const result = await crearPreferencia(
+          productosParaPago,
+          user.correo,
+          pedidoId
+        );
 
         if (!result.success) {
           alert(
