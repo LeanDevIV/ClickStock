@@ -409,10 +409,12 @@ Este proyecto sigue las mejores prácticas de desarrollo:
 
 ---
 
-## 👨‍💻 Autor
+## 👨‍💻 Autores
 
-**Lean**  
-Desarrollador Full Stack apasionado por crear experiencias web modernas y funcionales.
+**Leandro Córdoba**  
+**Sara Robles**  
+
+Desarrolladores Full Stack apasionados por crear experiencias web modernas y funcionales.
 
 ---
 
@@ -425,5 +427,4 @@ Este proyecto es parte de un portafolio educativo.
 ## 🔗 Links
 
 - **Frontend**: https://stock-project-frontend-beta.vercel.app/
-- **Backend**: [Repositorio del servidor]
-- **Documentación API**: [Enlace a docs]
+- **Backend**: https://click-stock-server.vercel.app/

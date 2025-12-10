@@ -15,13 +15,26 @@ import {
   Paper,
   IconButton,
 } from "@mui/material";
-import { AddShoppingCart, ArrowBack, Inventory, Favorite, FavoriteBorder } from "@mui/icons-material";
+import {
+  AddShoppingCart,
+  ArrowBack,
+  Inventory,
+  Favorite,
+  FavoriteBorder,
+} from "@mui/icons-material";
 import { Snackbar, Alert } from "@mui/material";
 import clientAxios from "../../utils/clientAxios.js";
 import ReviewForm from "../../components/reviews/ReviewForm.jsx";
 import ReviewsList from "../../components/reviews/ReviewsList.jsx";
 import useCart from "../../hooks/useCart.js";
 import { useFavoritos } from "../../hooks/useFavoritos.js";
+import { usePageTitle } from "../../hooks/usePageTitle";
+import { usePromocionStore } from "../../hooks/usePromocionStore";
+import PromocionBadge from "../../components/promotions/PromocionBadge";
+import {
+  obtenerPromocionProducto,
+  calcularPrecioConDescuento,
+} from "../../utils/promocionUtils";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -36,10 +49,18 @@ const ProductDetail = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
+  const [promociones, setPromociones] = useState([]);
+
+  usePageTitle(product?.nombre || "Detalle del Producto");
 
   const { añadirAlCarrito, cargando } = useCart();
-  
-  const { toggleFavorito, esFavorito, loading: cargandoFavorito } = useFavoritos();
+  const { obtenerPromocionesActivas } = usePromocionStore();
+
+  const {
+    toggleFavorito,
+    esFavorito,
+    loading: cargandoFavorito,
+  } = useFavoritos();
 
   const handleReviewAdded = () => setRefresh((prev) => prev + 1);
 
@@ -59,7 +80,7 @@ const ProductDetail = () => {
 
   const handleToggleFavorito = async () => {
     if (!product) return;
-    
+
     try {
       await toggleFavorito(product._id);
     } catch (error) {
@@ -74,11 +95,15 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const { data } = await clientAxios.get(`/productos/${id}`);
-        setProduct(data.producto || data);
+        const [productRes, promocionesRes] = await Promise.all([
+          clientAxios.get(`/productos/${id}`),
+          obtenerPromocionesActivas(),
+        ]);
+        setProduct(productRes.data.producto || productRes.data);
+        setPromociones(promocionesRes || []);
       } catch {
         setError("No se pudo cargar el producto.");
       } finally {
@@ -86,14 +111,14 @@ const ProductDetail = () => {
       }
     };
 
-    fetchProduct();
-  }, [id]);
+    fetchData();
+  }, [id, obtenerPromocionesActivas]);
 
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={4}>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid item xs={12} md={6}>
             <Skeleton
               variant="rectangular"
               height={400}
@@ -103,7 +128,7 @@ const ProductDetail = () => {
               }}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid item xs={12} md={6}>
             <Skeleton variant="text" height={60} sx={{ mb: 2 }} />
             <Skeleton variant="text" height={40} width="40%" sx={{ mb: 3 }} />
             <Skeleton variant="text" height={100} sx={{ mb: 3 }} />
@@ -160,6 +185,11 @@ const ProductDetail = () => {
     "https://via.placeholder.com/600x400?text=Sin+imagen";
   const hasMultipleImages = product.imagenes && product.imagenes.length > 1;
 
+  const promocion = obtenerPromocionProducto(product._id, promociones);
+  const precioConDescuento = promocion
+    ? calcularPrecioConDescuento(product.precio, promocion.descuento)
+    : null;
+
   return (
     <>
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -199,7 +229,24 @@ const ProductDetail = () => {
                     objectFit: "cover",
                   }}
                 />
-                
+
+                {/* Badge de promoción */}
+                {promocion && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 16,
+                      left: 16,
+                      zIndex: 1,
+                    }}
+                  >
+                    <PromocionBadge
+                      descuento={promocion.descuento}
+                      size="medium"
+                    />
+                  </Box>
+                )}
+
                 {/* BOTÓN DE FAVORITOS sobre la imagen */}
                 <IconButton
                   onClick={handleToggleFavorito}
@@ -208,7 +255,9 @@ const ProductDetail = () => {
                     position: "absolute",
                     top: 16,
                     right: 16,
-                    color: esFavorito(product._id) ? "error.main" : "text.secondary",
+                    color: esFavorito(product._id)
+                      ? "error.main"
+                      : "text.secondary",
                     bgcolor: "background.paper",
                     border: "1px solid",
                     borderColor: "divider",
@@ -217,8 +266,12 @@ const ProductDetail = () => {
                     height: 48,
                     transition: "all 0.3s ease",
                     "&:hover": {
-                      bgcolor: esFavorito(product._id) ? "error.light" : "primary.light",
-                      color: esFavorito(product._id) ? "error.dark" : "primary.main",
+                      bgcolor: esFavorito(product._id)
+                        ? "error.light"
+                        : "primary.light",
+                      color: esFavorito(product._id)
+                        ? "error.dark"
+                        : "primary.main",
                       transform: "scale(1.1)",
                     },
                     "&:disabled": {
@@ -231,22 +284,24 @@ const ProductDetail = () => {
               </Box>
 
               {hasMultipleImages && (
-                <Box sx={{ 
-                  p: 2, 
-                  display: "flex", 
-                  gap: 1, 
-                  overflowX: "auto",
-                  "&::-webkit-scrollbar": {
-                    height: 6,
-                  },
-                  "&::-webkit-scrollbar-track": {
-                    background: "transparent",
-                  },
-                  "&::-webkit-scrollbar-thumb": {
-                    background: theme.palette.divider,
-                    borderRadius: 3,
-                  },
-                }}>
+                <Box
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    gap: 1,
+                    overflowX: "auto",
+                    "&::-webkit-scrollbar": {
+                      height: 6,
+                    },
+                    "&::-webkit-scrollbar-track": {
+                      background: "transparent",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                      background: theme.palette.divider,
+                      borderRadius: 3,
+                    },
+                  }}
+                >
                   {product.imagenes.map((img, index) => (
                     <Box
                       key={index}
@@ -303,8 +358,8 @@ const ProductDetail = () => {
                     component="h1"
                     fontWeight="bold"
                     color="text.primary"
-                    sx={{ 
-                      lineHeight: 1.2, 
+                    sx={{
+                      lineHeight: 1.2,
                       flex: 1,
                     }}
                   >
@@ -318,14 +373,46 @@ const ProductDetail = () => {
                   />
                 </Box>
 
-                <Typography
-                  variant="h3"
-                  fontWeight="bold"
-                  color="primary.main"
-                  gutterBottom
-                >
-                  ${product.precio?.toLocaleString()}
-                </Typography>
+                {promocion ? (
+                  <Box>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        textDecoration: "line-through",
+                        color: "text.secondary",
+                        fontWeight: 500,
+                        mb: 0.5,
+                      }}
+                    >
+                      ${product.precio?.toLocaleString()}
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      fontWeight="bold"
+                      color="error.main"
+                      gutterBottom
+                    >
+                      ${precioConDescuento?.toLocaleString()}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="success.main"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      Ahorrás $
+                      {(product.precio - precioConDescuento).toLocaleString()}
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="h3"
+                    fontWeight="bold"
+                    color="primary.main"
+                    gutterBottom
+                  >
+                    ${product.precio?.toLocaleString()}
+                  </Typography>
+                )}
               </Box>
 
               <Box>

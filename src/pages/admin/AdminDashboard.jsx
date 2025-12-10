@@ -16,7 +16,11 @@ import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { AdminSidebar } from "../../components/admin/AdminSidebar";
 import { GenericTable } from "../../components/common/GenericTable";
 
+import { usePageTitle } from "../../hooks/usePageTitle";
+
 export const AdminDashboard = () => {
+  usePageTitle("Admin - Dashboard");
+
   const theme = useTheme();
   const modoOscuro = theme.palette.mode === "dark";
   const [selectedSection, setSelectedSection] = useState("Productos");

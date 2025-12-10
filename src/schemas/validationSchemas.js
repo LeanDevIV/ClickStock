@@ -43,6 +43,9 @@ export const promocionSchema = z
       .max(100, "El descuento máximo es 100%"),
     fechaInicio: z.string().min(1, "La fecha de inicio es requerida"),
     fechaFin: z.string().min(1, "La fecha de fin es requerida"),
+    productos: z
+      .array(z.any())
+      .min(1, "Debes seleccionar al menos un producto"),
     imagen: fileSchema,
   })
   .refine(
@@ -52,6 +55,32 @@ export const promocionSchema = z
     },
     {
       message: "La fecha de fin debe ser posterior a la fecha de inicio",
+      path: ["fechaFin"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.fechaInicio) return true;
+      const fechaInicio = new Date(data.fechaInicio);
+      const añoActual = new Date().getFullYear();
+      const añoInicio = fechaInicio.getFullYear();
+      return añoInicio >= añoActual && añoInicio <= añoActual + 1;
+    },
+    {
+      message: "La fecha de inicio debe ser del año actual o el próximo año",
+      path: ["fechaInicio"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (!data.fechaFin) return true;
+      const fechaFin = new Date(data.fechaFin);
+      const añoActual = new Date().getFullYear();
+      const añoFin = fechaFin.getFullYear();
+      return añoFin >= añoActual && añoFin <= añoActual + 1;
+    },
+    {
+      message: "La fecha de fin debe ser del año actual o el próximo año",
       path: ["fechaFin"],
     }
   );
@@ -125,4 +154,52 @@ export const pedidoSchema = z.object({
     .enum(["pendiente", "procesando", "enviado", "entregado", "cancelado"])
     .optional()
     .default("pendiente"),
+});
+
+export const usuarioSchema = z.object({
+  nombre: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(30, "El nombre no puede exceder los 30 caracteres")
+    .trim()
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, "El nombre solo puede contener letras")
+    .refine((val) => !noRepetitionsRegex.test(val), {
+      message: "No repitas caracteres más de 3 veces en el nombre",
+    }),
+  apellido: z
+    .string()
+    .min(2, "El apellido debe tener al menos 2 caracteres")
+    .max(30, "El apellido no puede exceder los 30 caracteres")
+    .trim()
+    .regex(
+      /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+      "El apellido solo puede contener letras"
+    )
+    .refine((val) => !noRepetitionsRegex.test(val), {
+      message: "No repitas caracteres más de 3 veces en el apellido",
+    }),
+  correo: z
+    .string()
+    .email("Correo electrónico inválido")
+    .min(1, "El correo es requerido")
+    .trim()
+    .toLowerCase(),
+  telefono: z
+    .string()
+    .max(20, "El teléfono no puede exceder los 20 caracteres")
+    .regex(
+      /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/,
+      "Ingresa un número de teléfono válido"
+    )
+    .optional()
+    .or(z.literal("")),
+  fotoPerfil: z
+    .string()
+    .url("Debe ser una URL válida")
+    .optional()
+    .or(z.literal("")),
+  contrasenia: z
+    .string()
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .optional(),
 });

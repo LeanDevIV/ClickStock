@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   TableRow,
   TableCell,
@@ -8,15 +8,35 @@ import {
   Tooltip,
   Box,
   useTheme,
+  Select,
+  MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
+  Restore as RestoreIcon,
   LocationOn as LocationIcon,
+  Check as CheckIcon,
+  Close as CloseIcon,
+  CheckCircle as CheckCircleIcon,
+  Cancel as CancelIcon,
 } from "@mui/icons-material";
+import { toast } from "react-hot-toast";
+import clientaxios from "../../utils/clientAxios.js";
 
-const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
+const FilaTablaPedidos = ({
+  pedido,
+  index,
+  onEliminar,
+  onEstadoActualizado,
+  onRestaurar,
+}) => {
   const theme = useTheme();
+  const [editandoEstado, setEditandoEstado] = useState(false);
+  const [estadoTemporal, setEstadoTemporal] = useState(pedido.estado);
+  const [cargando, setCargando] = useState(false);
+  const [cargandoRestaurar, setCargandoRestaurar] = useState(false);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("es-AR", {
@@ -55,6 +75,88 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
     return estados[estado] || estado;
   };
 
+  const iniciarEdicionEstado = () => {
+    setEstadoTemporal(pedido.estado);
+    setEditandoEstado(true);
+  };
+
+  const cancelarEdicion = () => {
+    setEditandoEstado(false);
+    setEstadoTemporal(pedido.estado);
+  };
+
+  const guardarEstado = async () => {
+    if (estadoTemporal === pedido.estado) {
+      setEditandoEstado(false);
+      return;
+    }
+
+    setCargando(true);
+    const toastId = toast.loading("Actualizando estado del pedido...");
+
+    try {
+      const updateData = {
+        estado: estadoTemporal,
+      };
+
+      const { data: responseData } = await clientaxios.put(
+        `/pedidos/${pedido._id}`,
+        updateData
+      );
+      if (onEstadoActualizado) {
+        onEstadoActualizado(responseData.pedido || responseData);
+      }
+
+      toast.success("Estado del pedido actualizado exitosamente", {
+        id: toastId,
+      });
+      setEditandoEstado(false);
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.error || error.message || "Problema de conexión.";
+      toast.error(`Error al actualizar estado: ${errorMessage}`, {
+        id: toastId,
+      });
+      setEstadoTemporal(pedido.estado);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const manejarRestaurar = async () => {
+    if (!pedido.isDeleted) {
+      toast.error("Este pedido no está eliminado");
+      return;
+    }
+
+    setCargandoRestaurar(true);
+    const toastId = toast.loading("Restaurando pedido...");
+
+    try {
+      const { data } = await clientaxios.patch(
+        `/pedidos/restore/${pedido._id}`
+      );
+
+      if (onRestaurar) {
+        onRestaurar(data.pedido);
+      }
+
+      toast.success("Pedido restaurado exitosamente", { id: toastId });
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.error || error.message || "Problema de conexión.";
+      toast.error(`Error al restaurar pedido: ${errorMessage}`, {
+        id: toastId,
+      });
+    } finally {
+      setCargandoRestaurar(false);
+    }
+  };
+
+  const manejarCambioEstado = (event) => {
+    setEstadoTemporal(event.target.value);
+  };
+
   return (
     <TableRow
       hover
@@ -66,12 +168,11 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
               ? "rgba(255,255,255,0.05)"
               : "rgba(0,0,0,0.04)",
         },
+        backgroundColor: pedido.isDeleted ? "rgba(255, 0, 0, 0.05)" : "inherit",
       }}
     >
-      {/* Número */}
       <TableCell sx={{ fontWeight: "bold", width: 50 }}>{index + 1}</TableCell>
 
-      {/* Cliente */}
       <TableCell>
         <Typography variant="body2" fontWeight="600">
           {pedido.usuario?.nombre || "Cliente"}
@@ -81,7 +182,6 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
         </Typography>
       </TableCell>
 
-      {/* Productos */}
       <TableCell sx={{ maxWidth: 250 }}>
         <Box
           sx={{
@@ -119,7 +219,6 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
         </Box>
       </TableCell>
 
-      {/* Dirección */}
       <TableCell sx={{ minWidth: 200 }}>
         <Box sx={{ display: "flex", gap: 1 }}>
           <LocationIcon fontSize="small" color="action" />
@@ -136,45 +235,154 @@ const FilaTablaPedidos = ({ pedido, index, onEditar, onEliminar }) => {
         </Box>
       </TableCell>
 
-      {/* Total */}
       <TableCell sx={{ fontWeight: "bold", color: theme.palette.primary.main }}>
         {formatCurrency(pedido.total)}
       </TableCell>
 
-      {/* Estado */}
       <TableCell>
-        <Chip
-          label={getEstadoText(pedido.estado)}
-          color={getEstadoColor(pedido.estado)}
-          size="small"
-          sx={{ fontWeight: "bold" }}
-        />
+        {editandoEstado ? (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Select
+              value={estadoTemporal}
+              onChange={manejarCambioEstado}
+              size="small"
+              disabled={cargando}
+              sx={{
+                minWidth: 130,
+                height: 32,
+              }}
+            >
+              <MenuItem value="pendiente">Pendiente</MenuItem>
+              <MenuItem value="procesando">Procesando</MenuItem>
+              <MenuItem value="enviado">Enviado</MenuItem>
+              <MenuItem value="entregado">Entregado</MenuItem>
+              <MenuItem value="cancelado">Cancelado</MenuItem>
+            </Select>
+
+            {cargando ? <CircularProgress size={20} /> : <></>}
+          </Box>
+        ) : (
+          <Chip
+            label={getEstadoText(pedido.estado)}
+            color={getEstadoColor(pedido.estado)}
+            size="small"
+            sx={{
+              fontWeight: "bold",
+              cursor: pedido.isDeleted ? "default" : "pointer",
+              opacity: pedido.isDeleted ? 0.6 : 1,
+            }}
+          />
+        )}
       </TableCell>
 
-      {/* Fecha */}
+      <TableCell align="center">
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {pedido.isDeleted ? (
+            <Tooltip title="Pedido eliminado">
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <CancelIcon fontSize="small" color="error" />
+                <Typography variant="body2" color="error" fontWeight="bold">
+                  Sí
+                </Typography>
+              </Box>
+            </Tooltip>
+          ) : (
+            <Tooltip title="Pedido activo">
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <CheckCircleIcon fontSize="small" color="success" />
+                <Typography variant="body2" color="success" fontWeight="bold">
+                  No
+                </Typography>
+              </Box>
+            </Tooltip>
+          )}
+        </Box>
+      </TableCell>
+
       <TableCell>
         <Typography variant="body2" color="text.secondary">
           {formatDate(pedido.fechaCreacion)}
         </Typography>
       </TableCell>
 
-      {/* Acciones */}
-      <TableCell sx={{ width: 110 }}>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Tooltip title="Editar pedido">
-            <IconButton color="primary" size="small" onClick={onEditar}>
-              <EditIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Eliminar pedido">
-            <IconButton
-              color="error"
-              size="small"
-              onClick={() => onEliminar(pedido._id)}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+      <TableCell sx={{ width: 200 }}>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          {!pedido.isDeleted && !editandoEstado && (
+            <Tooltip title="Editar estado">
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={iniciarEdicionEstado}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {editandoEstado && (
+            <>
+              <Tooltip title="Guardar cambios">
+                <IconButton
+                  size="small"
+                  color="success"
+                  onClick={guardarEstado}
+                  disabled={cargando}
+                >
+                  {cargando ? (
+                    <CircularProgress size={16} />
+                  ) : (
+                    <CheckIcon fontSize="small" />
+                  )}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Cancelar edición">
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={cancelarEdicion}
+                  disabled={cargando}
+                >
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </>
+          )}
+
+          {pedido.isDeleted && (
+            <Tooltip title="Restaurar pedido">
+              <IconButton
+                color="success"
+                size="small"
+                onClick={manejarRestaurar}
+                disabled={cargandoRestaurar}
+              >
+                {cargandoRestaurar ? (
+                  <CircularProgress size={16} />
+                ) : (
+                  <RestoreIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {!pedido.isDeleted && (
+            <Tooltip title="Eliminar pedido">
+              <IconButton
+                color="error"
+                size="small"
+                onClick={() => onEliminar(pedido)}
+                disabled={editandoEstado || cargando}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       </TableCell>
     </TableRow>

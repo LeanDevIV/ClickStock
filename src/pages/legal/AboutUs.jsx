@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { GitHub, LinkedIn } from "@mui/icons-material";
 import { styled, keyframes } from "@mui/material/styles";
+import { usePageTitle } from "../../hooks/usePageTitle";
 
 const neonBorder = keyframes`
   0% {
@@ -95,7 +96,8 @@ const integrantes = [
   {
     nombre: "Sara Robles",
     rol: "Diseñador fullstack",
-    imagen: "https://avatars.githubusercontent.com/u/209563219?s=400&u=5014b0af280a14903d42f113e74f572233278f5d&v=4",
+    imagen:
+      "https://avatars.githubusercontent.com/u/209563219?s=400&u=5014b0af280a14903d42f113e74f572233278f5d&v=4",
     github: "https://github.com/sara-18Git",
     linkedin: "#",
   },
@@ -117,6 +119,7 @@ const integrantes = [
 ];
 
 export default function AboutUs() {
+  usePageTitle("Sobre Nosotros");
   const theme = useTheme();
   const modoOscuro = theme.palette.mode === "dark";
 

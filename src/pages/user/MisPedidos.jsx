@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import {
   Box,
   Typography,
@@ -15,14 +16,21 @@ import {
   LocationOn,
   ShoppingBag,
   Login as LoginIcon,
+  Cancel,
+  Receipt,
 } from "@mui/icons-material";
 import clientAxios from "../../utils/clientAxios.js";
 import { useStore } from "../../hooks/useStore.js";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
+
+import { usePageTitle } from "../../hooks/usePageTitle";
 
 const MisPedidos = () => {
+  usePageTitle("Mis Pedidos");
+
   const { user } = useStore();
   const { handleOpenAuth } = useOutletContext() || {};
+  const navigate = useNavigate();
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
@@ -49,6 +57,42 @@ const MisPedidos = () => {
       cancelado: "error",
     };
     return colors[estado] || "default";
+  };
+
+  const cancelarPedido = async (pedidoId) => {
+    try {
+      const result = await Swal.fire({
+        title: "¿Cancelar pedido?",
+        text: "Esta acción no se puede deshacer",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, cancelar",
+        cancelButtonText: "No, mantener",
+      });
+
+      if (result.isConfirmed) {
+        await clientAxios.delete(`/pedidos/${pedidoId}`);
+
+        setPedidos(pedidos.filter((p) => p._id !== pedidoId));
+
+        Swal.fire({
+          title: "¡Cancelado!",
+          text: "Tu pedido ha sido cancelado",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
+    } catch (error) {
+      console.error("Error al cancelar pedido:", error);
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo cancelar el pedido. Por favor, intentá de nuevo.",
+        icon: "error",
+      });
+    }
   };
 
   useEffect(() => {
@@ -107,9 +151,48 @@ const MisPedidos = () => {
 
   if (error) {
     return (
-      <Alert severity="error" sx={{ mt: 5, width: "90%", mx: "auto" }}>
-        {error}
-      </Alert>
+      <Box sx={{ maxWidth: 900, mx: "auto", mt: 5, px: 2 }}>
+        <Card
+          sx={{
+            textAlign: "center",
+            py: 8,
+            backgroundColor: "background.default",
+          }}
+        >
+          <CardContent>
+            <Receipt
+              sx={{
+                fontSize: 80,
+                color: "text.secondary",
+                mb: 2,
+                opacity: 0.5,
+              }}
+            />
+            <Typography variant="h5" color="text.secondary" gutterBottom>
+              Error al cargar tus pedidos
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Lo sentimos, hubo un problema al obtener tus pedidos. Por favor,
+              intentá de nuevo más tarde.
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => window.location.reload()}
+              sx={{ mr: 2 }}
+            >
+              Reintentar
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={() => navigate("/")}
+            >
+              Volver al Inicio
+            </Button>
+          </CardContent>
+        </Card>
+      </Box>
     );
   }
 
@@ -120,7 +203,37 @@ const MisPedidos = () => {
       </Typography>
 
       {pedidos.length === 0 && (
-        <Alert severity="info">No tenés pedidos todavía.</Alert>
+        <Card
+          sx={{
+            textAlign: "center",
+            py: 8,
+            backgroundColor: "background.default",
+          }}
+        >
+          <CardContent>
+            <ShoppingBag
+              sx={{
+                fontSize: 80,
+                color: "text.secondary",
+                mb: 2,
+                opacity: 0.5,
+              }}
+            />
+            <Typography variant="h5" color="text.secondary" gutterBottom>
+              No tenés pedidos todavía
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Comenzá a explorar nuestros productos y hacé tu primer pedido
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate("/")}
+            >
+              Explorar Productos
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {pedidos.map((pedido) => (
@@ -187,6 +300,20 @@ const MisPedidos = () => {
             >
               Total: {formatCurrency(pedido.total)}
             </Typography>
+
+            {pedido.estado !== "entregado" && (
+              <Box sx={{ mt: 2, textAlign: "right" }}>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Cancel />}
+                  onClick={() => cancelarPedido(pedido._id)}
+                  size="small"
+                >
+                  Cancelar Pedido
+                </Button>
+              </Box>
+            )}
           </CardContent>
         </Card>
       ))}

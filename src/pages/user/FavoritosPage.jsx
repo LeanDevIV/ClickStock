@@ -27,7 +27,11 @@ import toast from "react-hot-toast";
 
 const placeholder = () => `https://picsum.photos/id/66/300/200`;
 
+import { usePageTitle } from "../../hooks/usePageTitle";
+
 const FavoritosPage = () => {
+  usePageTitle("Mis Favoritos");
+
   const theme = useTheme();
   const navigate = useNavigate();
   const { handleOpenAuth } = useOutletContext();

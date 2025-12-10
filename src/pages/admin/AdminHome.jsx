@@ -70,7 +70,11 @@ const CardSurface = styled(Box)(({ theme }) => ({
   boxShadow: theme.shadows[4],
 }));
 
+import { usePageTitle } from "../../hooks/usePageTitle";
+
 const AdminHome = () => {
+  usePageTitle("Admin - Inicio");
+
   const navigate = useNavigate();
 
   const adminOptions = [
