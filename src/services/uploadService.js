@@ -62,3 +62,5 @@ export const subirMultiplesArchivos = async (
     throw error;
   }
 };
+
+export const uploadImage = subirArchivo;

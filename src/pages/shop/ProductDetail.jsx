@@ -29,6 +29,12 @@ import ReviewsList from "../../components/reviews/ReviewsList.jsx";
 import useCart from "../../hooks/useCart.js";
 import { useFavoritos } from "../../hooks/useFavoritos.js";
 import { usePageTitle } from "../../hooks/usePageTitle";
+import { usePromocionStore } from "../../hooks/usePromocionStore";
+import PromocionBadge from "../../components/promotions/PromocionBadge";
+import {
+  obtenerPromocionProducto,
+  calcularPrecioConDescuento,
+} from "../../utils/promocionUtils";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -43,10 +49,12 @@ const ProductDetail = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
+  const [promociones, setPromociones] = useState([]);
 
   usePageTitle(product?.nombre || "Detalle del Producto");
 
   const { añadirAlCarrito, cargando } = useCart();
+  const { obtenerPromocionesActivas } = usePromocionStore();
 
   const {
     toggleFavorito,
@@ -87,11 +95,15 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const { data } = await clientAxios.get(`/productos/${id}`);
-        setProduct(data.producto || data);
+        const [productRes, promocionesRes] = await Promise.all([
+          clientAxios.get(`/productos/${id}`),
+          obtenerPromocionesActivas(),
+        ]);
+        setProduct(productRes.data.producto || productRes.data);
+        setPromociones(promocionesRes || []);
       } catch {
         setError("No se pudo cargar el producto.");
       } finally {
@@ -99,8 +111,8 @@ const ProductDetail = () => {
       }
     };
 
-    fetchProduct();
-  }, [id]);
+    fetchData();
+  }, [id, obtenerPromocionesActivas]);
 
   if (loading) {
     return (
@@ -173,6 +185,11 @@ const ProductDetail = () => {
     "https://via.placeholder.com/600x400?text=Sin+imagen";
   const hasMultipleImages = product.imagenes && product.imagenes.length > 1;
 
+  const promocion = obtenerPromocionProducto(product._id, promociones);
+  const precioConDescuento = promocion
+    ? calcularPrecioConDescuento(product.precio, promocion.descuento)
+    : null;
+
   return (
     <>
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -212,6 +229,23 @@ const ProductDetail = () => {
                     objectFit: "cover",
                   }}
                 />
+
+                {/* Badge de promoción */}
+                {promocion && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 16,
+                      left: 16,
+                      zIndex: 1,
+                    }}
+                  >
+                    <PromocionBadge
+                      descuento={promocion.descuento}
+                      size="medium"
+                    />
+                  </Box>
+                )}
 
                 {/* BOTÓN DE FAVORITOS sobre la imagen */}
                 <IconButton
@@ -339,14 +373,46 @@ const ProductDetail = () => {
                   />
                 </Box>
 
-                <Typography
-                  variant="h3"
-                  fontWeight="bold"
-                  color="primary.main"
-                  gutterBottom
-                >
-                  ${product.precio?.toLocaleString()}
-                </Typography>
+                {promocion ? (
+                  <Box>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        textDecoration: "line-through",
+                        color: "text.secondary",
+                        fontWeight: 500,
+                        mb: 0.5,
+                      }}
+                    >
+                      ${product.precio?.toLocaleString()}
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      fontWeight="bold"
+                      color="error.main"
+                      gutterBottom
+                    >
+                      ${precioConDescuento?.toLocaleString()}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="success.main"
+                      sx={{ fontWeight: 600 }}
+                    >
+                      Ahorrás $
+                      {(product.precio - precioConDescuento).toLocaleString()}
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="h3"
+                    fontWeight="bold"
+                    color="primary.main"
+                    gutterBottom
+                  >
+                    ${product.precio?.toLocaleString()}
+                  </Typography>
+                )}
               </Box>
 
               <Box>

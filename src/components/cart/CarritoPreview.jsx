@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useCart from "../../hooks/useCart";
 import {
   Drawer,
   Box,
@@ -12,29 +13,15 @@ import {
   Badge,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { obtenerCarrito } from "../../services/carritoService";
 import { Link } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 
 const CarritoPreview = ({ show, handleClose }) => {
-  const [carrito, setCarrito] = useState({ productos: [], total: 0 });
+  const { articulos, precioTotal } = useCart();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
 
-  useEffect(() => {
-    if (show) cargarCarrito();
-  }, [show]);
-
-  const cargarCarrito = async () => {
-    try {
-      const data = await obtenerCarrito();
-      setCarrito(data);
-    } catch (error) {
-      console.error("Error al cargar carrito:", error);
-    }
-  };
-
-  const ultimosCinco = carrito.productos.slice(-5).reverse();
+  const ultimosCinco = articulos.slice(-5).reverse();
 
   return (
     <Drawer
@@ -143,7 +130,7 @@ const CarritoPreview = ({ show, handleClose }) => {
             Total:
           </Typography>
           <Typography variant="h6" fontWeight="bold" color="primary.main">
-            ${carrito.total}
+            ${precioTotal?.toLocaleString()}
           </Typography>
         </Box>
 

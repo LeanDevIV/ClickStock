@@ -14,15 +14,14 @@ export const useProductosFiltrados = () => {
         setLoading(true);
         setError(null);
 
-        const [respuestaProductos, respuestaCategorias] = await Promise.all([
-          clientAxios.get("/productos", {
-            params: {
-              includeDeleted: false,
-              includeUnavailable: false,
-            },
-          }),
-          clientAxios.get("/categorias"),
-        ]);
+        const respuestaProductos = await clientAxios.get("/productos", {
+          params: {
+            includeDeleted: false,
+            includeUnavailable: false,
+          },
+        });
+
+        const respuestaCategorias = await clientAxios.get("/categorias");
 
         let datosProductos = respuestaProductos.data || [];
         datosProductos = datosProductos.filter(
@@ -32,7 +31,6 @@ export const useProductosFiltrados = () => {
 
         let datosCategorias = respuestaCategorias.data;
 
-        // Verificar si viene envuelto en { success: true, data: [...] }
         if (
           datosCategorias &&
           datosCategorias.data &&
@@ -41,7 +39,6 @@ export const useProductosFiltrados = () => {
           datosCategorias = datosCategorias.data;
         }
 
-        // Asegurar que sea un array
         if (!Array.isArray(datosCategorias)) {
           datosCategorias = [];
         }
