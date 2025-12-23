@@ -9,7 +9,6 @@ import {
   LocalOffer as PromocionesIcon,
 } from "@mui/icons-material";
 import { MENU_ITEMS, THEME } from "../../config/adminConfig";
-import Bsod from "../common/Bsod";
 
 const iconMap = {
   Productos: ProductosIcon,
@@ -87,7 +86,6 @@ export const AdminSidebar = ({
           </Button>
         );
       })}
-      <Bsod variant="outlined" size="medium" style={{ margin: "10px" }} />
     </Box>
   );
 };
