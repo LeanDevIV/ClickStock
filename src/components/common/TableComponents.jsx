@@ -135,11 +135,18 @@ export const TableRowActions = ({
             </Tooltip>
 
             {!isDeleted && (
-              <Tooltip title="Eliminar (soft delete)">
+              <Tooltip
+                title={
+                  isCurrentUser
+                    ? "No puedes eliminar tu propio usuario"
+                    : "Eliminar (soft delete)"
+                }
+              >
                 <IconButton
                   onClick={() => handleDeleteClick("soft")}
                   color="warning"
                   size="small"
+                  disabled={isCurrentUser}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -152,6 +159,7 @@ export const TableRowActions = ({
                   onClick={() => handleDeleteClick("hard")}
                   color="error"
                   size="small"
+                  disabled={isCurrentUser}
                 >
                   <DeleteForeverIcon />
                 </IconButton>

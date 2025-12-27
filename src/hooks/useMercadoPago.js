@@ -21,10 +21,11 @@ export const useMercadoPago = () => {
         },
       });
 
-      if (response.data.id) {
-        const mpUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${response.data.id}`;
-        window.open(mpUrl, "_blank");
-        return { success: true, url: mpUrl };
+      if (response.data.init_point) {
+        window.open(response.data.init_point, "_blank");
+        return { success: true, url: response.data.init_point };
+      } else {
+        throw new Error("No se recibió init_point de Mercado Pago");
       }
     } catch (error) {
       let message = "Error inesperado. Intenta nuevamente.";
