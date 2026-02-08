@@ -72,8 +72,13 @@ function ProductosHome() {
   useEffect(() => setPaginaActual(1), [categoriaSeleccionada]);
 
   const inicio = (paginaActual - 1) * porPagina;
-  // proteger accesos a productosFiltrados
-  const lista = (productosFiltrados ?? []).slice(inicio, inicio + porPagina);
+  // normalizar productos para evitar producto.categoria === null (evita errores al leer ._id)
+  const productosNormalizados = (productosFiltrados ?? []).map((p) => ({
+    ...p,
+    categoria: p?.categoria ?? { _id: "sin-categoria", nombre: "Sin categoría" },
+  }));
+
+  const lista = productosNormalizados.slice(inicio, inicio + porPagina);
   const totalPag = Math.max(
     1,
     Math.ceil(((productosFiltrados?.length) ?? 0) / porPagina),
