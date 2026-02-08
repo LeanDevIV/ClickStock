@@ -72,10 +72,11 @@ function ProductosHome() {
   useEffect(() => setPaginaActual(1), [categoriaSeleccionada]);
 
   const inicio = (paginaActual - 1) * porPagina;
-  const lista = productosFiltrados.slice(inicio, inicio + porPagina);
+  // proteger accesos a productosFiltrados
+  const lista = (productosFiltrados ?? []).slice(inicio, inicio + porPagina);
   const totalPag = Math.max(
     1,
-    Math.ceil(productosFiltrados.length / porPagina)
+    Math.ceil(((productosFiltrados?.length) ?? 0) / porPagina),
   );
 
   const cambiarPagina = (nueva) => {
@@ -124,11 +125,11 @@ function ProductosHome() {
             }}
           >
             <Tab label="Todos" value="todos" />
-            {categorias.map((categoria) => (
+            {categorias?.filter(Boolean)?.map((categoria, _idx) => (
               <Tab
-                key={categoria._id}
-                label={categoria.nombre}
-                value={categoria._id}
+                key={categoria?._id ?? categoria?.nombre ?? `cat-${_idx}`}
+                label={categoria?.nombre ?? "Sin categoría"}
+                value={categoria?._id ?? categoria?.nombre ?? ""}
               />
             ))}
           </Tabs>
@@ -187,7 +188,7 @@ function ProductosHome() {
 
           {totalPag > 1 && (
             <Typography textAlign="center" mt={2} sx={{ opacity: 0.7 }}>
-              Mostrando {lista.length} de {productosFiltrados.length} productos
+              Mostrando {(lista?.length ?? 0)} de {(productosFiltrados?.length ?? 0)} productos
             </Typography>
           )}
         </>
