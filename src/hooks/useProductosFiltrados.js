@@ -98,10 +98,10 @@ export const useProductosFiltrados = () => {
     return null;
   };
 
-  const categoriasVisibles = categorias.filter((categoria) =>
+  const categoriasVisibles = categorias?.filter((categoria) =>
     productos.some((producto) => {
-      const idCategoria = producto.categoria._id || producto.categoria;
-      return idCategoria === categoria._id;
+      const idCategoria = producto.categoria?._id || producto?.categoria;
+      return idCategoria === categoria?._id;
     })
   );
 
