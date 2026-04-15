@@ -71,10 +71,14 @@ const FloatingChat = () => {
       setMessages((prev) => [...prev, { sender: "bot", text: botMessage }]);
     } catch (error) {
       console.error("Error al enviar mensaje:", error);
+      const status = error.response?.status;
       const errorMessage =
-        error.response?.data?.error ||
-        error.message ||
-        "Lo siento, hubo un error al conectarse con el asistente. Por favor, intenta de nuevo.";
+        status === 429
+          ? "Has alcanzado el límite de consultas. Intenta de nuevo en unos minutos."
+          : error.response?.data?.error?.message ||
+            error.response?.data?.message ||
+            error.message ||
+            "Lo siento, hubo un error al conectarse con el asistente. Por favor, intenta de nuevo.";
       setMessages((prev) => [...prev, { sender: "bot", text: errorMessage }]);
     } finally {
       setLoading(false);
